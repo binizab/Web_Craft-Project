@@ -1,0 +1,1542 @@
+@import url('https://fonts.googleapis.com/css2?family=Satisfy&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Satisfy&display=swap');
+
+
+:root {
+        --bg-color: #0f172a;
+        --card-bg: #1e293b;
+        --user-msg: #3b82f6;
+        --bot-msg: #334155;
+        --text-main: #f1f5f9;
+        --text-muted: #94a3b8;
+        --accent: #10b981;
+    }
+
+* {
+    font-family:"Poppins", sans-serif;
+    margin: 0;
+    padding: 0;
+    user-select: none;
+}
+
+    @media (min-width: 600px) {
+
+body {
+    overflow-x: hidden;
+}
+
+nav {
+    background: linear-gradient(45deg, rgb(0, 0, 15), rgb(129, 129, 248), rgb(10, 10, 71));
+    color: white;
+    display: flex;
+    flex-direction: row;
+    height: 70px;
+    position: fixed;
+    width: 100%;
+    z-index: 3;
+}
+
+nav ul {
+    display: flex;
+    flex-direction: row;
+    padding: 10px 20px;
+    align-items: center;
+    margin-left: 10px;
+}
+
+nav ul li {
+    position: relative;
+    list-style: none;
+    margin-left: 10px;
+    transition: .3s;
+    cursor: pointer;
+    margin-top: 15px;
+}
+
+li:hover {
+    color: rgb(53, 53, 231);
+}
+
+nav ul li::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 2px;
+    width: 0%;
+    background-color: blue;
+}
+
+.active {
+    color: blue;
+}
+
+.active::after {
+    width: 100%;
+}
+
+.logbtn {
+    width: 100px;
+    height: 40px;
+    background-color: black;
+    color: white;
+    border: 2px solid blue;
+    outline: none;
+    box-shadow: 0 4px 12px blue;
+    border-radius: 12px;
+    align-self: center;
+    margin-left: 10px;
+    cursor: pointer;
+    transition: .4s;
+}
+
+.chatbtn {
+    height: 50px;
+    width: 50px;
+    border-radius: 50px;
+    background-color: black;
+    color: white;
+    border: 2px solid red;
+    outline: none;
+    box-shadow: 0 4px 12px red;
+    align-self: center;
+    margin-left: 10px;
+    cursor: pointer;
+    transition: .4s;
+}
+
+.logbtn:hover {
+    background-color: blue;
+}
+
+.chatbtn:hover {
+    background-color: red;
+}
+
+.chatbot {
+    width: 400px;
+    height: 570px;
+    position: absolute;
+    right: 0;
+    background-color: rgb(1, 1, 26);
+    margin-top: 70px;
+    border: 2px solid red;
+    box-shadow: 0 4px 12px red;
+    border-radius: 12px;
+    padding: 10px 20px;
+    visibility: hidden;
+    transition-delay: .2s;
+}
+
+.invisibility {
+    visibility: visible;
+}
+
+.add-wrapper {
+    display: flex;
+    flex-direction: column;
+    width: 100px;
+    border-radius: 10px;
+    position: absolute;
+    margin-top: -120px;
+    margin-left: 280px;
+    background-color: rgb(52, 51, 51);
+    visibility: hidden;
+}
+
+.add {
+    width: 30px;
+    height: 30px;
+    border-radius: 15px;
+    color: white;
+    background-color: rgb(40, 39, 39);
+    outline: none;
+    border: none;
+    position: absolute;
+    margin-top: -47px;
+    margin-left: 320px;
+    cursor: pointer;
+}
+
+.chatbot .fa-telegram {
+    transform: scale(2);
+    color: skyblue;
+    position: absolute;
+    margin-top: -40px;
+    margin-left: 365px;
+}
+
+.chatbot textarea {
+    width: 90%;
+    resize: none;
+    color: white;
+    padding: 5px 20px;
+    height: 40px;
+    border-radius: 20px;
+    outline: none;
+    background-color: rgb(1, 1, 26);
+    border: 2px solid blue;
+    box-shadow: 0 4px 12px blue;
+    margin-top: 450px;
+}
+
+.ai_area {
+    display: flex;
+    flex-direction: row;
+}
+
+.user_area {
+    display: flex;
+    flex-direction: row;
+}
+
+.aIprofile {
+    background-color: red;
+    width: 30px;
+    height: 30px;
+    padding-left: 10px;
+    border-radius: 15px;
+    align-content: center;
+    transform: scale(1.2);
+}
+
+.aIresponse {
+    background-color: red;
+    width: 100px;
+    height: 40px;
+    margin-left: 10px;
+    border-radius: 12px;
+    padding: 10px 20px;
+}
+
+.user_area {
+    margin-left: 200px;
+    margin-bottom: 20px;
+}
+
+.userprofile {
+    background-color: skyblue;
+    width: 30px;
+    height: 30px;
+    padding-left: 10px;
+    border-radius: 15px;
+    align-content: center;
+    transform: scale(1.2);
+    margin-left: 10px;
+}
+
+.userComment {
+    background-color: skyblue;
+    width: 100px;
+    height: 40px;
+    border-radius: 12px;
+    padding: 10px 20px;
+}
+
+.add-wrapper button {
+    color: white;
+    outline: none;
+    border-radius: 10px;
+    border: none;
+    background-color: rgb(52, 51, 51);
+    padding: 0px 10px;
+    cursor: pointer;
+}
+
+nav h1 {
+      font-family: "Satisfy", cursive;
+      margin-left: 5px;
+      align-self: center;
+}
+
+.movement {
+    transform: translateX(-700px);
+}
+
+.sign-up-wrapper {
+    width: 400px;
+    height: 500px;
+    border-radius: 40px;
+    position: absolute;
+    margin-left: 1500px;
+    margin-top: -380px;
+    z-index: 2;
+    background-color: rgb(0,0,0,0.5);
+    padding: 20px 20px;
+    text-align: center;
+    backdrop-filter: blur(5px);
+    transition: .5s;
+}
+
+.sign-up-wrapper .email input {
+    width: 80%;
+    height: 40px;
+    background-color: rgb(1, 1, 26);
+    border-radius: 20px;
+    color: white;
+    border: 2px solid blue;
+    box-shadow: 0 4px 12px blue;
+    outline: none;
+    padding: 0px 10px;
+}
+
+.email label {
+    position: absolute;
+    margin-left: -270px;
+    transition: .5s;
+    margin-top: 10px;
+}
+
+.email i {
+    position: absolute;
+    margin-left: -30px;
+    margin-top: 12px;
+    transition: .5s;
+}
+
+input:focus ~ label {
+    transform: scale(0.8);
+    color: blue;
+    margin-top: -10px;
+    background-color: rgb(1, 1, 26);
+}
+
+input:focus ~  i {
+    color: blue;
+}
+
+.sign-up-wrapper .fName input {
+    width: 80%;
+    height: 40px;
+    background-color: rgb(1, 1, 26);
+    border-radius: 20px;
+    color: white;
+    border: 2px solid blue;
+    box-shadow: 0 4px 12px blue;
+    outline: none;
+    padding: 0px 10px;
+}
+
+.fName label {
+    position: absolute;
+    margin-left: -270px;
+    transition: .5s;
+    margin-top: 8px;
+}
+
+.fName i {
+    position: absolute;
+    margin-left: 260px;
+    margin-top: 12px;
+    transition: .5s;
+}
+
+input:focus ~ label {
+    transform: scale(0.8);
+    color: blue;
+    margin-top: -10px;
+    background-color: rgb(1, 1, 26);
+}
+
+input:focus ~  i {
+    color: blue;
+}
+
+
+.sign-up-wrapper .lName input {
+    width: 80%;
+    height: 40px;
+    background-color: rgb(1, 1, 26);
+    border-radius: 20px;
+    color: white;
+    border: 2px solid blue;
+    box-shadow: 0 4px 12px blue;
+    outline: none;
+    padding: 0px 10px;
+}
+
+.lName label {
+    position: absolute;
+    margin-left: -270px;
+    transition: .5s;
+    margin-top: 8px;
+}
+
+.lName i {
+    position: absolute;
+    margin-left: 260px;
+    margin-top: 12px;
+    transition: .5s;
+}
+
+input:focus ~ label {
+    transform: scale(0.8);
+    color: blue;
+    margin-top: -10px;
+    background-color: rgb(1, 1, 26);
+}
+
+input:focus ~  i {
+    color: blue;
+}
+
+.sign-up-wrapper .password input {
+    width: 80%;
+    height: 40px;
+    background-color: rgb(1, 1, 26);
+    border-radius: 20px;
+    color: white;
+    border: 2px solid blue;
+    box-shadow: 0 4px 12px blue;
+    outline: none;
+    padding: 0px 10px;
+}
+
+.password label {
+    position: absolute;
+    margin-left: 900px;
+    transition: .5s;
+    margin-top: 10px;
+}
+
+.password i {
+    position: absolute;
+    margin-left: -30px;
+    margin-top: 12px;
+    transition: .5s;
+}
+
+input:focus ~ label {
+    transform: scale(0.8);
+    color: blue;
+    margin-top: -10px;
+    background-color: rgb(1, 1, 26);
+}
+
+input:focus ~  i {
+    color: blue;
+}
+
+.sign-up-wrapper button {
+    width: 200px;
+    height: 50px;
+    border-radius: 40px;
+    outline: none;
+    background: linear-gradient(45deg, blue, rgb(129, 129, 245), rgb(2, 2, 44));
+    border: 2px solid blue;
+    box-shadow: 0 4px 12px blue;
+    cursor: pointer;
+    margin-top: 30px;
+    margin-bottom: 20px;
+}
+
+.sign-up-wrapper a {
+    color: blue;
+    cursor: pointer;
+}
+
+.sign-up-wrapper button:hover {
+    background: linear-gradient(45deg, rgb(2, 2, 44), rgb(129, 129, 245), blue);
+}
+
+.email {
+    margin-top: 30px;
+}
+
+.lName {
+    margin-top: 30px;
+}
+
+.fName {
+    margin-top: 30px;
+}
+
+.password {
+    margin-top: 30px;
+}
+
+input:not(:placeholder-shown) ~ i {
+    color: blue;
+}
+
+input:not(:placeholder-shown) ~ label {
+    color: blue;
+    margin-top: -10px;
+    background-color: black;
+    transform: scale(0.8);
+}
+
+.log-in-wrapper {
+    width: 400px;
+    height: 500px;
+    border-radius: 40px;
+    position: absolute;
+    margin-left: 1500px;
+    margin-top: -380px;
+    z-index: 2;
+    background-color: rgb(0,0,0,0.5);
+    padding: 20px 20px;
+    text-align: center;
+    backdrop-filter: blur(5px);
+    transition: .5s;
+}
+
+.log-in-wrapper .username input {
+    width: 80%;
+    height: 40px;
+    background-color: rgb(1, 1, 26);
+    border-radius: 20px;
+    color: white;
+    border: 2px solid red;
+    box-shadow: 0 4px 12px red;
+    outline: none;
+    padding: 0px 10px;
+}
+
+.username label {
+    position: absolute;
+    margin-left: -270px;
+    transition: .5s;
+    margin-top: 8px;
+}
+
+.username i {
+    position: absolute;
+    margin-left: -30px;
+    margin-top: 12px;
+    transition: .5s;
+}
+
+.log-in-wrapper .email input {
+    width: 80%;
+    height: 40px;
+    background-color: rgb(1, 1, 26);
+    border-radius: 20px;
+    color: white;
+    border: 2px solid red;
+    box-shadow: 0 4px 12px red;
+    outline: none;
+    padding: 0px 10px;
+}
+
+.email label {
+    position: absolute;
+    margin-left: -270px;
+    transition: .5s;
+    margin-top: 8px;
+}
+
+.email i {
+    position: absolute;
+    margin-left: -30px;
+    margin-top: 12px;
+    transition: .5s;
+}
+
+.log-in-wrapper input:focus ~ label {
+    transform: scale(0.8);
+    color: red;
+    margin-top: -10px;
+    background-color: rgb(1, 1, 26);
+}
+
+.log-in-wrapper input:focus ~  i {
+    color: red;
+}
+
+.log-in-wrapper .password input {
+    width: 80%;
+    height: 40px;
+    background-color: rgb(1, 1, 26);
+    border-radius: 20px;
+    color: white;
+    border: 2px solid red;
+    box-shadow: 0 4px 12px red;
+    outline: none;
+    padding: 0px 10px;
+}
+
+.password label {
+    position: absolute;
+    margin-left: -270px;
+    transition: .5s;
+    margin-top: 8px;
+}
+
+.password i {
+    position: absolute;
+    margin-left: -30px;
+    margin-top: 12px;
+    transition: .5s;
+}
+
+.log-in-wrapper button {
+    width: 200px;
+    height: 50px;
+    border-radius: 40px;
+    outline: none;
+    background: linear-gradient(45deg, red, rgb(245, 129, 129), rgb(44, 2, 2));
+    border: 2px solid red;
+    box-shadow: 0 4px 12px red;
+    cursor: pointer;
+    margin-top: 80px;
+    margin-bottom: 20px;
+}
+
+.log-in-wrapper a {
+    color: red;
+    cursor: pointer;
+}
+
+.log-in-wrapper button:hover {
+    background: linear-gradient(45deg, rgb(44, 2, 2), rgb(245, 129, 129), red);
+}
+
+.username {
+    margin-top: 30px;
+}
+
+.email {
+    margin-top: 30px;
+}
+
+.password {
+    margin-top: 30px;
+}
+
+.log-in-wrapper input:not(:placeholder-shown) ~ i {
+    color: red;
+}
+
+.log-in-wrapper input:not(:placeholder-shown) ~ label {
+    color: red;
+    margin-top: -10px;
+    background-color: black;
+    transform: scale(0.8);
+}
+
+.home {
+    background-color: rgb(1, 1, 26);
+    color: white;
+    height: 1000px;
+}
+
+.home .text {
+    width: 40%;
+    margin-top: 200px;
+    margin-left: 50px;
+}
+
+.text h1 {
+    text-align: center;
+    transform: scale(1.1);
+}
+
+.text p {
+    text-align: center;
+    transform: scale(1.1);
+}
+
+.home img {
+    position: absolute;
+    width: 500px;
+    height: 500px;
+    margin-left: 300px;
+    margin-top: -300px;
+}
+
+.home .signbtn {
+    position: relative;
+    width: 100px;
+    height: 40px;
+    background-color: rgb(1, 1, 26);
+    color: white;
+    border-radius: 12px;
+    outline: none;
+    border: 2px solid blue;
+    box-shadow: 0 4px 12px blue;
+    overflow: hidden;
+    z-index: 1;
+    cursor: pointer;
+    transition: .3s;
+    transform: scale(1.2);
+    margin-left: 230px;
+    margin-top: 40px;
+}
+
+.signbtn::after {
+    position: absolute;
+    content: '';
+    background-color: blue;
+    width: 0%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: -1;
+    transition: .3s ease;
+}
+
+.home .signbtn:hover::after {
+    width: 100%;
+}
+
+.home .contact {
+    position: relative;
+    width: 100px;
+    height: 40px;
+    background-color: rgb(1, 1, 26);
+    color: white;
+    border-radius: 12px;
+    outline: none;
+    border: 2px solid red;
+    box-shadow: 0 4px 12px red;
+    overflow: hidden;
+    z-index: 1;
+    cursor: pointer;
+    transition: .3s;
+    transform: scale(1.2);
+    margin-left: 50px;
+}
+
+.contact::after {
+    position: absolute;
+    content: '';
+    background-color: red;
+    width: 0%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: -1;
+    transition: .3s ease;
+}
+
+.home .contact:hover::after {
+    width: 100%;
+}
+
+.about {
+    background-color: rgb(1, 1, 26);
+    color: white;
+    height: 1000px;
+}
+
+.about img {
+    width: 300px;
+    height: 300px;
+    border-radius: 150px;
+    margin-top: 100px;
+    margin-left: 150px;
+}
+
+.about p {
+    transform: scale(1.1);
+    text-align: center;
+    width: 40%;
+    margin-left: 650px;
+    margin-top: -200px;
+}
+
+.about a, .about i {
+    transform: scale(1.5);
+    color: red;
+    margin-left: 20px;
+    transition: .3s;
+}
+
+.about i:hover {
+    color: blue;
+}
+
+.about .profile {
+    margin-left: 770px;
+    margin-top: 30px;
+}
+
+.about h2 {
+    position: relative;
+    text-align: center;
+    transform: scale(1.3);
+}
+
+.about h2::before{
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    width: 68px;
+    margin-left: 570px;
+    align-self: center;
+    background-color: blue;
+}
+
+.contact {
+    background-color: rgb(1, 1, 26);
+    color: white;
+    height: 900px;
+    position: relative;
+}
+
+footer {
+    position: absolute;
+    display: flex;
+    flex-direction: row;
+    background-color: blue;
+    color: white;
+    width: 100%;
+    padding: 0px 20px;
+}
+
+.contact h2 {
+    position: relative;
+    text-align: center;
+    transform: scale(1.3);
+}
+
+.contact h2::before{
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    width: 68px;
+    margin-left: 570px;
+    align-self: center;
+    background-color: blue;
+}
+
+.contact p a {
+    color: white;
+    pointer-events: none;
+}
+
+.contact p {
+    margin-top: 50px;
+    margin-left: 20px;
+}
+
+.commentSection {
+    position: absolute;
+    margin-left: 600px;
+    margin-top: -300px;
+    display: flex;
+    flex-direction: column;
+}
+
+.commentSection input {
+    height: 40px;
+    width: 400px;
+    margin-top: 30px;
+    border-bottom: 2px solid blue;
+    background-color: rgb(1, 1, 26);
+    outline: none;
+    border-right: none;
+    border-left: none;
+    border-top: none;
+    color: white;
+}
+
+.commentSection textarea {
+    resize: none;
+    height: 100px;
+    outline: none;
+    margin-top: 30px;
+    background-color: rgb(1, 1, 26);
+    border: 2px solid red;
+    border-radius: 12px;
+    color: white;
+    box-shadow: 0 4px 12px red;
+    padding: 10px 20px;
+}
+
+.commentSection button {
+    width: 100px;
+    height: 40px;
+    outline: none;
+    border: 2px solid blue;
+    color: white;
+    background-color: blue;
+    box-shadow: 0 4px 12px blue;
+    transition: .5s;
+    border-radius: 30px;
+    margin-top: 30px;
+    cursor: pointer;
+}
+
+.commentSection button:hover {
+    background-color: red;
+    box-shadow: 0 4px 12px red;
+    border: 2px solid red;
+}
+
+footer a {
+    color: white;
+    text-decoration: none;
+    transition: .5s;
+}
+
+footer a:hover {
+    color: red;
+}
+
+.socialink {
+    margin-left: 150px;
+}
+
+.socialink a {
+    margin-left: 15px;
+}
+
+.link {
+    margin-left: 300px;
+}
+
+.gallery {
+    background-color: rgb(1, 1, 26);
+    color: white;
+}
+
+.gallery .collection {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 50px;
+    margin-left: 100px;
+}
+
+.gallery h2 {
+    position: relative;
+    text-align: center;
+    transform: scale(1.3);
+    margin-top: 700px;
+}
+
+.gallery h2::before{
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    width: 68px;
+    margin-left: 570px;
+    align-self: center;
+    background-color: blue;
+}
+
+.imgcontainer {
+    width: 300px;
+    height: 240px;
+    overflow: hidden;
+    border-radius: 12px;
+    margin-top: 20px;
+}
+
+.gallery img {
+    cursor: zoom-in;
+    transition: .5s;
+    width: 300px;
+    height: 240px;
+}
+
+.gallery img:hover {
+    transform: scale(1.3);
+}
+
+.services {
+    background-color: rgb(1, 1, 26);
+    color: white;
+    height: 1000px;
+}
+
+.services h2 {
+    position: relative;
+    text-align: center;
+    transform: scale(1.3);
+}
+
+.services h2::before{
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    width: 68px;
+    margin-left: 570px;
+    align-self: center;
+    background-color: blue;
+}
+
+.wrap {
+    display: flex;
+}
+
+.wrap img {
+    width: 200px;
+    height: 300px;
+    margin-top: 5px;
+    border-radius: 15px;
+}
+
+.service {
+    text-align: center;
+    margin-left: 80px;
+    cursor: pointer;
+    width: 500px;
+    height: 400px;
+    margin-top: 100px;
+    border-radius: 15px;
+    transition: .2s;
+}
+
+.service:hover {
+    background-color: #302f2f;
+    border: 2px solid blue;
+    transform: translateY(-10px);
+}
+
+    .testimonials {
+      padding: 40px 20px;
+      text-align: center;
+      height: 630px;
+    }
+
+    .testimonials h2 {
+      position: relative;
+      margin-top: 100px;
+      margin-bottom: 40px;
+    }
+
+    .testimonials h2::before {
+      content: '';
+      position: absolute;
+      bottom: 0px;
+      margin-left: 585px;
+      transform: translateX(-50%);
+      height: 3px;
+      width: 145px;
+      right: 0;
+      background-color: blue;
+    }
+
+    .swiper {
+      width: 100%;
+      max-width: 800px;
+      margin-top: 150px;
+    }
+
+    .swiper-slide {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      cursor: grabbing;
+    }
+
+    .swiper-slide img {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 15px;
+      transform: scale(1.2);
+    }
+
+    .swiper-slide h3 {
+      margin: 5px 0;
+      font-size: 1.2rem;
+    }
+
+    .swiper-slide p {
+      font-size: 0.9rem;
+      color: #ccc;
+    }
+
+    .swiper-button-next,
+    .swiper-button-prev {
+      color: white;
+    }
+
+      .testimonials h2 {
+        font-size: 1.5rem;
+      }
+
+      .swiper-slide img {
+        width: 80px;
+        height: 80px;
+      }
+      
+      .upclick {
+        position: fixed;
+        bottom: 40px;
+        right: 30px;
+        z-index: 99;
+        font-size: 18px;
+        border: 2px solid blue;
+        box-shadow: 0 4px 12px blue;
+        width: 50px;
+        height: 50px;
+        outline: none;
+        background-color: blue;
+        color: white;
+        cursor: pointer;
+        padding: 12px 16px;
+        border-radius: 25px;
+        transition: 0.5s ease;
+        display: none;
+        animation: popUp 1s ease-out infinite;
+      }
+
+      .upclick:hover {
+        background-color: red;
+        border: 2px solid red;
+        box-shadow: 0 4px 12px red;
+      }
+
+      @keyframes popUp {
+  0%   { transform: translateY(0); }
+  10%  { transform: translateY(-20px); }
+  20%  { transform: translateY(0); }
+  30%  { transform: translateY(-15px); }
+  40%  { transform: translateY(0); }
+  50% { transform: translateY(-10); }
+  60% { transform: translateY(0); }
+  70% { transform: translateY(-5); }
+  80% { transform: translateY(0); }
+  90% { transform: translateY(-3); }
+  100% { transform: translateY(0); }
+}
+}
+
+.switch-container {
+        /* This wrapper helps position the slideBox absolutely relative to the slider */
+        position: relative;
+        margin-top: 7px;
+        transform: scale(0.6);
+        display: inline-block; /* Keeps the container snug around the slider */
+    }
+
+    /* --- The Track (Slider) --- */
+    .slider {
+        width: 120px;
+        height: 50px;
+        background-color: #ccc; /* Default 'off' (light mode) track color */
+        border-radius: 30px;
+        cursor: pointer;
+        transition: background-color 0.5s; /* Smooth track color change */
+        /* Optional: Adding a slight shadow */
+        box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2); 
+    }
+
+    /* --- The Handle (Slide Box) --- */
+    .slideBox {
+        width: 50px;
+        height: 50px; /* Changed from 20px to 50px for a perfect circle/square fit */
+        border-radius: 50%; /* Made it a circle */
+        background-color: white; /* Handle color */
+        position: absolute;
+        top: 0; /* Positioned relative to the track/slider */
+        left: 0;
+        color: #333; /* Icon color for 'off' state */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 1.5em; /* Larger icon */
+        cursor: pointer;
+        transition: transform 0.5s, background-color 0.5s, color 0.5s; 
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3); /* Handle shadow */
+    }
+
+    /* --- 'On' State Classes --- */
+    /* Moves the handle to the right edge */
+    .on-state .slideBox {
+        transform: translateX(75px); /* 150px (width) - 50px (handle width) = 100px */
+        background-color: #2196F3; /* Change handle color when 'on' */
+        color: white; /* Change icon color when 'on' */
+    }
+
+    /* Changes the track color to reflect the 'on' state (e.g., green/blue for dark mode) */
+    .on-state .slider {
+        background-color: #2c3e50; /* Dark mode track color */
+    }
+
+    /* Changes the icon inside the handle for the 'on' state */
+    .on-state .slideBox .fas.fa-sun {
+        content: "\f186"; /* Moon icon */
+    }
+
+    /* Optional: Body color change for dark mode */
+    .dark-mode {
+        background-color: #121212;
+    }
+
+    .dropdown {
+            position: relative;
+            display: inline-block;
+            width: 200px;
+        }
+
+        .profileBtn {
+            width: 60px;
+            height: 60px;
+            color: white;
+            border-radius: 50%;
+            background-color: blue;
+            border: 2px solid blue;
+            outline: none;
+            transition: .3s;
+            cursor: pointer;
+            box-shadow: 0 4px 12px blue;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative; /* Keeps it anchored */
+            z-index: 10;
+        }
+
+        button:hover {
+            background-color: rgb(107, 107, 241);
+        }
+
+        .hide {
+            display: none;
+        }
+
+        .color {
+            background-color: white;
+        }
+
+        h1 {
+      font-weight: 300;
+      letter-spacing: 1px;
+      margin-bottom: 30px;
+    }
+
+    /* Role Buttons */
+    .button-group {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .role-btn {
+      padding: 12px 24px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      background-color: #1e293b;
+      color: var(--text-color);
+      border: 1px solid #334155;
+      border-radius: 8px;
+      transition: all 0.2s;
+    }
+
+    .role-btn:hover {
+      background-color: #38bdf8;
+      color: #000;
+      transform: translateY(-2px);
+    }
+
+    /* Blur Overlay */
+    #overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(8px); /* The Blur Effect */
+      -webkit-backdrop-filter: blur(8px);
+      z-index: 10;
+    }
+
+    /* Login Container */
+    #loginContainer {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(30, 41, 59, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 30px;
+      border-radius: 16px;
+      width: 320px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      z-index: 20;
+    }
+
+    #displayText {
+      margin-top: 0;
+      font-size: 1.2rem;
+      text-align: center;
+      color: #38bdf8;
+    }
+
+    .input-group {
+      margin-bottom: 15px;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 12px;
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 6px;
+      color: white;
+      outline: none;
+    }
+
+    .input-group input:focus {
+      border-color: #38bdf8;
+    }
+
+    .action-btns {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    button#enterBtn, button#guestBtn {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    #enterBtn { background-color: rgb(52, 52, 246); color: white; }
+    #guestBtn { background-color: #475569; color: white; }
+    
+    button:hover { opacity: 0.9; }
+
+    #errorMessage {
+      text-align: center;
+      font-size: 13px;
+      margin-bottom: 10px;
+      min-height: 18px;
+    }
+
+        /* Resetting the global 'i' styling to fit inside buttons */
+        fa-user {
+            font-size: 24px;
+        }
+
+        /* Profile Card - Positioned Absolutely so it doesn't push the button */
+        .container {
+            position: absolute;
+            top: 130px; /* Adjust based on where you want it to appear */
+            width: 280px;
+            background-color: #111;
+            border: 1px solid blue;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            color: white;
+            display: none; /* Hidden by default */
+            box-shadow: 0 10px 25px rgba(0, 0, 255, 0.3);
+        }
+
+        .container i.large-user {
+            width: 80px;
+            height: 80px;
+            background-color: blue;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px auto;
+            font-size: 40px;
+        }
+
+        .details {
+            text-align: left;
+            margin-top: 15px;
+        }
+
+        .details label {
+            color: blue;
+            font-size: 11px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .details p {
+            background: #222;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 5px 0 15px 0;
+            font-size: 14px;
+            border-left: 3px solid blue;
+        }
+
+        .main {
+            background-color: #211f1f;
+            padding: 12px 15px;
+            border: 1px solid #0e0d0d;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .selector {
+            display: none;
+            position: absolute;
+            background-color: rgb(37, 35, 35);
+            min-width: 100%;
+            box-shadow: 0px 8px 16px rgba(0,0,0,0.1);
+            z-index: 1;
+            border-radius: 8px;
+            margin-top: 5px;
+            overflow: hidden;
+            border: 1px solid #eee;
+        }
+
+        .selector div {
+            padding: 12px 15px;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .selector div:hover {
+            background-color: #353030;
+        }
+
+        .show {
+            display: block;
+        }
+
+        .main::after {
+            content: '▼';
+            font-size: 10px;
+            color: #666;
+        }
+
+        .toggle-password {
+            cursor: pointer;
+        }
+
+        
+
+        #chat-history {
+        margin-top: 20px;
+        padding: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 16px;
+        height: 65vh;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        background-color: var(--card-bg);
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+        scrollbar-width: thin;
+        scrollbar-color: var(--bot-msg) transparent;
+    }
+
+    /* Custom Scrollbar for Chrome/Safari */
+    #chat-history::-webkit-scrollbar {
+        width: 6px;
+    }
+    #chat-history::-webkit-scrollbar-thumb {
+        background-color: #475569;
+        border-radius: 10px;
+    }
+
+    /* Common chat message styles */
+    .chat-message {
+        max-width: 80%;
+        margin: 8px 0;
+        padding: 12px 18px;
+        border-radius: 18px;
+        font-size: 0.95rem;
+        line-height: 1.5;
+        position: relative;
+        animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* User's message style */
+    .user-message {
+        align-self: flex-end;
+        background: linear-gradient(135deg, #2563eb, #3b82f6);
+        color: white;
+        border-bottom-right-radius: 4px;
+    }
+
+    /* Bot's message style */
+    .bot-message {
+        align-self: flex-start;
+        background-color: var(--bot-msg);
+        color: var(--text-main);
+        border-bottom-left-radius: 4px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    /* Markdown styling inside bot messages */
+    .bot-message strong {
+        color: #60a5fa; /* Soft blue for emphasis */
+    }
+
+    .bot-message h3 {
+        color: var(--text-main);
+        font-size: 1.1em;
+        margin-top: 10px;
+    }
+
+    .bot-message code {
+        background-color: rgba(0,0,0,0.3);
+        color: #f87171;
+        padding: 2px 5px;
+        border-radius: 4px;
+    }
+
+    /* Input container styling */
+    .input-group-custom {
+        margin-top: 20px;
+        padding: 15px 0;
+        background-color: transparent;
+    }
+
+    .form-control {
+        background-color: var(--card-bg) !important;
+        border: 1px solid #475569 !important;
+        color: white !important;
+        border-radius: 12px !important;
+        padding: 25px 15px !important;
+    }
+
+    .form-control:focus {
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.4) !important;
+        border-color: var(--user-msg) !important;
+    }
+
+    .btn-success {
+        background-color: var(--user-msg) !important;
+        border: none !important;
+        border-radius: 12px !important;
+        padding: 0 25px !important;
+        font-weight: 600;
+        margin-left: 10px;
+        transition: transform 0.1s ease;
+    }
+
+    .btn-success:hover {
+        background-color: #2563eb !important;
+        transform: translateY(-1px);
+    }
+
+    .btn-success:active {
+        transform: translateY(1px);
+    }

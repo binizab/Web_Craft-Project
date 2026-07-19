@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional Student ID</title>
+    <style>
+        :root {
+            --primary-blue: rgb(2, 2, 138);
+            --primary-red: red;
+            --line-color: #000;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+
+        /* Fixed ID Card Size (Standard CR80 size approx) */
+        .container {
+            width: 450px;
+            height: 280px;
+            background: white;
+            border: 2px solid #333;
+            border-radius: 10px;
+            padding: 15px;
+            position: relative;
+            box-shadow: 5px 5px 15px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        /* Header Styles */
+        .header { text-align: center; }
+        .header-logo { width: 50px; float: left; }
+        .school-name-am { color: var(--primary-blue); font-size: 11px; margin: 0; width: 250px; margin: 0 auto; line-height: 1.2; }
+        
+        .separator {
+            border-bottom: 2px solid var(--primary-blue);
+            margin: 5px 0;
+            width: 100%;
+        }
+
+        /* Photo and ID Header */
+        .student-photo {
+            width: 80px;
+            height: 90px;
+            border: 1px solid #000;
+            position: absolute;
+            right: 15px;
+            top: 80px;
+        }
+
+        .id-title {
+            color: var(--primary-red);
+            font-size: 14px;
+            margin: 5px 0;
+            text-align: left;
+        }
+
+        /* THE FIX: Data Rows */
+        .data-row {
+            display: flex;
+            align-items: baseline;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+
+        .label-blue { color: var(--primary-blue); font-weight: bold; min-width: 80px; }
+        .label-black { color: black; min-width: 50px; margin-right: 5px; }
+
+        /* Constant Width Slot */
+        .field-slot {
+            flex-grow: 1;
+            border-bottom: 1px solid var(--line-color);
+            display: inline-block;
+            height: 1.2em;
+            padding: 0 5px;
+            font-weight: bold;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis; /* Adds ... if text is too long */
+        }
+
+        /* Specific widths for smaller combined rows */
+        .short-slot { width: 80px; flex-grow: 0; }
+
+        /* Back Side Specifics */
+        .back { text-align: center; }
+        .back-title { color: var(--primary-red); text-decoration: underline; margin-bottom: 15px; }
+        .sign-area { margin-top: 20px; text-align: right; }
+
+    </style>
+</head>
+<body>
+
+    <div class="container front">
+        <div class="header">
+            <h1 style="color: var(--primary-red); font-size: 22px; margin: 0;">EB ACADEMY</h1>
+            <p class="school-name-am">ኤል-ቤቴል ሕፃናት - መሰናዶ ትምህርት ቤት ኅ/የተ/የ/ማ<br>El-Bethel Kindergarten - Preparatory School P.L.C</p>
+            <small>011-111-08-82 / 011-646-33</small>
+        </div>
+        
+        <div class="separator"></div>
+        
+        <img src="WIN_20260131_20_25_05_Pro.jpg" alt="Photo" class="student-photo">
+
+        <h2 class="id-title" style="margin-bottom: 0;">የተማሪ መታወቂያ ካርድ</h2>
+        <h2 class="id-title" style="text-decoration: underline; margin-top: 0;">STUDENT ID CARD</h2>
+
+        <div class="data-row" style="margin-top: 15px; width: 320px;">
+            <span class="label-blue">የተማሪው ስም</span>
+            <span class="label-black">Name:</span>
+            <span id="out-name" class="field-slot">Abebe Kebede Balcha</span>
+        </div>
+
+        <div class="data-row" style="width: 320px;">
+            <span class="label-blue">ክፍል</span>
+            <span class="label-black">Class:</span>
+            <span id="out-class" class="field-slot">Grade 10-A</span>
+        </div>
+
+        <div class="data-row" style="width: 320px;">
+            <span class="label-blue">የት/ዘመን</span>
+            <span class="label-black">Year:</span>
+            <span id="out-year" class="field-slot short-slot">2026</span>
+            <span class="label-blue" style="min-width: 40px; margin-left: 10px;">ተራ.ቁ.</span>
+            <span class="label-black">No:</span>
+            <span id="out-no" class="field-slot short-slot">4452</span>
+        </div>
+    </div>
+
+    <div class="container back">
+        <h2 class="back-title">የተማሪው አድራሻ / STUDENT ADDRESS</h2>
+        
+        <div class="data-row">
+            <span class="label-blue">ክ/ከተማ</span> <span class="label-black">Subcity:</span>
+            <span id="out-subcity" class="field-slot">Yeka</span>
+            <span class="label-blue" style="margin-left:10px;">ቀበሌ</span> <span class="label-black">Keb:</span>
+            <span id="out-kebele" class="field-slot">03</span>
+        </div>
+
+        <div class="data-row">
+            <span class="label-blue">ስልክ</span> <span class="label-black">Tel:</span>
+            <span id="out-telephone" class="field-slot">011-555-0199</span>
+        </div>
+
+        <div class="data-row">
+            <span class="label-blue">በአደጋ ጊዜ</span> <span class="label-black">Contact:</span>
+            <span id="out-contact" class="field-slot">Parent Name</span>
+        </div>
+
+        <div class="data-row">
+            <span class="label-blue">የሚያገለግልበት</span> <span class="label-black">Valid:</span>
+            <span id="out-valid" class="field-slot">2026/27</span>
+        </div>
+
+        <div class="sign-area">
+            <div style="width: 150px; border-top: 1px solid #000; display: inline-block; margin-top: 40px;">
+                <small>Principal's Signature</small>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

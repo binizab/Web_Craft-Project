@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Owner Hub — Multi-business Dashboard</title>
+<meta name="description" content="Responsive dashboard for managing e-commerce, e-school and portfolio operations." />
+<link rel="stylesheet" href="webCraft_dashboard.css" />
+<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer></script>
+<script src="https://unpkg.com/lucide@latest" defer></script>
+<script src="webCraft_dashboard.js" defer></script>
+</head>
+<body>
+  <!-- Login overlay -->
+  <div id="login-overlay" class="login-overlay hidden">
+    <div class="login-card">
+      <div class="login-logo">OH</div>
+      <h1>Owner Hub</h1>
+      <p class="muted">Sign in to access your dashboard</p>
+      <form id="login-form">
+        <label>Username</label>
+        <input id="login-user" type="text" autocomplete="username" placeholder="owner" required />
+        <label>Password</label>
+        <input id="login-pass" type="password" autocomplete="current-password" placeholder="owner123" required />
+        <div id="login-error" class="error hidden">Invalid credentials</div>
+        <button type="submit" class="btn btn-primary btn-block">Sign in</button>
+        <p class="hint muted">Hint: <code>owner</code> / <code>owner123</code></p>
+      </form>
+    </div>
+  </div>
+
+  <!-- App shell -->
+  <div id="app" class="app hidden">
+    <aside id="sidebar" class="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">OH</div>
+        <div class="sidebar-title">
+          <div class="brand">Owner Hub</div>
+          <div class="muted xs">Multi-business</div>
+        </div>
+      </div>
+      <nav id="nav" class="nav"></nav>
+      <div class="sidebar-footer">
+        <button id="account-btn" class="account-btn">
+          <div class="avatar" id="side-avatar">OW</div>
+          <div class="who">
+            <div class="name" id="side-name">Owner</div>
+            <div class="muted xs" id="side-email">owner@hub.et</div>
+          </div>
+        </button>
+      </div>
+    </aside>
+
+    <div class="main">
+      <header class="header">
+        <button id="sidebar-toggle" class="icon-btn" aria-label="Collapse sidebar">
+          <i data-lucide="panel-left"></i>
+        </button>
+        <div id="page-title" class="page-title">Dashboard</div>
+        <div class="grow"></div>
+
+        <div class="dropdown">
+          <button id="notif-btn" class="icon-btn" aria-label="Notifications">
+            <i data-lucide="bell"></i>
+            <span id="notif-badge" class="badge">3</span>
+          </button>
+          <div id="notif-panel" class="panel notif-panel hidden">
+            <div class="panel-head">
+              <span>Notifications</span>
+              <button id="mark-read" class="link">Mark all read</button>
+            </div>
+            <div id="notif-list" class="notif-list"></div>
+          </div>
+        </div>
+
+        <button id="theme-btn" class="icon-btn" aria-label="Toggle theme">
+          <i data-lucide="moon"></i>
+        </button>
+
+        <div class="dropdown">
+          <button id="user-btn" class="user-btn">
+            <div class="avatar sm" id="hdr-avatar">OW</div>
+            <span id="hdr-name" class="hidden-sm">Owner</span>
+          </button>
+          <div id="user-panel" class="panel user-panel hidden">
+            <div class="user-info">
+              <div class="name" id="up-name">Owner</div>
+              <div class="muted xs" id="up-email">owner@hub.et</div>
+              <div class="muted xs mono" id="up-id">ID: OWN-0001</div>
+            </div>
+            <hr />
+            <button class="menu-item" data-route="profile"><i data-lucide="user"></i> Edit Profile</button>
+            <button class="menu-item" id="account-modal-btn"><i data-lucide="id-card"></i> Account info</button>
+            <hr />
+            <button class="menu-item danger" id="logout-btn"><i data-lucide="log-out"></i> Sign out</button>
+          </div>
+        </div>
+      </header>
+
+      <main id="page" class="page"></main>
+    </div>
+  </div>
+
+  <!-- Account modal -->
+  <div id="account-modal" class="modal hidden">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h3>Owner Account</h3>
+        <button class="icon-btn" data-close-modal><i data-lucide="x"></i></button>
+      </div>
+      <div class="account-body">
+        <div class="avatar lg" id="m-avatar">OW</div>
+        <div class="kv"><span class="muted">Full name</span><strong id="m-name">Owner</strong></div>
+        <div class="kv"><span class="muted">Email</span><strong id="m-email">owner@hub.et</strong></div>
+        <div class="kv"><span class="muted">User ID</span><strong class="mono" id="m-id">OWN-0001</strong></div>
+        <div class="kv"><span class="muted">Phone</span><strong id="m-phone">+251 911 000 000</strong></div>
+        <div class="kv"><span class="muted">Joined</span><strong id="m-joined">2024-01-15</strong></div>
+        <div class="kv"><span class="muted">Role</span><strong>Owner / Admin</strong></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Punishment modal -->
+  <div id="punish-modal" class="modal hidden">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h3>Issue Punishment</h3>
+        <button class="icon-btn" data-close-modal><i data-lucide="x"></i></button>
+      </div>
+      <div class="modal-body">
+        <p class="muted sm" id="punish-target">Request: —</p>
+        <label>Type</label>
+        <select id="punish-type">
+          <option value="fine">Money fine</option>
+          <option value="ban">Ban</option>
+          <option value="warning">Warning</option>
+          <option value="suspend">Suspension</option>
+        </select>
+        <label>Degree (1–10): <span id="degree-val">5</span></label>
+        <input id="punish-degree" type="range" min="1" max="10" value="5" />
+        <label>Amount (ETB)</label>
+        <input id="punish-amount" type="number" value="500" min="0" />
+        <label>Note</label>
+        <textarea id="punish-note" rows="3" placeholder="Reason..."></textarea>
+        <div class="modal-actions">
+          <button class="btn" data-close-modal>Cancel</button>
+          <button class="btn btn-danger" id="punish-confirm">Confirm</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast hidden"></div>
+</body>
+</html>

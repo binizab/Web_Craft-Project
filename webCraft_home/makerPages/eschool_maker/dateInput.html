@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Full Custom Calendar & Select</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        :root {
+            --primary: #6366f1;
+            --primary-light: #eef2ff;
+            --border: #e2e8f0;
+            --text: #1e293b;
+            --text-muted: #64748b;
+            --bg: #ffffff;
+            --radius: 12px;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background-color: #f8fafc;
+            display: flex;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+
+        .card {
+            background: var(--bg);
+            padding: 24px;
+            border-radius: 16px;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+            border: 1px solid var(--border);
+            width: 100%;
+            max-width: 350px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        /* --- Calendar UI --- */
+        .calendar-wrapper {
+            position: relative;
+        }
+
+        .calendar-input {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            cursor: pointer;
+            background: white;
+            transition: all 0.2s;
+        }
+
+        .calendar-input:hover { border-color: var(--primary); }
+        .calendar-input i { color: var(--text-muted); width: 18px; }
+
+        .calendar-dropdown {
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+            z-index: 100;
+            padding: 16px;
+            display: none;
+        }
+
+        .calendar-dropdown.show { display: block; }
+
+        /* Calendar Header */
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .calendar-header h4 { font-size: 0.95rem; }
+
+        .nav-btn {
+            background: none;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-btn:hover { background: var(--primary-light); }
+
+        /* Calendar Grid */
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+            text-align: center;
+        }
+
+        .weekday {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            padding-bottom: 8px;
+        }
+
+        .day {
+            padding: 8px 0;
+            font-size: 0.875rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .day:hover:not(.empty) { background: var(--primary-light); color: var(--primary); }
+        .day.selected { background: var(--primary) !important; color: white; font-weight: 600; }
+        .day.today { border: 1px solid var(--primary); color: var(--primary); }
+        .day.empty { cursor: default; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <label>Choose Date</label>
+    <div class="calendar-wrapper">
+        <div class="calendar-input" id="calInput">
+            <i data-lucide="calendar"></i>
+            <span id="selectedDateText">Select a date</span>
+        </div>
+
+        <div class="calendar-dropdown" id="calDropdown">
+            <div class="calendar-header">
+                <button class="nav-btn" id="prevMonth"><i data-lucide="chevron-left"></i></button>
+                <h4 id="monthDisplay">Month Year</h4>
+                <button class="nav-btn" id="nextMonth"><i data-lucide="chevron-right"></i></button>
+            </div>
+            <div class="calendar-grid" id="calendarGrid">
+                </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    lucide.createIcons();
+
+    const calInput = document.getElementById('calInput');
+    const calDropdown = document.getElementById('calDropdown');
+    const grid = document.getElementById('calendarGrid');
+    const monthDisplay = document.getElementById('monthDisplay');
+    const dateText = document.getElementById('selectedDateText');
+
+    let currentNavDate = new Date();
+    let selectedDate = null;
+
+    const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    const weekdays = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
+
+    function renderCalendar() {
+        grid.innerHTML = '';
+        const year = currentNavDate.getFullYear();
+        const month = currentNavDate.getMonth();
+
+        monthDisplay.innerText = `${months[month]} ${year}`;
+
+        // Header
+        weekdays.forEach(day => {
+            const el = document.createElement('div');
+            el.className = 'weekday';
+            el.innerText = day;
+            grid.appendChild(el);
+        });
+
+        const firstDay = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+        // Padding
+        for (let i = 0; i < firstDay; i++) {
+            const el = document.createElement('div');
+            el.className = 'day empty';
+            grid.appendChild(el);
+        }
+
+        // Days
+        for (let i = 1; i <= daysInMonth; i++) {
+            const el = document.createElement('div');
+            el.className = 'day';
+            el.innerText = i;
+
+            const isToday = new Date().toDateString() === new Date(year, month, i).toDateString();
+            if (isToday) el.classList.add('today');
+
+            if (selectedDate && selectedDate.toDateString() === new Date(year, month, i).toDateString()) {
+                el.classList.add('selected');
+            }
+
+            el.onclick = () => {
+                selectedDate = new Date(year, month, i);
+                dateText.innerText = selectedDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+                calDropdown.classList.remove('show');
+                renderCalendar();
+            };
+
+            grid.appendChild(el);
+        }
+    }
+
+    calInput.onclick = (e) => {
+        e.stopPropagation();
+        calDropdown.classList.toggle('show');
+    };
+
+    document.getElementById('prevMonth').onclick = (e) => {
+        e.stopPropagation();
+        currentNavDate.setMonth(currentNavDate.getMonth() - 1);
+        renderCalendar();
+    };
+
+    document.getElementById('nextMonth').onclick = (e) => {
+        e.stopPropagation();
+        currentNavDate.setMonth(currentNavDate.getMonth() + 1);
+        renderCalendar();
+    };
+
+    window.onclick = () => calDropdown.classList.remove('show');
+    calDropdown.onclick = (e) => e.stopPropagation();
+
+    renderCalendar();
+</script>
+
+</body>
+</html>

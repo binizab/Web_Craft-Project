@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NovaMail | Peer-to-Peer Video</title>
+    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+    <style>
+        :root {
+            --bg: #0f172a;
+            --card: #1e293b;
+            --accent: #38bdf8;
+            --danger: #ef4444;
+            --success: #22c55e;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: white;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .connection-panel {
+            background: var(--card);
+            padding: 20px;
+            border-radius: 15px;
+            border: 1px solid #334155;
+            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+            justify-content: center;
+            width: 90%;
+            max-width: 1200px;
+        }
+
+        .id-badge {
+            background: #0f172a;
+            padding: 8px 15px;
+            border-radius: 8px;
+            border: 1px solid var(--accent);
+            font-family: monospace;
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        input {
+            background: #0f172a;
+            border: 1px solid #334155;
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            outline: none;
+            width: 250px;
+        }
+
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            width: 90%;
+            max-width: 1200px;
+        }
+
+        .video-container {
+            background: var(--card);
+            border-radius: 20px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            aspect-ratio: 16 / 9;
+            border: 2px solid #334155;
+        }
+
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            background: #000;
+        }
+
+        .label {
+            position: absolute;
+            bottom: 15px;
+            left: 15px;
+            background: rgba(0,0,0,0.7);
+            padding: 5px 12px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--success);
+            border-radius: 50%;
+        }
+
+        .controls {
+            margin-top: 30px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border-radius: 50px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-start { background: var(--accent); color: #000; }
+        .btn-connect { background: var(--success); color: white; }
+        .btn-stop { background: var(--danger); color: white; }
+        
+        .btn:hover { opacity: 0.8; transform: translateY(-2px); }
+        .btn:disabled { background: #475569; cursor: not-allowed; transform: none; }
+    </style>
+</head>
+<body>
+
+    <h1 style="margin-bottom: 5px;">P2P Video Connect</h1>
+    <p style="color: #94a3b8; margin-bottom: 25px;">Real-time communication using WebRTC</p>
+
+    <div class="connection-panel">
+        <div>Your ID: <span id="my-id" class="id-badge">Connecting...</span></div>
+        <input type="text" id="remote-id" placeholder="Enter Remote ID to Call">
+        <button class="btn btn-connect" id="connectBtn">Connect & Call</button>
+    </div>
+
+    
+    <div class="video-grid">
+        <div class="video-container">
+            <video id="localVideo" autoplay playsinline muted></video>
+            <div class="label"><div class="status-dot"></div> Local Camera (You)</div>
+        </div>
+
+        <div class="video-container">
+            <video id="remoteVideo" autoplay playsinline></video>
+            <div class="label" style="border-color: var(--accent);"><div class="status-dot" style="background: var(--accent)"></div> Remote Feed</div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button class="btn btn-start" id="startCam">1. Initialize Camera</button>
+        <button class="btn btn-stop" onclick="location.reload()">End Session</button>
+    </div>
+
+    <script>
+        const localVideo = document.getElementById('localVideo');
+        const remoteVideo = document.getElementById('remoteVideo');
+        const startCamBtn = document.getElementById('startCam');
+        const connectBtn = document.getElementById('connectBtn');
+        const myIdDisplay = document.getElementById('my-id');
+        const remoteIdInput = document.getElementById('remote-id');
+
+        let localStream = null;
+        let peer = new Peer(); // PeerJS creates a unique ID for this device
+
+        // Initialize Peer
+        peer.on('open', (id) => {
+            myIdDisplay.innerText = id;
+            console.log('My peer ID is: ' + id);
+        });
+
+        // 1. Get Local Camera Stream
+        async function startCamera() {
+            try {
+                localStream = await navigator.mediaDevices.getUserMedia({ 
+                    video: true, 
+                    audio: true 
+                });
+                localVideo.srcObject = localStream;
+                startCamBtn.disabled = true;
+                startCamBtn.innerText = "Camera Active";
+                console.log("Local camera started");
+            } catch (err) {
+                console.error("Camera error:", err);
+                alert("Please allow camera permissions.");
+            }
+        }
+
+        // 2. Handle Incoming Calls
+        peer.on('call', (call) => {
+            console.log("Receiving call...");
+            if (!localStream) {
+                alert("Incoming call! Please start your camera first to answer.");
+                return;
+            }
+            
+            call.answer(localStream); // Answer with our local stream
+            call.on('stream', (remoteStream) => {
+                remoteVideo.srcObject = remoteStream;
+            });
+        });
+
+        // 3. Initiate Call to Remote Peer
+        connectBtn.addEventListener('click', () => {
+            const remoteId = remoteIdInput.value.trim();
+            if (!remoteId) {
+                alert("Please enter the Remote ID of the other device.");
+                return;
+            }
+            if (!localStream) {
+                alert("Start your camera first!");
+                return;
+            }
+
+            console.log("Calling: " + remoteId);
+            const call = peer.call(remoteId, localStream);
+            
+            call.on('stream', (remoteStream) => {
+                // When they answer, show their stream in the remote video box
+                remoteVideo.srcObject = remoteStream;
+            });
+
+            call.on('error', (err) => {
+                console.error("Call error:", err);
+                alert("Failed to connect to peer.");
+            });
+        });
+
+        startCamBtn.addEventListener('click', startCamera);
+
+        // Handle errors
+        peer.on('error', (err) => {
+            console.error("Peer error:", err.type);
+            if(err.type === 'peer-disconnected') console.log("Peer disconnected");
+        });
+    </script>
+</body>
+</html>

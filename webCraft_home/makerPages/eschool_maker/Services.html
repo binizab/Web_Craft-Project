@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Multi-Branch Manager | Pro Wizard</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+    
+    <style>
+        :root {
+            --bg-gradient: #050801;
+            --glass-bg: rgba(15, 23, 42, 0.96);
+            --accent-blue: #38bdf8;
+            --accent-glow: rgba(56, 189, 248, 0.4);
+            --text-primary: #f8fafc;
+            --text-dim: #94a3b8;
+            --border: rgba(255, 255, 255, 0.08);
+            --success: #10b981;
+            --error: #ff4b4b;
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        body {
+            margin: 0; padding: 20px; min-height: 100vh;
+            background: var(--bg-gradient); font-family: 'Poppins', sans-serif; 
+            color: var(--text-primary); display: flex; flex-direction: column; align-items: center;
+        }
+
+        /* --- Wizard Stepper --- */
+        .stepper-container {
+            width: 100%; max-width: 800px; margin-bottom: 40px; padding: 20px;
+        }
+        .stepper {
+            display: flex; justify-content: space-between; position: relative;
+        }
+        .stepper::before {
+            content: ""; position: absolute; top: 50%; left: 0; right: 0;
+            height: 2px; background: var(--border); transform: translateY(-50%); z-index: 1;
+        }
+        .step-circle {
+            width: 45px; height: 45px; border-radius: 50%; background: #1e293b;
+            border: 2px solid var(--border); display: flex; align-items: center;
+            justify-content: center; font-weight: bold; z-index: 2; transition: 0.4s;
+            position: relative;
+        }
+        .step-circle.active { 
+            background: var(--accent-blue); color: #020617; border-color: var(--accent-blue);
+            box-shadow: 0 0 20px var(--accent-glow);
+        }
+        .step-circle.completed { background: var(--success); border-color: var(--success); color: white; }
+        
+        /* --- Step Content Wrappers --- */
+        .step-content { display: none; width: 100%; max-width: 1250px; animation: fadeIn 0.5s ease; }
+        .step-content.active { display: block; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .text-step-card {
+            background: var(--glass-bg); padding: 60px 40px; border-radius: 30px;
+            border: 1px solid var(--border); text-align: center; max-width: 700px; margin: 0 auto;
+        }
+        .text-step-card h1 { color: var(--accent-blue); margin-bottom: 20px; }
+        .text-step-card p { color: var(--text-dim); line-height: 1.6; font-size: 1.1rem; }
+
+        /* --- Step 3 Specific Styles --- */
+        .master-control {
+            background: var(--glass-bg); padding: 18px; border-radius: 20px;
+            border: 1px solid var(--accent-blue); margin: 0 auto 30px auto;
+            display: flex; align-items: center; justify-content: center;
+            gap: 15px; box-shadow: 0 0 20px var(--accent-glow); width: 100%; max-width: 480px;
+        }
+        .master-control input {
+            background: #020617; border: 1px solid var(--accent-blue);
+            padding: 10px; border-radius: 10px; color: white; width: 80px; text-align: center;
+            font-size: 1.2rem; font-weight: bold;
+        }
+
+        .dashboard-grid { display: grid; grid-template-columns: 1fr; gap: 25px; width: 100%; }
+        @media (min-width: 768px) { .dashboard-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (min-width: 1100px) { .dashboard-grid { grid-template-columns: repeat(3, 1fr); } }
+
+        .branch-card {
+            background: var(--glass-bg); padding: 25px; border-radius: 28px;
+            border: 1px solid var(--border); display: flex; flex-direction: column; gap: 18px;
+            transition: 0.3s;
+        }
+        .branch-card:hover { border-color: var(--accent-blue); }
+
+        /* --- Inputs & UI Components --- */
+        .input-group { position: relative; width: 100%; }
+        .input-group i { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--accent-blue); }
+        .input-group input {
+            width: 100%; background: rgba(2, 6, 23, 0.6); border: 1px solid var(--border);
+            padding: 15px 15px 15px 42px; border-radius: 14px; color: white; outline: none; transition: 0.3s;
+        }
+        .input-group input:focus { border-color: var(--accent-blue); }
+        .input-group label {
+            position: absolute; left: 42px; top: 15px; color: var(--text-dim);
+            pointer-events: none; transition: 0.3s;
+        }
+        .input-group input:focus ~ label, .input-group input:not(:placeholder-shown) ~ label {
+            top: -24px; left: 5px; font-size: 0.75rem; color: var(--accent-blue); font-weight: 600;
+        }
+
+        .custom-dropdown { border: 1px solid var(--border); border-radius: 14px; background: rgba(2, 6, 23, 0.4); position: relative; }
+        .dropdown-trigger { padding: 14px 18px; display: flex; justify-content: space-between; cursor: pointer; align-items: center; }
+        .dropdown-content { 
+            display: none; padding: 15px; border-top: 1px solid var(--border); 
+            max-height: 250px; overflow-y: auto; background: #020617; border-radius: 0 0 14px 14px;
+        }
+        .active .dropdown-content { display: block; }
+        .check-item { display: flex; align-items: center; gap: 12px; padding: 8px 0; cursor: pointer; font-size: 0.9rem; }
+        .check-item input { accent-color: var(--accent-blue); width: 17px; height: 17px; }
+
+        .btn-blue {
+            background: var(--accent-blue); color: #020617; border: none; padding: 16px 30px;
+            border-radius: 14px; font-weight: 700; cursor: pointer; display: flex;
+            align-items: center; justify-content: center; gap: 10px; transition: 0.2s;
+        }
+        .btn-blue:hover { transform: scale(1.02); box-shadow: 0 0 15px var(--accent-glow); }
+        .btn-outline {
+            background: transparent; border: 1.5px solid var(--accent-blue); color: var(--accent-blue);
+            padding: 12px; border-radius: 12px; cursor: pointer; font-weight: 600; width: 100%;
+            transition: 0.2s;
+        }
+        .btn-outline:hover { background: rgba(56, 189, 248, 0.1); }
+
+        /* --- Navigation Bar --- */
+        .nav-actions {
+            display: flex; justify-content: space-between; width: 100%; max-width: 1250px;
+            margin-top: 50px; padding: 20px 0; border-top: 1px solid var(--border);
+        }
+
+        /* --- Map Modal --- */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(2, 6, 23, 0.98);
+            display: none; justify-content: center; align-items: center; z-index: 3000; padding: 15px;
+        }
+        .modal-content { 
+            width: 100%; max-width: 850px; background: #0f172a; border-radius: 30px;
+            padding: 25px; border: 1px solid var(--border); position: relative;
+        }
+        #map { height: 55vh; width: 100%; border-radius: 20px; margin-top: 15px; border: 1px solid var(--border); width: 300px;}
+
+        .error-msg { color: var(--error); font-size: 0.8rem; margin-top: 6px; display: flex; align-items: center; gap: 6px; animation: shake 0.3s; }
+        .input-error { border-color: var(--error) !important; }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+    </style>
+</head>
+<body>
+
+    <div class="stepper-container">
+        <div class="stepper">
+            <div class="step-circle active" id="dot-1">1</div>
+            <div class="step-circle" id="dot-2">2</div>
+            <div class="step-circle" id="dot-3">3</div>
+            <div class="step-circle" id="dot-4">4</div>
+            <div class="step-circle" id="dot-5">5</div>
+        </div>
+    </div>
+
+    <div class="step-content active" id="step-1">
+        <div class="text-step-card">
+            <i class="fas fa-rocket" style="font-size: 3rem; color: var(--accent-blue); margin-bottom: 20px;"></i>
+            <h1>Welcome to Pro Manager</h1>
+            <p>Ready to scale your business? This setup wizard will guide you through connecting your branches, locations, and social assets. Click next to begin the authentication process.</p>
+        </div>
+    </div>
+
+    <div class="step-content" id="step-2">
+        <div class="text-step-card">
+            <i class="fas fa-shield-halved" style="font-size: 3rem; color: var(--accent-blue); margin-bottom: 20px;"></i>
+            <h1>Security & Identity</h1>
+            <p>Your data is encrypted using AES-256 protocols. In this step, we've verified your primary account credentials and established a secure handshake with the central database.</p>
+        </div>
+    </div>
+
+    <div class="step-content" id="step-3">
+        <div class="master-control">
+            <i class="fas fa-layer-group" style="color: var(--accent-blue); font-size: 1.5rem;"></i>
+            <label>Branches to Add:</label>
+            <input type="number" id="branchCount" value="1" min="1" max="50" onchange="handleCountChange()">
+        </div>
+        <div class="dashboard-grid" id="branchGrid"></div>
+    </div>
+
+    <div class="step-content" id="step-4">
+        <div class="text-step-card">
+            <i class="fas fa-clipboard-check" style="font-size: 3rem; color: var(--success); margin-bottom: 20px;"></i>
+            <h1>Review & Validation</h1>
+            <p>All branch coordinates and metadata have been synchronized. Our system is now performing a final integrity check on your URLs and geographical pins to ensure perfect accuracy.</p>
+        </div>
+    </div>
+
+    <div class="step-content" id="step-5">
+        <div class="text-step-card">
+            <i class="fas fa-circle-check" style="font-size: 4rem; color: var(--success); margin-bottom: 20px;"></i>
+            <h1>Setup Complete!</h1>
+            <p>Your multi-branch infrastructure is now live. You can manage individual performance metrics and social feeds from your main dashboard at any time.</p>
+            <button class="btn-blue" onclick="location.reload()" style="margin: 30px auto 0 auto;">Finish & Launch</button>
+        </div>
+    </div>
+
+    <div class="nav-actions">
+        <button class="btn-blue" id="prevBtn" onclick="moveStep(-1)" style="visibility: hidden; background: #1e293b; color: white;">
+            <i class="fas fa-chevron-left"></i> Previous
+        </button>
+        <button class="btn-blue" id="nextBtn" onclick="moveStep(1)">
+            Continue <i class="fas fa-chevron-right"></i>
+        </button>
+    </div>
+
+    <div class="modal-overlay" id="mapModal">
+        <div class="map-modal-content">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h3 style="margin:0;"><i class="fas fa-map-location-dot"></i> Select Location</h3>
+                <span style="cursor:pointer; font-size:28px; color:var(--text-dim)" onclick="closeMap()">&times;</span>
+            </div>
+            <div id="map"></div>
+            <button class="btn-blue" onclick="confirmLocation()" style="margin-top:20px; width:100%;">
+                Confirm Pin Placement
+            </button>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+    
+    <script>
+        let currentStep = 1;
+        let map, marker, activeBranchId;
+
+        // --- Wizard Logic ---
+
+        function moveStep(n) {
+            // Logic Gate for Step 3
+            if (n === 1 && currentStep === 3) {
+                if (!validateBranchData()) {
+                    return; // Stop the user if Step 3 isn't valid
+                }
+            }
+
+            // Transition UI
+            document.getElementById(`step-${currentStep}`).classList.remove('active');
+            document.getElementById(`dot-${currentStep}`).classList.remove('active');
+            if (n === 1) document.getElementById(`dot-${currentStep}`).classList.add('completed');
+
+            currentStep += n;
+
+            document.getElementById(`step-${currentStep}`).classList.add('active');
+            document.getElementById(`dot-${currentStep}`).classList.add('active');
+
+            // Toggle Nav Buttons
+            document.getElementById('prevBtn').style.visibility = (currentStep === 1 || currentStep === 5) ? 'hidden' : 'visible';
+            document.getElementById('nextBtn').style.display = currentStep === 5 ? 'none' : 'flex';
+        }
+
+        // --- Step 3 Validation ---
+
+        function validateBranchData() {
+            const count = document.getElementById('branchCount').value;
+            let errors = 0;
+
+            for (let i = 1; i <= count; i++) {
+                const card = document.querySelector(`.branch-card:nth-child(${i})`);
+                card.querySelectorAll('.error-msg').forEach(e => e.remove());
+                card.querySelectorAll('.input-error').forEach(e => e.classList.remove('input-error'));
+
+                const addError = (el, msg) => {
+                    const err = document.createElement('div');
+                    err.className = 'error-msg';
+                    err.innerHTML = `<i class="fas fa-circle-exclamation"></i> ${msg}`;
+                    const wrapper = el.closest('.input-group, .custom-dropdown, .btn-outline');
+                    wrapper.after(err);
+                    if (el.tagName === 'INPUT') el.classList.add('input-error');
+                    errors++;
+                };
+
+                // Validate Relative Loc (Name)
+                const name = document.getElementById(`name-${i}`);
+                if (!name.value.trim()) addError(name, "Location name is required");
+
+                // Validate Absolute Loc (Coordinates)
+                const loc = document.getElementById(`loc-${i}`);
+                if (!loc.value.trim()) addError(card.querySelector('.btn-outline'), "Please pin on map");
+
+                // Validate Grade Selection
+                const gradeBox = document.getElementById(`grade-drop-${i}`);
+                if (gradeBox.querySelectorAll('input:checked').length === 0) {
+                    addError(gradeBox.querySelector('.dropdown-trigger'), "Select at least one grade");
+                }
+
+                // Validate Social Links if checked
+                const socialLinks = document.getElementById(`links-${i}`).querySelectorAll('input');
+                socialLinks.forEach(link => {
+                    if (!link.value.trim()) addError(link, "Link cannot be empty");
+                    else if (!link.value.startsWith('https://')) addError(link, "Must start with https://");
+                });
+            }
+
+            if (errors > 0) {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                return false;
+            }
+            return true;
+        }
+
+        // --- Branch Generation Logic ---
+
+        function handleCountChange() {
+            updateBranchGrid();
+        }
+
+        function updateBranchGrid() {
+            const grid = document.getElementById('branchGrid');
+            const count = Math.min(Math.max(document.getElementById('branchCount').value, 1), 50);
+            grid.innerHTML = '';
+            for (let i = 1; i <= count; i++) {
+                grid.appendChild(createBranchCard(i));
+            }
+        }
+
+        function createBranchCard(id) {
+            const card = document.createElement('div');
+            card.className = 'branch-card';
+            card.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center">
+                    <h3 style="margin:0; color:var(--accent-blue);"><i class="fas fa-store"></i> Branch #${id}</h3>
+                </div>
+
+                <div class="input-group">
+                    <i class="fas fa-pen-nib"></i>
+                    <input type="text" id="name-${id}" placeholder=" ">
+                    <label>Relative Location (Name)</label>
+                </div>
+
+                <div class="input-group">
+                    <i class="fas fa-location-crosshairs"></i>
+                    <input type="text" id="loc-${id}" placeholder=" " readonly>
+                    <label>GPS Coordinates</label>
+                </div>
+
+                <button class="btn-outline" onclick="openMap(${id})">
+                    <i class="fas fa-map-pin"></i> Pin Map Location
+                </button>
+
+                <div class="custom-dropdown" id="grade-drop-${id}">
+                    <div class="dropdown-trigger" onclick="toggleDrop('grade-drop-${id}')">
+                        <span><i class="fas fa-graduation-cap"></i> &nbsp; Available Grades</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="dropdown-content">
+                        ${['Nursery', 'KG 1', 'KG 2', 'Grade 1', 'Grade 2', 'Grade 3', 'Grade 4', 'Grade 5'].map(g => `
+                            <label class="check-item"><input type="checkbox"> ${g}</label>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <div class="custom-dropdown" id="social-drop-${id}">
+                    <div class="dropdown-trigger" onclick="toggleDrop('social-drop-${id}')">
+                        <span><i class="fas fa-share-nodes"></i> &nbsp; Social Channels</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="dropdown-content">
+                        <label class="check-item"><input type="checkbox" onchange="toggleSocial(${id}, 'YouTube', this.checked, 'fa-youtube')"> YouTube</label>
+                        <label class="check-item"><input type="checkbox" onchange="toggleSocial(${id}, 'Telegram', this.checked, 'fa-telegram')"> Telegram</label>
+                        <label class="check-item"><input type="checkbox" onchange="toggleSocial(${id}, 'Facebook', this.checked, 'fa-facebook')"> Facebook</label>
+                    </div>
+                </div>
+
+                <div id="links-${id}" style="display:flex; flex-direction:column; gap:12px;"></div>
+            `;
+            return card;
+        }
+
+        function toggleDrop(id) {
+            document.getElementById(id).classList.toggle('active');
+        }
+
+        function toggleSocial(branchId, platform, checked, icon) {
+            const container = document.getElementById(`links-${branchId}`);
+            if (checked) {
+                const div = document.createElement('div');
+                div.id = `link-${branchId}-${platform}`;
+                div.className = 'input-group';
+                div.style.marginTop = "10px";
+                div.innerHTML = `
+                    <i class="fab ${icon}"></i>
+                    <input type="text" placeholder=" ">
+                    <label>${platform} URL</label>
+                `;
+                container.appendChild(div);
+            } else {
+                document.getElementById(`link-${branchId}-${platform}`)?.remove();
+            }
+        }
+
+        // --- Map Functions ---
+
+        function openMap(id) {
+            activeBranchId = id;
+            document.getElementById('mapModal').style.display = 'flex';
+            if (!map) {
+                map = L.map('map').setView([9.0192, 38.7525], 13);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+                map.on('click', e => {
+                    if (marker) map.removeLayer(marker);
+                    marker = L.marker(e.latlng, { draggable: true }).addTo(map);
+                });
+            }
+            setTimeout(() => map.invalidateSize(), 300);
+        }
+
+        function confirmLocation() {
+            if (marker) {
+                const pos = marker.getLatLng();
+                document.getElementById(`loc-${activeBranchId}`).value = `${pos.lat.toFixed(6)}, ${pos.lng.toFixed(6)}`;
+                closeMap();
+            } else {
+                alert("Please click on the map to place a pin.");
+            }
+        }
+
+        function closeMap() {
+            document.getElementById('mapModal').style.display = 'none';
+        }
+
+        // Initial Grid Load
+        updateBranchGrid();
+    </script>
+</body>
+</html>

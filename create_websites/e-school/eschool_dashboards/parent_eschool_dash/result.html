@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>EB Academy - Pro Printer (Dark Mode)</title>
+    <style>
+        /* Root variables for easy theme switching */
+        :root {
+            --bg-color: #1a1a1a;
+            --panel-bg: #2d2d2d;
+            --text-color: #e0e0e0;
+            --input-border: #444444;
+        }
+
+        @page { size: A4 landscape; margin: 0; }
+
+        body {
+            font-family: 'Times New Roman', serif;
+            margin: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: background 0.3s ease;
+        }
+
+        /* Controls Panel */
+        .controls {
+            background: var(--panel-bg);
+            padding: 25px;
+            width: 850px;
+            margin: 20px 0;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .controls h3 { margin: 0; grid-column: span 2; border-bottom: 1px solid var(--input-border); padding-bottom: 5px; }
+
+        input { 
+            padding: 10px; 
+            background: var(--panel-bg); 
+            color: var(--text-color); 
+            border: 1px solid var(--input-border); 
+            border-radius: 4px;
+        }
+
+        .btn-row { grid-column: span 2; display: flex; gap: 10px; }
+        
+        button { 
+            flex: 1; 
+            padding: 12px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            border: none; 
+            border-radius: 4px;
+        }
+
+        .print-btn { background: #002b5c; color: white; }
+        .theme-btn { background: #d4af37; color: #000; }
+
+        /* Certificate Pages (STAYS LIGHT FOR PRINTING) */
+        .page {
+            width: 297mm;
+            height: 210mm;
+            background: white; /* Always white for ink safety */
+            color: #000;
+            margin-bottom: 40px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            page-break-after: always;
+        }
+
+        .border-outer { width: 92%; height: 88%; border: 12px solid #002b5c; padding: 4px; box-sizing: border-box; }
+        .border-inner { border: 3px solid #d4af37; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; }
+
+        /* Typography */
+        .school-header { font-size: 45px; font-weight: bold; color: #002b5c; margin: 0; }
+        .title { font-size: 65px; color: #d4af37; margin: 15px 0; font-family: 'Georgia', serif; }
+        .student-name { font-size: 55px; border-bottom: 3px solid #333; min-width: 450px; font-style: italic; margin: 15px; }
+
+        /* Marks Table */
+        .marks-table { width: 85%; border-collapse: collapse; margin-top: 20px; color: #000; }
+        .marks-table th, .marks-table td { border: 2px solid #002b5c; padding: 15px; text-align: left; }
+        .marks-table th { background: #f0f4f8; }
+
+        /* Print Logic */
+        @media print {
+            .controls { display: none; }
+            body { background: white; }
+            .page { box-shadow: none; margin: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="controls">
+        <h3>EB Academy - Data Entry</h3>
+        <input type="text" id="nameIn" placeholder="Full Student Name" oninput="sync()">
+        <input type="text" id="gradeIn" placeholder="Grade/Class" oninput="sync()">
+        
+        <input type="number" id="m1In" placeholder="Math Mark" oninput="sync()">
+        <input type="number" id="m2In" placeholder="English Mark" oninput="sync()">
+        <input type="number" id="m3In" placeholder="Science Mark" oninput="sync()">
+        <input type="number" id="m4In" placeholder="Amharic Mark" oninput="sync()">
+        
+        <div class="btn-row">
+            <button class="print-btn" onclick="window.print()">🖨️ Print Certificate</button>
+        </div>
+    </div>
+
+    <div class="page">
+        <div class="border-outer">
+            <div class="border-inner">
+                <div class="school-header">EB ACADEMY</div>
+                <div style="letter-spacing: 3px; font-size: 18px;">ADDIS ABABA, ETHIOPIA</div>
+                <div class="title">Certificate of Achievement</div>
+                <p style="font-size: 20px;">This award is presented to</p>
+                <div class="student-name" id="nameOut">Student Name</div>
+                <p style="font-size: 18px; width: 70%;">For completing the required courses for <strong><span id="gradeOut">Grade ___</span></strong> with academic distinction and honor.</p>
+                
+                <div style="display:flex; justify-content: space-around; width: 100%; margin-top: 40px;">
+                    <div style="border-top: 2px solid #333; width: 200px; padding-top: 5px;">Director</div>
+                    <div style="border-top: 2px solid #333; width: 200px; padding-top: 5px;">Class Teacher</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="page">
+        <div class="border-outer">
+            <div class="border-inner">
+                <h2 style="color: #002b5c; text-decoration: underline;">OFFICIAL STUDENT REPORT</h2>
+                <table class="marks-table">
+                    <thead>
+                        <tr><th>Subject</th><th>Score / 100</th><th>Remarks</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Mathematics</td><td id="m1">-</td><td>Excellent</td></tr>
+                        <tr><td>English Language</td><td id="m2">-</td><td>Very Good</td></tr>
+                        <tr><td>General Science</td><td id="m3">-</td><td>Satisfactory</td></tr>
+                        <tr><td>Amharic Language</td><td id="m4">-</td><td>Good</td></tr>
+                    </tbody>
+                </table>
+                <p style="margin-top: 50px; font-style: italic;">"Educating the next generation of leaders."</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function sync() {
+            document.getElementById('nameOut').innerText = document.getElementById('nameIn').value || "Student Name";
+            document.getElementById('gradeOut').innerText = document.getElementById('gradeIn').value || "Grade ___";
+            document.getElementById('m1').innerText = document.getElementById('m1In').value || "-";
+            document.getElementById('m2').innerText = document.getElementById('m2In').value || "-";
+            document.getElementById('m3').innerText = document.getElementById('m3In').value || "-";
+            document.getElementById('m4').innerText = document.getElementById('m4In').value || "-";
+        }
+
+    </script>
+</body>
+</html>

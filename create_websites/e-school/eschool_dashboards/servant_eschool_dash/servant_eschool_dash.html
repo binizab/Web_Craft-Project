@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PureFlow | Facilities & Sanitation Control</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --primary: #10b981; /* Emerald Green */
+            --primary-soft: #ecfdf5;
+            --bg-main: #f8fafc;
+            --dark: #0f172a;
+            --text-muted: #64748b;
+            --white: #ffffff;
+            --danger: #ef4444;
+            --border-color: #e2e8f0;
+            --radius-lg: 1rem;
+            --radius-xl: 2rem;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--dark);
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            min-height: 100vh;
+        }
+
+        /* --- Sidebar --- */
+        .sidebar {
+            background: var(--white);
+            border-right: 1px solid var(--border-color);
+            padding: 2.5rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 3rem;
+        }
+
+        .nav-menu { flex-grow: 1; }
+        .nav-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            margin: 1.5rem 0 0.5rem 0.5rem;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.85rem 1rem;
+            text-decoration: none;
+            color: var(--text-muted);
+            font-weight: 600;
+            border-radius: var(--radius-lg);
+            transition: 0.2s;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: var(--primary-soft);
+            color: var(--primary);
+        }
+
+        /* --- Main Content --- */
+        .content { padding: 3rem; }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 2.5rem;
+        }
+
+        .header-info h1 { font-size: 2rem; font-weight: 800; }
+        .header-info p { color: var(--text-muted); }
+
+        /* --- Cards --- */
+        .grid-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .card {
+            background: var(--white);
+            padding: 1.5rem;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow);
+        }
+
+        .card-icon {
+            background: var(--primary-soft);
+            color: var(--primary);
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+        }
+
+        .val { font-size: 1.75rem; font-weight: 800; display: block; }
+        .lab { font-size: 0.8rem; color: var(--text-muted); font-weight: 600; }
+
+        /* --- Tables/Lists --- */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1.8fr 1.2fr;
+            gap: 2rem;
+        }
+
+        .section-title { font-weight: 800; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem; }
+
+        .zone-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.25rem;
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            margin-bottom: 0.75rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
+        }
+
+        .status-clean { background: var(--primary); color: var(--primary); }
+        .status-pending { background: var(--warning); color: var(--warning); }
+        .status-urgent { background: var(--danger); color: var(--danger); }
+
+        /* --- Supply Meter --- */
+        .meter-container { margin-bottom: 1.5rem; }
+        .meter-label { display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.5rem; }
+        .meter-bar { height: 8px; background: #f1f5f9; border-radius: 10px; overflow: hidden; }
+        .meter-fill { height: 100%; background: var(--primary); }
+
+        @media (max-width: 1024px) {
+            .layout { grid-template-columns: 1fr; }
+            .sidebar { display: none; }
+            .grid-stats { grid-template-columns: 1fr 1fr; }
+            .main-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="brand">
+                <i data-lucide="sparkles"></i>
+                <span>PureFlow</span>
+            </div>
+
+            <nav class="nav-menu">
+                <p class="nav-label">Operations</p>
+                <a href="#" class="nav-item active"><i data-lucide="layout-dashboard"></i> Floor Map</a>
+                <a href="#" class="nav-item"><i data-lucide="clipboard-check"></i> Task List</a>
+                <a href="#" class="nav-item"><i data-lucide="droplet"></i> Chemical Inventory</a>
+                
+                <p class="nav-label">Staff</p>
+                <a href="#" class="nav-item"><i data-lucide="users"></i> Team Rosters</a>
+                <a href="#" class="nav-item"><i data-lucide="clock"></i> Shift Logs</a>
+            </nav>
+        </aside>
+
+        <main class="content">
+            <header>
+                <div class="header-info">
+                    <h1>Facilities Dashboard</h1>
+                    <p>Current Shift: <strong>Morning (06:00 - 14:00)</strong></p>
+                </div>
+                <button style="background: var(--dark); color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 12px; font-weight: 700; cursor: pointer;">
+                    Log Incident
+                </button>
+            </header>
+
+            <div class="grid-stats">
+                <div class="card">
+                    <div class="card-icon"><i data-lucide="check-circle"></i></div>
+                    <span class="val">84%</span>
+                    <span class="lab">Zones Cleaned</span>
+                </div>
+                <div class="card">
+                    <div class="card-icon"><i data-lucide="alert-circle"></i></div>
+                    <span class="val">02</span>
+                    <span class="lab">Urgent Requests</span>
+                </div>
+                <div class="card">
+                    <div class="card-icon"><i data-lucide="user-check"></i></div>
+                    <span class="val">12</span>
+                    <span class="lab">Staff Active</span>
+                </div>
+                <div class="card">
+                    <div class="card-icon"><i data-lucide="package-2"></i></div>
+                    <span class="val">Low</span>
+                    <span class="lab">Stock Alert</span>
+                </div>
+            </div>
+
+            <div class="main-grid">
+                <section>
+                    <h2 class="section-title"><i data-lucide="map"></i> Zone Live Status</h2>
+                    
+                    <div class="zone-item">
+                        <div>
+                            <h4 style="font-weight: 700;">Main Lobby & Reception</h4>
+                            <p style="font-size: 0.8rem; color: var(--text-muted);">Last Cleaned: 45 mins ago by <strong>Elena R.</strong></p>
+                        </div>
+                        <span style="font-size: 0.75rem; font-weight: 800; color: var(--primary); background: var(--primary-soft); padding: 0.4rem 0.8rem; border-radius: 20px;">COMPLETED</span>
+                    </div>
+
+                    <div class="zone-item">
+                        <div>
+                            <h4 style="font-weight: 700;">Conference Room B</h4>
+                            <p style="font-size: 0.8rem; color: var(--text-muted);">Scheduled for: 11:30 AM</p>
+                        </div>
+                        <span style="font-size: 0.75rem; font-weight: 800; color: #f59e0b; background: #fffbeb; padding: 0.4rem 0.8rem; border-radius: 20px;">PENDING</span>
+                    </div>
+
+                    <div class="zone-item" style="border-left: 4px solid var(--danger);">
+                        <div>
+                            <h4 style="font-weight: 700;">Restroom - Floor 2 (West)</h4>
+                            <p style="font-size: 0.8rem; color: var(--text-muted);">Spill Reported • High Priority</p>
+                        </div>
+                        <span style="font-size: 0.75rem; font-weight: 800; color: var(--danger); background: #fef2f2; padding: 0.4rem 0.8rem; border-radius: 20px;">URGENT</span>
+                    </div>
+                </section>
+
+                <section>
+                    <div class="card">
+                        <h2 class="section-title" style="margin-bottom: 1.5rem;"><i data-lucide="beaker"></i> Supply Levels</h2>
+                        
+                        <div class="meter-container">
+                            <div class="meter-label"><span>All-Purpose Cleaner</span><span>75%</span></div>
+                            <div class="meter-bar"><div class="meter-fill" style="width: 75%;"></div></div>
+                        </div>
+
+                        <div class="meter-container">
+                            <div class="meter-label"><span>Disinfectant Wipes</span><span>12%</span></div>
+                            <div class="meter-bar"><div class="meter-fill" style="width: 12%; background: var(--danger);"></div></div>
+                        </div>
+
+                        <div class="meter-container">
+                            <div class="meter-label"><span>Paper Towels</span><span>40%</span></div>
+                            <div class="meter-bar"><div class="meter-fill" style="width: 40%; background: #f59e0b;"></div></div>
+                        </div>
+
+                        <button style="width: 100%; margin-top: 1rem; padding: 0.8rem; border: 1px dashed var(--primary); background: transparent; color: var(--primary); font-weight: 700; border-radius: 12px; cursor: pointer;">
+                            Request Supplies
+                        </button>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>ShopHub — E-commerce Operations Suite</title>
+<meta name="description" content="Multi-role e-commerce operations dashboard for managers, finance, store, HR and delivery teams." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ===== LOGIN VIEW ===== -->
+<div id="loginView" class="login-wrap">
+  <div class="login-card">
+    <button class="theme-fab" id="loginTheme" aria-label="Toggle theme"><i data-lucide="moon"></i></button>
+    <div class="login-brand">
+      <div class="logo-badge"><i data-lucide="shopping-bag"></i></div>
+      <h1>ShopHub</h1>
+      <p>E-commerce Operations Suite</p>
+    </div>
+    <form id="loginForm" class="login-form" autocomplete="off">
+      <label>Select Role</label>
+      <div class="custom-select-wrapper">
+        <input type="hidden" name="role" id="roleInput" value="manager" required>
+        <div class="select-trigger" id="roleTrigger">
+          <div class="trigger-content">
+            <i data-lucide="briefcase"></i>
+            <span class="selected-label">Manager</span>
+          </div>
+          <i data-lucide="chevron-down" style="width:16px"></i>
+        </div>
+        <div class="options-menu" id="roleMenu">
+          <div class="option-item" data-value="manager" data-icon="briefcase"><i data-lucide="briefcase"></i>Manager</div>
+          <div class="option-item" data-value="finance" data-icon="wallet"><i data-lucide="wallet"></i>Finance</div>
+          <div class="option-item" data-value="store" data-icon="store"><i data-lucide="store"></i>Store</div>
+          <div class="option-item" data-value="hr" data-icon="users"><i data-lucide="users"></i>HR</div>
+          <div class="option-item" data-value="delivery" data-icon="truck"><i data-lucide="truck"></i>Delivery</div>
+        </div>
+      </div>
+
+      <label for="userName">Username</label>
+      <input id="userName" type="text" placeholder="e.g. Abebe Kebede" required>
+
+      <label for="passkey">Passkey</label>
+      <div class="passkey-field">
+        <input id="passkey" type="password" placeholder="Enter passkey" required>
+        <button type="button" class="eye-btn" id="eyeBtn" aria-label="Show passkey"><i data-lucide="eye"></i></button>
+      </div>
+
+      <div class="login-error" id="loginError"></div>
+      <button type="submit" class="btn-primary"><i data-lucide="log-in"></i>Sign In</button>
+      <p class="hint">Demo passkey: <code>shophub2026</code></p>
+    </form>
+  </div>
+</div>
+
+<!-- ===== APP VIEW ===== -->
+<div id="appView" class="app hidden">
+  <aside class="sidebar" id="sidebar">
+    <div class="side-head">
+      <div class="logo-badge sm"><i data-lucide="shopping-bag"></i></div>
+      <span class="brand-text">ShopHub</span>
+      <button class="collapse-btn" id="collapseBtn" aria-label="Collapse"><i data-lucide="sidebar"></i></button>
+    </div>
+    <div class="side-role" id="sideRole">Manager Panel</div>
+    <nav class="side-nav" id="sideNav"></nav>
+    <div class="side-foot">
+      <button class="logout-btn" id="logoutBtn"><i data-lucide="log-out"></i><span>Logout</span></button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <button class="icon-btn mobile-only" id="mobileMenu" aria-label="Menu"><i data-lucide="menu"></i></button>
+      <div class="search">
+        <i data-lucide="search"></i>
+        <input placeholder="Search orders, products, people…">
+      </div>
+      <div class="top-actions">
+        <button class="icon-btn" id="themeBtn" aria-label="Theme"><i data-lucide="moon"></i></button>
+        <button class="icon-btn" aria-label="Notifications"><i data-lucide="bell"></i></button>
+        <div class="user-chip">
+          <div class="avatar" id="userAvatar">M</div>
+          <div class="user-meta">
+            <strong id="userNameLabel">User</strong>
+            <small id="userRoleLabel">Manager</small>
+          </div>
+        </div>
+      </div>
+    </header>
+    <section class="content-frame">
+      <iframe id="contentFrame" class="frame" title="Dashboard content"></iframe>
+    </section>
+  </main>
+  <div class="backdrop" id="backdrop"></div>
+</div>
+
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

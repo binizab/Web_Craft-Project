@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PHP Admin Submission</title>
+    <style>
+        body { font-family: sans-serif; padding: 50px; display: flex; justify-content: center; }
+        .container { width: 300px; }
+        
+        /* The Success Container - Hidden by default */
+        #successBox {
+            display: none; 
+            background: #d4edda;
+            color: #155724;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #c3e6cb;
+            text-align: center;
+        }
+
+        input, button { width: 100%; padding: 10px; margin-bottom: 10px; box-sizing: border-box; }
+        button { background: #007bff; color: white; border: none; cursor: pointer; }
+        button:hover { background: #0056b3; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <form id="newForm">
+        <h3>Send to Admin</h3>
+        <input type="text" name="username" placeholder="Full Name" required>
+        <input type="email" name="email" placeholder="Email Address" required>
+        <button type="submit" id="submitBtn">Send Now</button>
+    </form>
+
+    <div id="mainContainer">
+        <h2>Hi! 👋</h2>
+        <p>Your message was sent successfully to the admin.</p>
+    </div>
+</div>
+
+<script>
+    const adminForm = document.getElementById('newForm');
+    const successBox = document.getElementById('blurOverlay');
+
+    adminForm.addEventListener('submit', function(e) {
+        e.preventDefault(); // Prevent page refresh
+
+        const formData = new FormData(this);
+
+        fetch('process.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                // Hide form and show the "Hi" box
+                successBox.style.display = 'block';
+            } else {
+                alert("Error: " + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert("Could not connect to the server.");
+        });
+    });
+</script>
+
+</body>
+</html>

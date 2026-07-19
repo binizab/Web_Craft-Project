@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EB Academy | Admissions Control</title>
+    <style>
+        :root {
+            --bg: #09090b;
+            --card: #18181b;
+            --accent: #38bdf8;
+            --text: #ffffff;
+            --dim: #71717a;
+            --border: #27272a;
+            --success: #10b981;
+            --danger: #ef4444;
+        }
+
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+
+        /* Tabs */
+        .tab-nav { display: flex; gap: 20px; border-bottom: 1px solid var(--border); margin-bottom: 30px; }
+        .tab { padding: 15px 30px; cursor: pointer; color: var(--dim); border-bottom: 2px solid transparent; transition: 0.3s; }
+        .tab.active { color: var(--accent); border-color: var(--accent); font-weight: bold; }
+
+        /* Application Cards */
+        .app-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; }
+        .app-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 20px; position: relative; transition: 0.3s; }
+        .app-card:hover { border-color: var(--accent); transform: translateY(-5px); }
+
+        .app-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; }
+        .type-tag { font-size: 0.7rem; padding: 3px 8px; border-radius: 4px; background: #333; color: #ccc; text-transform: uppercase; }
+
+        .btn-group { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 20px; }
+        .btn { padding: 10px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; font-size: 0.8rem; transition: 0.2s; }
+        
+        .btn-view { background: rgba(255,255,255,0.05); color: white; border: 1px solid #444; }
+        .btn-accept { background: var(--success); color: black; }
+        .btn-reject { background: var(--danger); color: white; }
+
+        /* Full Info Modal */
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 1000; align-items: center; justify-content: center; padding: 20px; }
+        .modal-content { background: var(--card); width: 100%; max-width: 600px; border-radius: 20px; padding: 40px; border: 1px solid var(--accent); position: relative; }
+        .close-modal { position: absolute; top: 20px; right: 20px; cursor: pointer; font-size: 1.5rem; color: var(--dim); }
+
+        .info-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #27272a; }
+        .info-label { color: var(--dim); font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header style="margin-bottom: 40px;">
+            <h1 style="color:var(--accent); margin:0;">Application Review Board</h1>
+            <p style="color:var(--dim)">Process new registrations for the 2026 Academic Year</p>
+        </header>
+
+        <div class="tab-nav">
+            <div class="tab active" onclick="filterType('all')">All Pending</div>
+            <div class="tab" onclick="filterType('student')">Student Admissions</div>
+            <div class="tab" onclick="filterType('teacher')">Teacher Recruitment</div>
+        </div>
+
+        <div class="app-grid" id="appGrid">
+            <div class="app-card" data-type="teacher">
+                <div class="app-header">
+                    <div>
+                        <span class="type-tag">Instructor App</span>
+                        <h3 style="margin: 10px 0 5px;">Mulugeta Tesfaye</h3>
+                        <span style="color:var(--dim); font-size:0.8rem;">Physics & Mathematics</span>
+                    </div>
+                </div>
+                <p style="font-size:0.85rem; color:#aaa;">"10 years experience in Ethiopian National Curriculum prep."</p>
+                <div class="btn-group">
+                    <button class="btn btn-view" onclick="showInfo('teacher', 'Mulugeta')">View Info</button>
+                    <button class="btn btn-accept" onclick="process(this, 'Accepted')">Accept</button>
+                    <button class="btn btn-reject" onclick="process(this, 'Rejected')">Reject</button>
+                </div>
+            </div>
+
+            <div class="app-card" data-type="student">
+                <div class="app-header">
+                    <div>
+                        <span class="type-tag">Student Reg</span>
+                        <h3 style="margin: 10px 0 5px;">Sara Kassa</h3>
+                        <span style="color:var(--dim); font-size:0.8rem;">Grade 11 - Natural Science</span>
+                    </div>
+                </div>
+                <p style="font-size:0.85rem; color:#aaa;">Transferring from: Bole High School</p>
+                <div class="btn-group">
+                    <button class="btn btn-view" onclick="showInfo('student', 'Sara')">View Info</button>
+                    <button class="btn btn-accept" onclick="process(this, 'Accepted')">Accept</button>
+                    <button class="btn btn-reject" onclick="process(this, 'Rejected')">Reject</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="infoModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+            <h2 id="modalTitle" style="color:var(--accent); margin-top:0;">Detailed Profile</h2>
+            <div id="modalBody">
+                </div>
+            <button class="btn btn-accept" style="width:100%; margin-top:20px;" onclick="closeModal()">Return to List</button>
+        </div>
+    </div>
+
+    <script>
+        const details = {
+            'Mulugeta': {
+                role: "Teacher Candidate",
+                email: "mulu.tes@email.com",
+                phone: "+251 911 00 11 22",
+                edu: "MSc in Physics, Addis Ababa University",
+                exp: "10 Years",
+                docs: "Verified (Resume, Degree, ID)"
+            },
+            'Sara': {
+                role: "Student Applicant",
+                email: "parent.kassa@email.com",
+                phone: "+251 922 44 55 66",
+                prevSchool: "Bole High School",
+                avgGrade: "94.2%",
+                docs: "Birth Certificate, Transcript attached"
+            }
+        };
+
+        function showInfo(type, name) {
+            const data = details[name];
+            document.getElementById('modalTitle').innerText = name + "'s Full Dossier";
+            let html = '';
+            for (const [key, value] of Object.entries(data)) {
+                html += `<div class="info-row"><span class="info-label">${key.toUpperCase()}</span><span>${value}</span></div>`;
+            }
+            document.getElementById('modalBody').innerHTML = html;
+            document.getElementById('infoModal').style.display = 'flex';
+        }
+
+        function closeModal() { document.getElementById('infoModal').style.display = 'none'; }
+
+        function process(btn, status) {
+            const card = btn.closest('.app-card');
+            if(confirm(`Are you sure you want to mark this applicant as ${status}?`)) {
+                card.style.opacity = '0.5';
+                card.style.pointerEvents = 'none';
+                card.innerHTML = `<div style="text-align:center; padding:40px;"><h2 style="color:${status === 'Accepted' ? 'var(--success)' : 'var(--danger)'}">${status.toUpperCase()}</h2></div>`;
+                setTimeout(() => card.remove(), 2000);
+            }
+        }
+
+        function filterType(val) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            document.querySelectorAll('.app-card').forEach(card => {
+                if(val === 'all' || card.dataset.type === val) card.style.display = 'block';
+                else card.style.display = 'none';
+            });
+        }
+    </script>
+</body>
+</html>

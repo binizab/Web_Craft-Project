@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium Custom Dropdown</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-light: #eef2ff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --bg: #f8fafc;
+            --white: #ffffff;
+            --border: #e2e8f0;
+            --radius: 12px;
+            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg);
+            display: flex;
+            justify-content: center;
+            padding-top: 100px;
+            margin: 0;
+        }
+
+        /* Container */
+        .dropdown-wrapper {
+            position: relative;
+            width: 320px;
+            user-select: none;
+        }
+
+        .label {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        /* The Selected Box */
+        .select-trigger {
+            background: var(--white);
+            border: 2px solid var(--border);
+            padding: 12px 16px;
+            border-radius: var(--radius);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s ease;
+            font-weight: 500;
+            color: var(--text-main);
+        }
+
+        .select-trigger:hover {
+            border-color: var(--primary);
+        }
+
+        .dropdown-wrapper.active .select-trigger {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px var(--primary-light);
+        }
+
+        .arrow {
+            transition: transform 0.3s ease;
+            color: var(--text-muted);
+        }
+
+        .dropdown-wrapper.active .arrow {
+            transform: rotate(180deg);
+            color: var(--primary);
+        }
+
+        /* The Options Menu */
+        .options-menu {
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 0;
+            width: 100%;
+            background: var(--white);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.2s ease;
+            z-index: 100;
+        }
+
+        .dropdown-wrapper.active .options-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        /* Individual Options */
+        .option {
+            padding: 12px 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--text-main);
+            font-size: 0.95rem;
+            transition: background 0.2s;
+        }
+
+        .option:hover {
+            background-color: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .option.selected {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        /* Custom scrollbar for long lists */
+        .options-menu::-webkit-scrollbar {
+            width: 6px;
+        }
+        .options-menu::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="dropdown-wrapper" id="customDropdown">
+        <span class="label">Choose Campus</span>
+        
+        <div class="select-trigger">
+            <span id="selectedText">Select an option...</span>
+            <i data-lucide="chevron-down" class="arrow" size="18"></i>
+        </div>
+
+        <div class="options-menu">
+            <div class="option" data-value="central">
+                <i data-lucide="map-pin" size="16"></i> Central High School
+            </div>
+            <div class="option" data-value="north">
+                <i data-lucide="map-pin" size="16"></i> North Wing Academy
+            </div>
+            <div class="option" data-value="west">
+                <i data-lucide="map-pin" size="16"></i> West Heights Prep
+            </div>
+            <div class="option" data-value="online">
+                <i data-lucide="monitor" size="16"></i> Virtual Learning Hub
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Icons
+        lucide.createIcons();
+
+        const dropdown = document.getElementById('customDropdown');
+        const trigger = dropdown.querySelector('.select-trigger');
+        const options = dropdown.querySelectorAll('.option');
+        const selectedText = document.getElementById('selectedText');
+
+        // 1. Toggle Open/Close
+        trigger.addEventListener('click', () => {
+            dropdown.classList.toggle('active');
+        });
+
+        // 2. Handle Option Selection
+        options.forEach(option => {
+            option.addEventListener('click', () => {
+                // Update text
+                selectedText.innerText = option.innerText;
+                
+                // Update styling
+                options.forEach(opt => opt.classList.remove('selected'));
+                option.classList.add('selected');
+                
+                // Close menu
+                dropdown.classList.remove('active');
+
+                // Log the value for your backend/form
+                console.log("Selected Value:", option.getAttribute('data-value'));
+            });
+        });
+
+        // 3. Close if user clicks outside
+        window.addEventListener('click', (e) => {
+            if (!dropdown.contains(e.target)) {
+                dropdown.classList.remove('active');
+            }
+        });
+    </script>
+</body>
+</html>

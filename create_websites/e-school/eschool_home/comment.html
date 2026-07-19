@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Comment Section</title>
+
+<script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+
+<style>
+body{
+    font-family: Arial;
+    background:#f4f4f4;
+}
+.comment-box{
+    width:400px;
+    background:#fff;
+    padding:20px;
+    margin:50px auto;
+    border-radius:8px;
+    box-shadow:0 0 10px rgba(0,0,0,.2);
+}
+input,textarea,button{
+    width:100%;
+    padding:10px;
+    margin:8px 0;
+}
+button{
+    background:#6a5acd;
+    color:white;
+    border:none;
+    cursor:pointer;
+}
+button:hover{
+    background:#483d8b;
+}
+</style>
+</head>
+
+<body>
+
+<div class="comment-box">
+<h2>Leave a Comment</h2>
+
+<input type="text" id="name" placeholder="Your Name" required>
+<input type="email" id="email" placeholder="Your Email" required>
+<textarea id="comment" placeholder="Your Comment" required></textarea>
+
+<button onclick="sendComment()">Send Comment</button>
+<p id="status"></p>
+</div>
+
+<script>
+(function(){
+    emailjs.init("vUYnQJyEb_HW8suO9"); // 🔑
+})();
+
+function sendComment(){
+    const params = {
+        from_name: document.getElementById("name").value,
+        from_email: document.getElementById("email").value,
+        comment: document.getElementById("comment").value
+    };
+
+    emailjs.send(
+        "service_k6ar6un",
+        "template_jrs527p",
+        params
+    ).then(() => {
+        document.getElementById("status").innerText = "Comment sent successfully ✅";
+    }).catch(() => {
+        document.getElementById("status").innerText = "Failed to send ❌";
+    });
+}
+</script>
+
+</body>
+</html>

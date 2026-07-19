@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Shipments — ShopHub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../../style.css" />
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+</head>
+<body class="module-body">
+<div class="page-head"><div><h2>Shipments</h2><p>All active orders</p></div><button class="btn primary"><i data-lucide="plus"></i>New Shipment</button></div><div class="card"><h3>Shipment List</h3><table><thead><tr><th>Tracking</th><th>Customer</th><th>Destination</th><th>Status</th><th>ETA</th></tr></thead><tbody><tr><td>TRK-9821</td><td>Aisha K</td><td>Boston, MA</td><td><span class='badge info'>In Transit</span></td><td>May 11</td></tr><tr><td>TRK-9820</td><td>Ravi P</td><td>Newark, NJ</td><td><span class='badge success'>Delivered</span></td><td>Done</td></tr><tr><td>TRK-9819</td><td>Sara J</td><td>Albany, NY</td><td><span class='badge warning'>Pending</span></td><td>May 12</td></tr></tbody></table></div>
+<script>
+(function(){
+  function paint(){ if(window.lucide) window.lucide.createIcons(); }
+  var t = (function(){ try{return localStorage.getItem('shophub-theme');}catch(e){return null;} })() || 'light';
+  document.documentElement.setAttribute('data-theme', t);
+  window.addEventListener('message', function(e){
+    if(e.data && e.data.type==='theme'){ document.documentElement.setAttribute('data-theme', e.data.theme); }
+  });
+  if(document.readyState!=='loading') paint(); else window.addEventListener('DOMContentLoaded', paint);
+  window.addEventListener('load', function(){ paint(); try{ parent.postMessage({type:'frameReady'},'*'); }catch(e){} });
+})();
+</script>
+</body>
+</html>

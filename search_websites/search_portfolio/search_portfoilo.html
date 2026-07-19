@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>PortfolioCatalog • Browse & Launch Portfolios | Dexie Showcase</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://unpkg.com/dexie@latest/dist/dexie.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg-body: #f8fafc;
+      --bg-card: #ffffff;
+      --bg-surface: #f1f5f9;
+      --border-color: #e2e8f0;
+      --text-main: #0f172a;
+      --text-muted: #475569;
+      --primary: #7c3aed;
+      --primary-dark: #6d28d9;
+      --primary-light: #8b5cf6;
+      --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.08);
+      --header-gradient-start: #e0e7ff;
+      --header-gradient-end: #c7d2fe;
+      --filter-bg: #ffffff;
+    }
+
+    body.dark {
+      --bg-body: #0a0f1c;
+      --bg-card: #1e293b;
+      --bg-surface: #0f172a;
+      --border-color: #334155;
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --primary: #a78bfa;
+      --primary-dark: #8b5cf6;
+      --filter-bg: #1e293b;
+      --header-gradient-start: #1e1b4b;
+      --header-gradient-end: #2e1065;
+    }
+
+    body {
+      font-family: 'Poppins', 'Inter', sans-serif;
+      background: var(--bg-body);
+      color: var(--text-main);
+      transition: background 0.25s ease, color 0.2s;
+      line-height: 1.5;
+    }
+
+    /* Header */
+    .catalog-header {
+      position: relative;
+      width: 100%;
+      min-height: 320px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      background: linear-gradient(135deg, var(--header-gradient-start), var(--header-gradient-end));
+      border-bottom: 1px solid var(--border-color);
+      overflow: hidden;
+    }
+    .overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.25);
+      z-index: 1;
+    }
+    .header-content {
+      position: relative;
+      z-index: 10;
+      max-width: 950px;
+      width: 90%;
+      padding: 2rem;
+    }
+    h1 {
+      font-size: 3rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #1e1b4b, #5b21b6);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      margin-bottom: 12px;
+    }
+    body.dark h1 {
+      background: linear-gradient(135deg, #e0e7ff, #c7d2fe);
+      -webkit-background-clip: text;
+      background-clip: text;
+    }
+    .subhead {
+      color: #3b2e5e;
+      font-weight: 500;
+      margin-bottom: 28px;
+    }
+    body.dark .subhead { color: #cbd5e6; }
+
+    /* Search Bar */
+    .search-container {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      background: rgba(0, 0, 0, 0.55);
+      backdrop-filter: blur(16px);
+      border-radius: 56px;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      padding: 5px 16px 5px 20px;
+      position: relative;
+    }
+    #activeFilters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+    .filter-pill {
+      background: var(--primary);
+      color: white;
+      font-weight: 700;
+      padding: 6px 14px;
+      border-radius: 40px;
+      font-size: 0.75rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .filter-pill span { cursor: pointer; font-size: 1.2rem; font-weight: 700; }
+    .search-input-wrapper {
+      flex: 1;
+      position: relative;
+    }
+    .search-input-wrapper i {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #cbd5e6;
+      width: 18px;
+      height: 18px;
+    }
+    .search-container input {
+      width: 100%;
+      background: transparent;
+      border: none;
+      padding: 12px 12px 12px 42px;
+      color: white;
+      font-size: 1rem;
+      outline: none;
+      font-weight: 500;
+    }
+    .filter-trigger {
+      background: rgba(30, 41, 59, 0.8);
+      border: none;
+      color: white;
+      width: 46px;
+      height: 46px;
+      border-radius: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .filter-trigger:hover { background: var(--primary); transform: scale(0.96); }
+
+    .filterDrop {
+      position: absolute;
+      top: 110%;
+      right: 10px;
+      width: 260px;
+      background: var(--filter-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 28px;
+      padding: 16px;
+      display: none;
+      z-index: 9999;
+      backdrop-filter: blur(12px);
+      box-shadow: var(--shadow-md);
+    }
+    .filterDrop.show { display: block; }
+    .filterHeader {
+      color: var(--primary);
+      font-size: 0.7rem;
+      font-weight: 800;
+      margin: 12px 0 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      text-transform: uppercase;
+    }
+    .filterContent {
+      padding: 8px 14px;
+      cursor: pointer;
+      border-radius: 40px;
+      transition: 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 500;
+    }
+    .filterContent:hover {
+      background: var(--primary);
+      color: white;
+    }
+
+    /* Stats & Grid */
+    .catalog-container {
+      max-width: 1400px;
+      margin: 48px auto;
+      padding: 0 28px;
+    }
+    .stats-info {
+      background: var(--bg-card);
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 24px;
+      border-radius: 60px;
+      margin-bottom: 36px;
+      font-weight: 600;
+      border: 1px solid var(--border-color);
+    }
+    .portfolio-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 28px;
+    }
+
+    /* Portfolio Card */
+    .portfolio-card {
+      background: var(--bg-card);
+      border-radius: 28px;
+      border: 1px solid var(--border-color);
+      overflow: hidden;
+      transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+      cursor: pointer;
+      box-shadow: var(--shadow-sm);
+    }
+    .portfolio-card:hover {
+      transform: translateY(-6px);
+      border-color: var(--primary);
+      box-shadow: var(--shadow-md);
+    }
+    .card-avatar {
+      height: 140px;
+      background: linear-gradient(135deg, var(--primary-dark), var(--primary-light));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    .avatar-circle-large {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.2);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: white;
+      border: 3px solid rgba(255,255,255,0.5);
+    }
+    .profile-img-card {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid white;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    }
+    .card-body {
+      padding: 1.5rem;
+    }
+    .card-title {
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .card-role {
+      color: var(--primary);
+      font-weight: 600;
+      font-size: 0.8rem;
+      margin-bottom: 12px;
+    }
+    .skill-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin: 12px 0;
+    }
+    .skill-chip {
+      background: var(--bg-surface);
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 0.7rem;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+    .meta-stats {
+      display: flex;
+      gap: 16px;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border-color);
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+    .empty-state {
+      grid-column: 1/-1;
+      text-align: center;
+      padding: 70px;
+      background: var(--bg-card);
+      border-radius: 48px;
+      border: 1px dashed var(--border-color);
+    }
+
+    /* Theme Toggle */
+    .theme-toggle {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 60px;
+      padding: 12px 18px;
+      cursor: pointer;
+      z-index: 1050;
+      backdrop-filter: blur(10px);
+      display: flex;
+      gap: 8px;
+      font-weight: 500;
+    }
+
+    /* Toast */
+    .toast-msg {
+      position: fixed;
+      bottom: 100px;
+      right: 28px;
+      background: var(--bg-card);
+      border-left: 4px solid var(--primary);
+      padding: 12px 20px;
+      border-radius: 60px;
+      font-size: 0.85rem;
+      z-index: 1100;
+      box-shadow: var(--shadow-md);
+      animation: slideIn 0.3s ease;
+    }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(30px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    @media (max-width: 700px) {
+      .catalog-header { min-height: 280px; }
+      h1 { font-size: 2rem; }
+      .portfolio-grid { gap: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="catalog-header">
+  <div class="overlay"></div>
+  <div class="header-content">
+    <h1>🎨 PortfolioCatalog</h1>
+    <p class="subhead">Browse all portfolios saved from Portfolio Maker • Click any card to launch full preview</p>
+    <div class="search-container">
+      <div id="activeFilters"></div>
+      <div class="search-input-wrapper">
+        <i data-lucide="search"></i>
+        <input type="text" id="searchInput" placeholder="Search by name, role, skills...">
+      </div>
+      <button class="filter-trigger" id="filterBtn">
+        <i data-lucide="sliders-horizontal"></i>
+      </button>
+      <div class="filterDrop" id="filterMenu">
+        <div class="filterContent" id="clearAll" style="color: var(--primary); font-weight: bold; border-bottom: 1px solid var(--border-color);">
+          <i data-lucide="eraser"></i> Clear filters
+        </div>
+        <div class="filterHeader"><i data-lucide="briefcase"></i> Experience Level</div>
+        <div class="filterContent filter-exp">Junior</div>
+        <div class="filterContent filter-exp">Senior</div>
+        <div class="filterContent filter-exp">Expert</div>
+        <div class="filterHeader"><i data-lucide="star"></i> Top Rated</div>
+        <div class="filterContent filter-rated">⭐ 4+ Stars</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="catalog-container">
+  <div class="stats-info">
+    <i data-lucide="users"></i>
+    <span id="resultCount">0</span> portfolios · Click to preview
+  </div>
+  <main class="portfolio-grid" id="portfolioGrid"></main>
+</div>
+
+<div class="theme-toggle" id="themeToggle">
+  <i data-lucide="moon" id="themeIcon"></i>
+  <span>Dark/Light</span>
+</div>
+
+<script>
+  (function() {
+    // Connect to the SAME Dexie DB used by Portfolio Maker
+    const portfolioDB = new Dexie("PortfolioMakerCoreDB");
+    // Define schema if not exists (safe)
+    try {
+      if (!portfolioDB.tables || !portfolioDB.tables.some(t => t.name === 'portfolios')) {
+        portfolioDB.version(1).stores({
+          portfolios: '++id, fullName, role, createdAt, updatedAt'
+        });
+      }
+    } catch(e) { console.warn(e); }
+    portfolioDB.open().catch(err => console.warn("DB open:", err));
+
+    let allPortfolios = [];
+    let activeFilters = { search: "", expLevel: null, topRated: false };
+
+    // Helper: calculate experience level from yearsExperience string
+    function getExpLevel(portfolio) {
+      const yearsStr = portfolio.yearsExperience || "";
+      const match = yearsStr.match(/\d+/);
+      if (!match) return "Junior";
+      const years = parseInt(match[0]);
+      if (years >= 8) return "Expert";
+      if (years >= 4) return "Senior";
+      return "Junior";
+    }
+
+    // Helper: check if portfolio has high rating (based on projects count or awards as proxy)
+    function isTopRated(portfolio) {
+      const projectsCount = parseInt(portfolio.projectsCount) || 0;
+      const awards = parseInt(portfolio.awardsCount) || 0;
+      return projectsCount >= 5 || awards >= 3;
+    }
+
+    // Searchable text
+    function searchableText(p) {
+      const name = p.fullName || "";
+      const role = p.role || "";
+      const bio = p.bio || "";
+      const skills = (p.skills || []).map(s => s.name).join(" ");
+      return `${name} ${role} ${bio} ${skills}`.toLowerCase();
+    }
+
+    // Load portfolios from Dexie
+    async function loadPortfolios() {
+      try {
+        allPortfolios = await portfolioDB.portfolios.orderBy("updatedAt").reverse().toArray();
+        applyFiltersAndRender();
+      } catch (err) {
+        console.error("Failed to load portfolios:", err);
+        document.getElementById('portfolioGrid').innerHTML = `<div class="empty-state"><i data-lucide="alert-circle"></i><h3>Cannot load portfolios</h3><p>Create portfolios in Portfolio Maker first.</p></div>`;
+        lucide.createIcons();
+      }
+    }
+
+    function filterPortfolios() {
+      return allPortfolios.filter(p => {
+        // Search filter
+        const searchMatch = activeFilters.search === "" || searchableText(p).includes(activeFilters.search.toLowerCase());
+        
+        // Experience level filter
+        let expMatch = true;
+        if (activeFilters.expLevel) {
+          expMatch = getExpLevel(p) === activeFilters.expLevel;
+        }
+        
+        // Top rated filter
+        let ratedMatch = true;
+        if (activeFilters.topRated) {
+          ratedMatch = isTopRated(p);
+        }
+        
+        return searchMatch && expMatch && ratedMatch;
+      });
+    }
+
+    function escapeHtml(str) { if(!str) return ''; return String(str).replace(/[&<>]/g, m => m==='&'?'&amp;':m==='<'?'&lt;':'&gt;'); }
+
+    // Render portfolio cards
+    function renderPortfolioCards() {
+      const filtered = filterPortfolios();
+      const grid = document.getElementById('portfolioGrid');
+      document.getElementById('resultCount').innerText = filtered.length;
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `<div class="empty-state"><i data-lucide="compass"></i><h3>No matching portfolios</h3><p>Try different filters or create new portfolios in Maker.</p></div>`;
+        lucide.createIcons();
+        return;
+      }
+
+      grid.innerHTML = filtered.map(portfolio => {
+        const name = portfolio.fullName || "Unnamed";
+        const initials = portfolio.initials || (name.slice(0,2).toUpperCase());
+        const role = portfolio.role || "Creative Professional";
+        const tagline = portfolio.tagline || "Crafting digital experiences";
+        const skills = portfolio.skills || [];
+        const displaySkills = skills.slice(0, 3);
+        const projectsCount = portfolio.projects?.length || 0;
+        const expLevel = getExpLevel(portfolio);
+        const profileImg = portfolio.profileImage || null;
+        
+        // Determine badge color based on exp level
+        let expColor = "#10b981";
+        if (expLevel === "Senior") expColor = "#f59e0b";
+        if (expLevel === "Expert") expColor = "#ef4444";
+        
+        return `
+          <div class="portfolio-card" data-id="${portfolio.id}">
+            <div class="card-avatar">
+              ${profileImg ? 
+                `<img src="${escapeHtml(profileImg)}" class="profile-img-card" alt="${escapeHtml(name)}">` : 
+                `<div class="avatar-circle-large">${escapeHtml(initials)}</div>`
+              }
+            </div>
+            <div class="card-body">
+              <h3 class="card-title">${escapeHtml(name)}</h3>
+              <div class="card-role">${escapeHtml(role)}</div>
+              <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:12px;">${escapeHtml(tagline.substring(0, 80))}</p>
+              <div class="skill-chips">
+                ${displaySkills.map(s => `<span class="skill-chip">${escapeHtml(s.name)}</span>`).join('')}
+                ${skills.length > 3 ? `<span class="skill-chip">+${skills.length-3}</span>` : ''}
+              </div>
+              <div class="meta-stats">
+                <span><i data-lucide="folder" style="width:14px;"></i> ${projectsCount} projects</span>
+                <span><i data-lucide="briefcase"></i> ${expLevel}</span>
+                <span><i data-lucide="calendar"></i> ${portfolio.yearsExperience || '0'} yrs</span>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+      
+      lucide.createIcons();
+      
+      // Attach click handlers
+      document.querySelectorAll('.portfolio-card').forEach(card => {
+        const existingHandler = card._clickHandler;
+        if (existingHandler) card.removeEventListener('click', existingHandler);
+        const handler = async (e) => {
+          e.stopPropagation();
+          const id = parseInt(card.getAttribute('data-id'));
+          await launchPortfolioPreview(id);
+        };
+        card.addEventListener('click', handler);
+        card._clickHandler = handler;
+      });
+    }
+
+    // Launch portfolio preview (opens portfolio_home.html with ID)
+    async function launchPortfolioPreview(portfolioId) {
+      const portfolio = allPortfolios.find(p => p.id === portfolioId);
+      if (!portfolio) {
+        showToast("Portfolio data not found", true);
+        return;
+      }
+      try {
+        // Store the ID for the preview page
+        localStorage.setItem('currentPreviewPortfolioId', portfolioId);
+        showToast(`Opening ${portfolio.fullName || 'portfolio'}...`, false);
+        // Build path to portfolio_home.html (relative path from current location)
+        // File structure: webCraft_project/webCraft_home/makerPages/portfolio_search/this_file.html
+        // Target: webCraft_project/create_websites/portfolio/portfolio_home/portfolio_home.html
+        const previewUrl = '../../../../create_websites/portfolio/portfolio_home/portfolio_home.html?id=' + portfolioId;
+        window.open(previewUrl, '_blank');
+      } catch (err) {
+        console.error("Launch error:", err);
+        showToast("Failed to open preview. Check portfolio_home.html path.", true);
+      }
+    }
+
+    let toastTimeout;
+    function showToast(msg, isError = false) {
+      const existing = document.querySelector('.toast-msg');
+      if(existing) existing.remove();
+      const toast = document.createElement('div');
+      toast.className = 'toast-msg';
+      toast.style.backgroundColor = isError ? '#450a0a' : 'var(--bg-card)';
+      toast.style.borderLeftColor = isError ? '#ef4444' : 'var(--primary)';
+      toast.innerHTML = `<i data-lucide="${isError ? 'alert-triangle' : 'external-link'}" style="width:14px; margin-right:8px;"></i> ${msg}`;
+      document.body.appendChild(toast);
+      lucide.createIcons();
+      if(toastTimeout) clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => toast.remove(), 2500);
+    }
+
+    // Filter UI updates
+    function updateFilterPills() {
+      const container = document.getElementById('activeFilters');
+      if(container) {
+        container.innerHTML = '';
+        if(activeFilters.expLevel) {
+          const pill = document.createElement('div');
+          pill.className = 'filter-pill';
+          pill.innerHTML = `${activeFilters.expLevel} <span onclick="window.clearSingleFilter('expLevel')">&times;</span>`;
+          container.appendChild(pill);
+        }
+        if(activeFilters.topRated) {
+          const pill = document.createElement('div');
+          pill.className = 'filter-pill';
+          pill.innerHTML = `⭐ Top Rated <span onclick="window.clearSingleFilter('topRated')">&times;</span>`;
+          container.appendChild(pill);
+        }
+      }
+    }
+
+    window.clearSingleFilter = function(type) {
+      if(type === 'expLevel') activeFilters.expLevel = null;
+      if(type === 'topRated') activeFilters.topRated = false;
+      applyFiltersAndRender();
+    };
+
+    function applyFiltersAndRender() {
+      renderPortfolioCards();
+      updateFilterPills();
+    }
+
+    // Event listeners
+    document.getElementById('searchInput').addEventListener('input', (e) => {
+      activeFilters.search = e.target.value;
+      applyFiltersAndRender();
+    });
+
+    document.querySelectorAll('.filter-exp').forEach(el => {
+      el.addEventListener('click', () => {
+        activeFilters.expLevel = el.innerText.trim();
+        applyFiltersAndRender();
+        document.getElementById('filterMenu').classList.remove('show');
+      });
+    });
+
+    document.querySelectorAll('.filter-rated').forEach(el => {
+      el.addEventListener('click', () => {
+        activeFilters.topRated = !activeFilters.topRated;
+        applyFiltersAndRender();
+        document.getElementById('filterMenu').classList.remove('show');
+      });
+    });
+
+    document.getElementById('clearAll').addEventListener('click', () => {
+      activeFilters = { search: activeFilters.search, expLevel: null, topRated: false };
+      applyFiltersAndRender();
+      document.getElementById('filterMenu').classList.remove('show');
+    });
+
+    const filterBtn = document.getElementById('filterBtn');
+    const filterMenu = document.getElementById('filterMenu');
+    filterBtn.addEventListener('click', (e) => { e.stopPropagation(); filterMenu.classList.toggle('show'); });
+    window.addEventListener('click', (e) => { if (filterMenu && !filterMenu.contains(e.target) && e.target !== filterBtn) filterMenu.classList.remove('show'); });
+
+    // Theme toggle
+    const themeToggle = document.getElementById('themeToggle');
+    function setTheme(theme) {
+      if (theme === 'dark') document.body.classList.add('dark');
+      else document.body.classList.remove('dark');
+      localStorage.setItem('portfolioCatalogTheme', theme);
+      const icon = document.getElementById('themeIcon');
+      if(icon) icon.setAttribute('data-lucide', theme === 'dark' ? 'sun' : 'moon');
+      lucide.createIcons();
+    }
+    themeToggle.addEventListener('click', () => {
+      const isDark = document.body.classList.contains('dark');
+      setTheme(isDark ? 'light' : 'dark');
+    });
+    const savedTheme = localStorage.getItem('portfolioCatalogTheme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    setTheme(savedTheme);
+
+    // Auto-refresh every 5 seconds to sync with maker
+    loadPortfolios();
+    setInterval(() => { loadPortfolios(); }, 5000);
+  })();
+</script>
+</body>
+</html>

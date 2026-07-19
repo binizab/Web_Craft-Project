@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>EB Academy | Sign In</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest"></script>
+<link rel="stylesheet" href="css/style.css" />
+<script src="js/theme.js"></script>
+</head>
+<body>
+<div class="login-wrap">
+  <div class="login-card">
+    <div class="login-logo">
+      <i data-lucide="graduation-cap" style="color:var(--accent);width:28px;height:28px"></i>
+      <span class="brand">EB Academy</span>
+      <div style="margin-left:auto">
+        <button class="icon-btn" onclick="toggleTheme()" title="Theme">
+          <i id="themeIcon" data-lucide="moon"></i>
+        </button>
+      </div>
+    </div>
+    <p class="sub">Sign in to your unified student workspace.</p>
+    <form id="loginForm">
+      <div class="field">
+        <label>Full name</label>
+        <input id="name" class="input" placeholder="Jane Student" required />
+      </div>
+      <div class="field">
+        <label>Email</label>
+        <input id="email" type="email" class="input" placeholder="jane@school.edu" required />
+      </div>
+      <div class="field">
+        <label>Role</label>
+        <select id="role" class="select">
+          <option value="student">Student</option>
+          <option value="teacher">Teacher</option>
+          <option value="admin">Admin</option>
+        </select>
+      </div>
+      <button class="btn btn-primary" type="submit">
+        <i data-lucide="log-in"></i> Continue
+      </button>
+    </form>
+  </div>
+</div>
+<script src="js/login.js"></script>
+</body>
+</html>

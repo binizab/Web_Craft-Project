@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>EB Academy | Grade Lookup</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; display: flex; justify-content: center; padding: 50px; }
+        .search-box { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 400px; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background: #10b981; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        button:hover { background: #059669; }
+        #resultArea { margin-top: 20px; border-top: 1px solid #eee; padding-top: 20px; display: none; }
+        .grade-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #fafafa; }
+        .status-pass { color: #10b981; font-weight: bold; }
+        .status-fail { color: #ef4444; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="search-box">
+    <h2>Student Portal</h2>
+    <p>Enter your full name to see your grades:</p>
+    
+    <input type="text" id="studentName" placeholder="e.g. John Doe">
+    <button onclick="findGrade()">Check Grade</button>
+
+    <div id="resultArea">
+        <h4 id="displayName"></h4>
+        <div id="gradesList"></div>
+    </div>
+</div>
+
+<script>
+    async function findGrade() {
+        const name = document.getElementById('studentName').value;
+        const resultArea = document.getElementById('resultArea');
+        const gradesList = document.getElementById('gradesList');
+        const displayName = document.getElementById('displayName');
+
+        if (!name) return alert("Please enter a name.");
+
+        try {
+            // Fetch only data for this specific user
+            const response = await fetch(`search_grade.php?username=${encodeURIComponent(name)}`);
+            const data = await response.json();
+
+            if (data.length === 0) {
+                alert("No records found for this student.");
+                resultArea.style.display = 'none';
+                return;
+            }
+
+            // Clear and build the list
+            displayName.innerText = `Results for: ${name}`;
+            gradesList.innerHTML = '';
+            
+            data.forEach(item => {
+                gradesList.innerHTML += `
+                    <div class="grade-item">
+                        <span>${item.subject}</span>
+                        <span><strong>${item.grade}</strong> 
+                        (<span class="${item.status.toLowerCase() === 'pass' ? 'status-pass' : 'status-fail'}">${item.status}</span>)
+                        </span>
+                    </div>
+                `;
+            });
+
+            resultArea.style.display = 'block';
+
+        } catch (error) {
+            console.error("Error:", error);
+            alert("Could not connect to the database.");
+        }
+    }
+</script>
+
+</body>
+</html>

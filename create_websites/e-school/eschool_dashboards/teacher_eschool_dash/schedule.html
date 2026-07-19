@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Student Schedule - Dark Mode</title>
+    <style>
+        /* Dark Mode Color Palette */
+        :root {
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --text-primary: #e0e0e0;
+            --text-secondary: #b0b0b0;
+            --accent-blue: #3700b3;
+            --btn-blue: #03dac6;
+            --btn-hover: #018786;
+            --border-color: #333;
+            --item-bg: #252525;
+            --success-green: #1b5e20;
+            --error-red: #cf6679;
+        }
+
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            margin: 20px; 
+            background-color: var(--bg-color); 
+            color: var(--text-primary);
+        }
+
+        .container { 
+            max-width: 800px; 
+            margin: auto; 
+            background: var(--card-bg); 
+            padding: 25px; 
+            border-radius: 15px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
+        }
+
+        h2 { 
+            color: var(--btn-blue); 
+            border-bottom: 2px solid var(--border-color); 
+            padding-bottom: 10px; 
+        }
+        
+        .input-section { 
+            display: grid; 
+            grid-template-columns: 2fr 2fr 1fr; 
+            gap: 10px; 
+            margin-bottom: 30px; 
+        }
+
+        input { 
+            padding: 12px; 
+            background-color: var(--item-bg);
+            border: 1px solid var(--border-color); 
+            border-radius: 8px; 
+            font-size: 14px; 
+            color: white;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--btn-blue);
+        }
+
+        .add-btn { 
+            background: var(--btn-blue); 
+            color: #000; 
+            border: none; 
+            cursor: pointer; 
+            font-weight: bold; 
+            border-radius: 8px; 
+            transition: 0.2s;
+        }
+
+        .add-btn:hover { background: var(--btn-hover); }
+
+        .schedule-list { list-style: none; padding: 0; }
+
+        .item { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding: 15px; 
+            background: var(--item-bg); 
+            border: 1px solid var(--border-color); 
+            margin-bottom: 10px; 
+            border-radius: 10px; 
+            transition: 0.3s;
+        }
+
+        .item.done { 
+            background-color: var(--success-green); 
+            opacity: 0.6; 
+        }
+
+        .item.done span, .item.done strong { 
+            text-decoration: line-through; 
+            color: #ccc;
+        }
+        
+        .info { flex-grow: 1; }
+        .info strong { display: block; font-size: 16px; color: var(--text-primary); }
+        .info small { color: var(--text-secondary); }
+
+        .actions { display: flex; gap: 5px; }
+        .btn-done { background: #2e7d32; color: white; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; }
+        .btn-del { background: #b00020; color: white; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; }
+        
+        .alert-active { 
+            border: 2px solid var(--error-red); 
+            animation: pulse 1.5s infinite; 
+        }
+
+        @keyframes pulse { 
+            0% { box-shadow: 0 0 0 0 rgba(207, 102, 121, 0.4); } 
+            70% { box-shadow: 0 0 0 10px rgba(207, 102, 121, 0); } 
+            100% { box-shadow: 0 0 0 0 rgba(207, 102, 121, 0); } 
+        }
+
+        /* Adjusting the datetime icon for dark mode */
+        input::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>📅 Student Schedule Producer</h2>
+    
+    <div class="input-section">
+        <input type="text" id="taskInput" placeholder="Class/Task Name">
+        <input type="datetime-local" id="dateTimeInput">
+        <button class="add-btn" onclick="addSchedule()">Add Task</button>
+    </div>
+
+    <ul id="scheduleList" class="schedule-list"></ul>
+</div>
+
+<script>
+    let schedules = JSON.parse(localStorage.getItem('studentSchedule')) || [];
+
+    function addSchedule() {
+        const task = document.getElementById('taskInput').value;
+        const dateTime = document.getElementById('dateTimeInput').value;
+
+        if (!task || !dateTime) return alert("Fill out all fields!");
+
+        const entry = {
+            id: Date.now(),
+            task,
+            dateTime,
+            completed: false,
+            alerted: false
+        };
+
+        schedules.push(entry);
+        saveAndRender();
+        document.getElementById('taskInput').value = '';
+        document.getElementById('dateTimeInput').value = '';
+    }
+
+    function toggleComplete(id) {
+        schedules = schedules.map(s => s.id === id ? {...s, completed: !s.completed} : s);
+        saveAndRender();
+    }
+
+    function deleteItem(id) {
+        schedules = schedules.filter(s => s.id !== id);
+        saveAndRender();
+    }
+
+    function saveAndRender() {
+        localStorage.setItem('studentSchedule', JSON.stringify(schedules));
+        const list = document.getElementById('scheduleList');
+        list.innerHTML = '';
+
+        schedules.sort((a, b) => new Date(a.dateTime) - new Date(b.dateTime)).forEach(item => {
+            const isDue = !item.completed && new Date(item.dateTime) <= new Date();
+            
+            list.innerHTML += `
+                <li class="item ${item.completed ? 'done' : ''} ${isDue ? 'alert-active' : ''}">
+                    <div class="info">
+                        <strong>${item.task}</strong>
+                        <small>📅 ${item.dateTime.replace('T', ' ')}</small>
+                    </div>
+                    <div class="actions">
+                        <button class="btn-done" onclick="toggleComplete(${item.id})">✓</button>
+                        <button class="btn-del" onclick="deleteItem(${item.id})">✕</button>
+                    </div>
+                </li>
+            `;
+        });
+    }
+
+    setInterval(() => {
+        const now = new Date();
+        schedules.forEach(item => {
+            const itemTime = new Date(item.dateTime);
+            if (!item.completed && !item.alerted && now >= itemTime) {
+                item.alerted = true;
+                saveAndRender();
+                alert(`⏰ REMINDER: It's time for ${item.task}!`);
+            }
+        });
+    }, 1000);
+
+    saveAndRender();
+</script>
+
+</body>
+</html>

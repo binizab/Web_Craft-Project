@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Responsive Checkbox Group</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        :root {
+            --primary: #6366f1;
+            --border: #e2e8f0;
+            --text: #1e293b;
+            --text-muted: #64748b;
+            --bg: #ffffff;
+            --radius: 8px;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background-color: #f8fafc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .selection-card {
+            background: var(--bg);
+            padding: 32px;
+            border-radius: 20px;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05);
+            width: 100%;
+            max-width: 500px;
+            border: 1px solid var(--border);
+        }
+
+        h2 {
+            font-size: 1.1rem;
+            color: var(--text);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* The Responsive Grid */
+        .checkbox-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 12px;
+        }
+
+        /* Custom Checkbox Wrapper */
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+
+        .checkbox-item:hover {
+            border-color: var(--primary);
+            background-color: #f5f7ff;
+        }
+
+        /* Hidden Original Input */
+        .hidden-check {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        /* Custom Box */
+        .custom-box {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border);
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            color: transparent;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+
+        /* Checked State */
+        .hidden-check:checked + .custom-box {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+
+        .label-text {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        /* Focus State for Accessibility */
+        .hidden-check:focus-visible + .custom-box {
+            outline: 2px solid var(--primary);
+            outline-offset: 2px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="selection-card">
+    <h2><i data-lucide="check-square" size="20"></i> Select Skills</h2>
+    
+    <div class="checkbox-grid">
+        <label class="checkbox-item">
+            <input type="checkbox" class="hidden-check" name="skill" value="html">
+            <div class="custom-box"><i data-lucide="check" size="14"></i></div>
+            <span class="label-text">HTML5</span>
+        </label>
+
+        <label class="checkbox-item">
+            <input type="checkbox" class="hidden-check" name="skill" value="css">
+            <div class="custom-box"><i data-lucide="check" size="14"></i></div>
+            <span class="label-text">CSS3</span>
+        </label>
+
+        <label class="checkbox-item">
+            <input type="checkbox" class="hidden-check" name="skill" value="js">
+            <div class="custom-box"><i data-lucide="check" size="14"></i></div>
+            <span class="label-text">JavaScript</span>
+        </label>
+
+        <label class="checkbox-item">
+            <input type="checkbox" class="hidden-check" name="skill" value="react">
+            <div class="custom-box"><i data-lucide="check" size="14"></i></div>
+            <span class="label-text">React</span>
+        </label>
+
+        <label class="checkbox-item">
+            <input type="checkbox" class="hidden-check" name="skill" value="node">
+            <div class="custom-box"><i data-lucide="check" size="14"></i></div>
+            <span class="label-text">Node.js</span>
+        </label>
+
+        <label class="checkbox-item">
+            <input type="checkbox" class="hidden-check" name="skill" value="python">
+            <div class="custom-box"><i data-lucide="check" size="14"></i></div>
+            <span class="label-text">Python</span>
+        </label>
+        
+        <label class="checkbox-item">
+                <input type="checkbox" class="hidden-check" name="skill" value="ui">
+            <div class="custom-box"><i data-lucide="check" size="14"></i></div>
+            <span class="label-text">UI Design</span>
+        </label>
+
+        <label class="checkbox-item">
+            <input type="checkbox" class="hidden-check" name="skill" value="git">
+            <div class="custom-box"><i data-lucide="check" size="14"></i></div>
+            <span class="label-text">Git</span>
+        </label>
+    </div>
+</div>
+
+<script>
+    lucide.createIcons();
+</script>
+
+</body>
+</html>

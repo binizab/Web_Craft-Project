@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Validated Stepper Form</title>
+    <style>
+        :root {
+            --primary: #007cf0;
+            --bg: #05070a;
+            --card: #0d1117;
+            --border: rgba(255, 255, 255, 0.1);
+            --error: #ff4d4d;
+            --text-main: #ffffff;
+            --text-dim: #8b949e;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow: hidden;
+        }
+
+        .master-container {
+            display: flex;
+            width: 100%;
+            max-width: 950px;
+            height: 650px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.7);
+        }
+
+        /* --- SIDEBAR --- */
+        .sidebar {
+            width: 320px;
+            background: rgba(255, 255, 255, 0.01);
+            padding: 60px 40px;
+            border-right: 1px solid var(--border);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+
+        .line-container {
+            position: absolute;
+            left: 58px; top: 80px; bottom: 80px;
+            width: 2px;
+            background: var(--border);
+            z-index: 1;
+        }
+
+        .line-fill {
+            width: 100%; height: 0%;
+            background: var(--primary);
+            box-shadow: 0 0 15px var(--primary);
+            transition: height 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .step-item {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            z-index: 2;
+            cursor: pointer;
+        }
+
+        .circle {
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            background: var(--card);
+            border: 2px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            transition: 0.4s;
+            color: var(--text-dim);
+        }
+
+        .step-item.active .circle, .step-item.completed .circle {
+            border-color: var(--primary);
+            color: white;
+            background: var(--primary);
+        }
+
+        /* --- CONTENT & SCROLL --- */
+        .content-area { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+        .scroll-container {
+            flex: 1;
+            padding: 40px 60px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+        }
+
+        .form-section { display: none; animation: slideIn 0.4s ease-out; }
+        .form-section.active { display: block; }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- INPUTS & VALIDATION --- */
+        .input-group { margin-bottom: 25px; position: relative; }
+        label { display: block; margin-bottom: 8px; color: var(--text-dim); font-size: 13px; }
+        
+        input {
+            width: 100%; padding: 14px; background: #161b22; 
+            border: 1px solid var(--border); border-radius: 12px; color: white; outline: none;
+            transition: border-color 0.3s;
+        }
+
+        input.invalid { border-color: var(--error); }
+        
+        .error-msg {
+            color: var(--error);
+            font-size: 11px;
+            margin-top: 5px;
+            height: 14px;
+            display: block;
+            opacity: 0;
+            transition: 0.3s;
+        }
+
+        input.invalid + .error-msg { opacity: 1; }
+
+        .footer {
+            padding: 25px 60px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .btn {
+            padding: 12px 28px; border-radius: 10px; cursor: pointer; font-weight: 600; border: none; transition: 0.3s;
+        }
+        .btn-next { background: var(--primary); color: white; }
+        .btn-back { background: transparent; color: var(--text-dim); }
+
+        @media (max-width: 800px) {
+            .master-container { flex-direction: column; height: auto; }
+            .sidebar { width: 100%; flex-direction: row; padding: 20px; border-bottom: 1px solid var(--border); }
+            .line-container, .step-label { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="master-container">
+    <aside class="sidebar">
+        <div class="line-container"><div class="line-fill" id="lineFill"></div></div>
+        
+        <div class="step-item active" onclick="jumpTo(0)">
+            <div class="circle">1</div>
+            <div class="step-label"><strong>Account</strong></div>
+        </div>
+        <div class="step-item" onclick="jumpTo(1)">
+            <div class="circle">2</div>
+            <div class="step-label"><strong>Personal</strong></div>
+        </div>
+        <div class="step-item" onclick="jumpTo(2)">
+            <div class="circle">3</div>
+            <div class="step-label"><strong>Company</strong></div>
+        </div>
+        <div class="step-item" onclick="jumpTo(3)">
+            <div class="circle">4</div>
+            <div class="step-label"><strong>Security</strong></div>
+        </div>
+        <div class="step-item" onclick="jumpTo(4)">
+            <div class="circle">5</div>
+            <div class="step-label"><strong>Finish</strong></div>
+        </div>
+    </aside>
+
+    <main class="content-area">
+        <div class="scroll-container" id="scrollBox">
+            <div class="form-section active" data-step="0">
+                <h2>Account Setup</h2>
+                <div class="input-group">
+                    <label>Email Address</label>
+                    <input type="email" id="email" placeholder="name@domain.com">
+                    <span class="error-msg">Please enter a valid email containing @</span>
+                </div>
+            </div>
+
+            <div class="form-section" data-step="1">
+                <h2>Personal Info</h2>
+                <div class="input-group">
+                    <label>Full Name</label>
+                    <input type="text" id="fullname" placeholder="John Doe">
+                    <span class="error-msg">This field is required</span>
+                </div>
+            </div>
+
+            <div class="form-section" data-step="2">
+                <h2>Business</h2>
+                <div class="input-group">
+                    <label>Organization</label>
+                    <input type="text" id="company" placeholder="Company Name">
+                    <span class="error-msg">This field is required</span>
+                </div>
+            </div>
+
+            <div class="form-section" data-step="3">
+                <h2>Privacy</h2>
+                <div class="input-group">
+                    <label>Password</label>
+                    <input type="password" id="pass" placeholder="••••••••">
+                    <span class="error-msg">Min. 6 characters required</span>
+                </div>
+            </div>
+
+            <div class="form-section" data-step="4">
+                <h2>Complete</h2>
+                <p style="color:var(--text-dim)">Click Submit to finalize your registration.</p>
+            </div>
+        </div>
+
+        <div class="footer">
+            <button class="btn btn-back" id="btnBack" onclick="move(-1)" style="visibility:hidden">Back</button>
+            <button class="btn btn-next" id="btnNext" onclick="move(1)">Next Step</button>
+        </div>
+    </main>
+</div>
+
+<script>
+    let current = 0;
+    const sections = document.querySelectorAll(".form-section");
+    const steps = document.querySelectorAll(".step-item");
+    const fill = document.getElementById("lineFill");
+
+    function validateCurrentStep() {
+        const activeSection = sections[current];
+        const inputs = activeSection.querySelectorAll("input");
+        let isValid = true;
+
+        inputs.forEach(input => {
+            // Email Validation
+            if (input.type === "email") {
+                if (!input.value.includes("@") || input.value.length < 5) {
+                    input.classList.add("invalid");
+                    isValid = false;
+                } else {
+                    input.classList.remove("invalid");
+                }
+            } 
+            // Password Validation
+            else if (input.type === "password") {
+                if (input.value.length < 6) {
+                    input.classList.add("invalid");
+                    isValid = false;
+                } else {
+                    input.classList.remove("invalid");
+                }
+            }
+            // Text Validation
+            else {
+                if (input.value.trim() === "") {
+                    input.classList.add("invalid");
+                    isValid = false;
+                } else {
+                    input.classList.remove("invalid");
+                }
+            }
+        });
+        return isValid;
+    }
+
+    function move(dir) {
+        if (dir === 1 && !validateCurrentStep()) return; // Block forward if invalid
+        
+        current += dir;
+        if (current >= sections.length) {
+            alert("Form Submitted!");
+            location.reload();
+            return;
+        }
+        updateUI();
+    }
+
+    function jumpTo(index) {
+        if (index > current && !validateCurrentStep()) return;
+        current = index;
+        updateUI();
+    }
+
+    function updateUI() {
+        sections.forEach((s, i) => s.classList.toggle("active", i === current));
+        steps.forEach((s, i) => {
+            s.classList.toggle("active", i === current);
+            s.classList.toggle("completed", i < current);
+        });
+
+        const percent = (current / (steps.length - 1)) * 100;
+        fill.style.height = percent + "%";
+
+        document.getElementById("btnBack").style.visibility = current === 0 ? "hidden" : "visible";
+        document.getElementById("btnNext").innerText = current === sections.length - 1 ? "Submit" : "Next Step";
+    }
+</script>
+</body>
+</html>

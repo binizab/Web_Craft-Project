@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Maker Page</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; background: #f4f4f4; }
+        .section { background: white; padding: 15px; margin-bottom: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; }
+        .preview { width: 100px; height: 100px; object-fit: cover; display: block; margin-top: 5px; border: 1px solid #ddd; }
+        label { display: block; font-weight: bold; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+    <h2>Data Maker</h2>
+    
+    <div class="section">
+        <label>Header Name:</label>
+        <input type="text" id="headerName" placeholder="Enter Page Title">
+    </div>
+
+    <div class="section">
+        <h3>Images (6 with labels, 4 without)</h3>
+        <div id="imageInputs" class="grid"></div>
+    </div>
+
+    <div class="section">
+        <h3>Mapped Images (Back & Front)</h3>
+        <label>Front Image:</label>
+        <input type="file" id="mapFront" accept="image/*" onchange="preview(this, 'pFront')">
+        <img id="pFront" class="preview">
+        <label>Back Image:</label>
+        <input type="file" id="mapBack" accept="image/*" onchange="preview(this, 'pBack')">
+        <img id="pBack" class="preview">
+    </div>
+
+    <div class="section">
+        <h3>Card Generator</h3>
+        <label>Number of Cards:</label>
+        <input type="number" id="cardCount" min="0" value="1">
+    </div>
+
+    <button onclick="saveData()" style="padding: 10px 20px; cursor: pointer;">Generate Receiver Page</button>
+
+    <script>
+        // Generate the 10 image inputs
+        const container = document.getElementById('imageInputs');
+        for (let i = 1; i <= 10; i++) {
+            const div = document.createElement('div');
+            div.innerHTML = `
+                <label>Image ${i}</label>
+                <input type="file" class="img-input" data-idx="${i}" accept="image/*" onchange="preview(this, 'prev${i}')">
+                <img id="prev${i}" class="preview">
+                ${i <= 6 ? `<input type="text" class="label-input" data-idx="${i}" placeholder="Label for image ${i}">` : ''}
+            `;
+            container.appendChild(div);
+        }
+
+        function preview(input, imgId) {
+            const reader = new FileReader();
+            reader.onload = (e) => document.getElementById(imgId).src = e.target.result;
+            if(input.files[0]) reader.readAsDataURL(input.files[0]);
+        }
+
+        async function saveData() {
+            const data = {
+                header: document.getElementById('headerName').value,
+                images: [],
+                mapFront: document.getElementById('pFront').src,
+                mapBack: document.getElementById('pBack').src,
+                cardCount: document.getElementById('cardCount').value
+            };
+
+            for (let i = 1; i <= 10; i++) {
+                data.images.push({
+                    src: document.getElementById(`prev${i}`).src,
+                    label: i <= 6 ? document.querySelector(`.label-input[data-idx="${i}"]`).value : ""
+                });
+            }
+
+            localStorage.setItem('sharedData', JSON.stringify(data));
+            window.location.href = 'receiver.html';
+        }
+    </script>
+</body>
+</html>

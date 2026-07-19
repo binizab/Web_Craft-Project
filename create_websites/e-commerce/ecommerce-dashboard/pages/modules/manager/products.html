@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Products — ShopHub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../../style.css" />
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+</head>
+<body class="module-body">
+<div class="page-head"><div><h2>Products</h2><p>Manage catalog & pricing</p></div><button class="btn primary"><i data-lucide="plus"></i>Add Product</button></div><div class="card"><h3>All Products</h3><table><thead><tr><th>SKU</th><th>Name</th><th>Stock</th><th>Price</th><th>Status</th></tr></thead><tbody><tr><td>P-001</td><td>Wireless Headphones</td><td>124</td><td>$89</td><td><span class='badge success'>Active</span></td></tr><tr><td>P-002</td><td>Smart Watch X3</td><td>42</td><td>$199</td><td><span class='badge success'>Active</span></td></tr><tr><td>P-003</td><td>Bluetooth Speaker</td><td>8</td><td>$49</td><td><span class='badge warning'>Low</span></td></tr><tr><td>P-004</td><td>Laptop Stand</td><td>0</td><td>$29</td><td><span class='badge danger'>Out</span></td></tr></tbody></table></div>
+<script>
+(function(){
+  function paint(){ if(window.lucide) window.lucide.createIcons(); }
+  var t = (function(){ try{return localStorage.getItem('shophub-theme');}catch(e){return null;} })() || 'light';
+  document.documentElement.setAttribute('data-theme', t);
+  window.addEventListener('message', function(e){
+    if(e.data && e.data.type==='theme'){ document.documentElement.setAttribute('data-theme', e.data.theme); }
+  });
+  if(document.readyState!=='loading') paint(); else window.addEventListener('DOMContentLoaded', paint);
+  window.addEventListener('load', function(){ paint(); try{ parent.postMessage({type:'frameReady'},'*'); }catch(e){} });
+})();
+</script>
+</body>
+</html>

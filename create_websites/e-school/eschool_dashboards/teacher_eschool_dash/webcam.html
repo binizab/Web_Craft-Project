@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NovaMail | Video Call</title>
+    <style>
+        :root {
+            --bg: #0f172a;
+            --card: #1e293b;
+            --accent: #38bdf8;
+            --danger: #ef4444;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: white;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+            width: 90%;
+            max-width: 1200px;
+        }
+
+        .video-container {
+            background: var(--card);
+            border-radius: 20px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            aspect-ratio: 16 / 9;
+            border: 2px solid #334155;
+        }
+
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            background: #000;
+        }
+
+        .label {
+            position: absolute;
+            bottom: 15px;
+            left: 15px;
+            background: rgba(0,0,0,0.6);
+            padding: 5px 12px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+        }
+
+        .controls {
+            margin-top: 30px;
+            display: flex;
+            gap: 20px;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border-radius: 50px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-start { background: var(--accent); color: #000; }
+        .btn-stop { background: var(--danger); color: white; }
+        .btn-share { background: #6366f1; color: white; }
+        
+        .btn:hover { opacity: 0.8; transform: scale(1.05); }
+        .btn:disabled { background: #475569; cursor: not-allowed; }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            background: #22c55e;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1 style="margin-bottom: 10px;">Virtual Communication</h1>
+    <p style="color: #94a3b8; margin-bottom: 40px;">Secure Camera & Screen Sharing Feed</p>
+
+    <div class="video-grid">
+        <div class="video-container">
+            <video id="localVideo" autoplay playsinline muted></video>
+            <div class="label"><span class="status-dot"></span> Camera: You</div>
+        </div>
+
+        <div class="video-container">
+            <video id="screenVideo" autoplay playsinline></video>
+            <div class="label">Screen Share Preview</div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button class="btn btn-start" id="startCam">Start Camera</button>
+        <button class="btn btn-share" id="startShare">Share Screen</button>
+        <button class="btn btn-stop" id="stopAll">End Session</button>
+    </div>
+
+    <script>
+        const localVideo = document.getElementById('localVideo');
+        const screenVideo = document.getElementById('screenVideo');
+        const startCamBtn = document.getElementById('startCam');
+        const startShareBtn = document.getElementById('startShare');
+        const stopBtn = document.getElementById('stopAll');
+
+        let stream = null;
+        let screenStream = null;
+
+        // 1. Access Webcam
+        async function startCamera() {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: true, 
+                    audio: true 
+                });
+                localVideo.srcObject = stream;
+                startCamBtn.disabled = true;
+            } catch (err) {
+                console.error("Error accessing camera: ", err);
+                alert("Could not access camera. Please check permissions.");
+            }
+        }
+
+        // 2. Access Screen Share
+        async function startScreenShare() {
+            try {
+                screenStream = await navigator.mediaDevices.getDisplayMedia({ 
+                    video: true 
+                });
+                screenVideo.srcObject = screenStream;
+                
+                // Handle when user clicks "Stop Sharing" in browser UI
+                screenStream.getVideoTracks()[0].onended = () => {
+                    screenVideo.srcObject = null;
+                };
+            } catch (err) {
+                console.error("Error sharing screen: ", err);
+            }
+        }
+
+        // 3. Stop Everything
+        function stopAll() {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                localVideo.srcObject = null;
+                startCamBtn.disabled = false;
+            }
+            if (screenStream) {
+                screenStream.getTracks().forEach(track => track.stop());
+                screenVideo.srcObject = null;
+            }
+        }
+
+        startCamBtn.addEventListener('click', startCamera);
+        startShareBtn.addEventListener('click', startScreenShare);
+        stopBtn.addEventListener('click', stopAll);
+    </script>
+</body>
+</html>

@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ethiopia School Catalog | 300+ Listings</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <style>
+    :root {
+      --primary-blue: #02b3e4;
+      --bg-body: #09121d;        
+      --bg-card: #1c2632;
+      --bg-header: #0f1a27;
+      --border-color: #2e3d49;
+      --text-main: #ffffff;
+      --text-muted: #94a3b8;
+    } 
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-body);
+      color: var(--text-main);
+      line-height: 1.5;
+      overflow-x: hidden;
+    }
+
+    /* --- Header Section --- */
+    .catalog-header {
+      width: 100%;
+      min-height: 400px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .header-bg {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      object-fit: cover;
+      z-index: 1;
+    }
+
+    .overlay {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: linear-gradient(to bottom, rgba(15, 26, 39, 0.6), var(--bg-body));
+      z-index: 2;
+    }
+
+    .header-content {
+      position: relative;
+      z-index: 3;
+      max-width: 800px;
+      width: 90%;
+      padding: 20px;
+    }
+
+    /* --- YouTube Style Search Container --- */
+    .search-container {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 30px;
+      background: #000;
+      border-radius: 50px;
+      border: 1px solid var(--border-color);
+      padding: 8px 15px;
+      position: relative;
+      transition: border-color 0.3s;
+    }
+
+    .search-container:focus-within {
+      border-color: var(--primary-blue);
+    }
+
+    #activeFilters {
+      display: flex;
+      gap: 5px;
+      align-items: center;
+      margin-left: 40px;
+    }
+
+    .filter-pill {
+      background: var(--primary-blue);
+      color: #000;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      animation: popIn 0.2s ease-out;
+    }
+
+    @keyframes popIn {
+      from { transform: scale(0.8); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .filter-pill span {
+      cursor: pointer;
+      font-size: 18px;
+      line-height: 1;
+      display: inline-block;
+    }
+
+    .search-container input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      padding: 10px;
+      color: white;
+      outline: none;
+      font-size: 16px;
+      min-width: 300px;
+    }
+
+    .filter-trigger {
+      background: var(--bg-card);
+      position: absolute;
+      border: none;
+      color: white;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: 0.3s;
+      right: 10px;
+    }
+
+    .filter-trigger:hover { background: #2e3d49; }
+
+    /* --- Filter Dropdown (Fixed Z-Index) --- */
+    .filterDrop {
+      position: absolute;
+      top: 110%;
+      right: 10px;
+      width: 240px;
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 15px;
+      padding: 15px;
+      display: none;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.8);
+      text-align: left;
+      z-index: 9999; /* Ensure it's in front of everything */
+    }
+
+    .filterDrop.show { display: block; }
+
+    .filterHeader {
+      color: var(--primary-blue);
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      margin: 12px 0 6px;
+      letter-spacing: 1px;
+    }
+
+    .filterContent {
+      padding: 10px;
+      cursor: pointer;
+      font-size: 14px;
+      border-radius: 8px;
+      transition: 0.2s;
+    }
+
+    .filterContent:hover { 
+      background: var(--primary-blue);
+      color: #000;
+      font-weight: 600;
+    }
+
+    /* --- Grid Layout --- */
+    .catalog-container {
+      max-width: 1250px;
+      margin: 40px auto;
+      padding: 0 25px;
+    }
+
+    .stats-info {
+      margin-bottom: 20px;
+      color: var(--text-muted);
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .course-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 30px;
+    }
+
+    /* --- School Card --- */
+    .course-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      cursor: pointer;
+    }
+
+    .course-card:hover { 
+      transform: translateY(-8px); 
+      border-color: var(--primary-blue);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+    }
+
+    .card-img-wrap {
+      position: relative;
+      height: 180px;
+      overflow: hidden;
+    }
+
+    .card-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: 0.5s;
+    }
+
+    .course-card:hover .card-image { transform: scale(1.1); }
+
+    .card-body { padding: 20px; flex-grow: 1; }
+    .card-label { color: var(--primary-blue); font-size: 11px; font-weight: 700; text-transform: uppercase; margin-bottom: 8px; display: block; }
+    .card-title { font-size: 20px; margin: 0 0 15px 0; font-weight: 600; }
+    
+    .meta-list { display: flex; flex-direction: column; gap: 8px; }
+    .meta-item { display: flex; align-items: center; gap: 10px; color: var(--text-muted); font-size: 14px; }
+    .meta-item i { width: 16px; height: 16px; color: var(--primary-blue); }
+
+    .hidden { display: none !important; }
+
+    /* --- Mobile Responsive --- */
+    @media (max-width: 600px) {
+      .catalog-header { min-height: 300px; padding: 40px 15px; }
+      .search-container { border-radius: 15px; padding: 10px; }
+      .filterDrop { width: 100%; right: 0; left: 0; top: 105%; }
+    }
+    
+  </style>
+</head>
+<body>
+
+  <header class="catalog-header">
+    <img src="computer.jpg" class="header-bg" alt="">
+    <div class="overlay"></div>
+    
+    <div class="header-content">
+      <h1>School Catalog</h1>
+      <p style="color: var(--text-muted)">Search and filter 300+ educational institutions in Ethiopia.</p>
+      
+      <div class="search-container">
+        <div id="activeFilters"></div>
+        <div>
+          <i data-lucide="search" style="position: absolute; left: 20px; top: 15px;"></i>
+          <input type="text" id="searchInput" placeholder="Search by name, city, or language...">
+        </div>
+        <button class="filter-trigger" id="filterBtn">
+          <i data-lucide="sliders-horizontal"></i>
+        </button>
+        
+        <div class="filterDrop" id="filterMenu">
+          <div class="filterContent" id="clearAll" style="color: var(--primary-blue); font-weight: bold; border-bottom: 1px solid var(--border-color); margin-bottom: 10px;">Clear All Filters</div>
+          
+          <div class="filterHeader">Language</div>
+          <div class="filterContent category">Amharic</div>
+          <div class="filterContent category">English</div>
+          <div class="filterContent category">Afaan Oromo</div>
+          
+          <div class="filterHeader">Type</div>
+          <div class="filterContent category">Private</div>
+          <div class="filterContent category">Public</div>
+          <div class="filterContent category">International</div>
+          
+          <div class="filterHeader">Student</div>
+          <div class="filterContent category">Male</div>
+          <div class="filterContent category">Female</div>
+          <div class="filterContent category">Both-Sex</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="catalog-container">
+    <div class="stats-info" id="stats">
+        Showing <span id="resultCount">0</span> schools. Use the search and filters to narrow down your options.
+          </div>
+    <main class="course-grid" id="schoolGrid">
+      </main>
+  </div>
+<script src="https://unpkg.com/dexie/dist/dexie.js"></script>
+
+<script>
+// 1. Initialize Database Access
+const db = new Dexie("ProjectEngineDB");
+db.version(2).stores({
+    projects: '++id, name, category, date',
+    shared: 'key'
+});
+
+// 2. Multi-Filter State Object
+// This allows multiple filters to be active simultaneously
+let activeFilters = {
+    search: "",
+    language: null,
+    type: null,
+    gender: null
+};
+
+/**
+ * Main function to filter and render the catalog
+ */
+async function applyLogic() {
+    // Fetch data from IndexedDB
+    const allProjects = await db.projects.toArray();
+    const schoolGrid = document.getElementById('schoolGrid');
+    const resultCount = document.getElementById('resultCount');
+
+    // 3. The Multi-Filter Processor
+    const filtered = allProjects.filter(p => {
+        // --- TEXT SEARCH ---
+        const term = activeFilters.search.toLowerCase();
+        const matchesSearch = !term || 
+            p["form-name"]?.toLowerCase().includes(term) || 
+            p.branches?.[0]?.name?.toLowerCase().includes(term);
+
+        // --- LANGUAGE FILTER (with Mapping) ---
+        let matchesLang = true;
+        if (activeFilters.language) {
+            const selected = activeFilters.language.toLowerCase();
+            const dbLang = (p["form-lType"] || '').toLowerCase();
+            if (selected === "amharic") matchesLang = dbLang === "amh";
+            else if (selected === "afaan oromo") matchesLang = dbLang === "orm";
+            else if (selected === "english") matchesLang = dbLang === "eng";
+        }
+
+        // --- SCHOOL TYPE FILTER ---
+        const matchesType = !activeFilters.type || 
+            p["form-scType"]?.toLowerCase() === activeFilters.type.toLowerCase();
+
+        // --- GENDER FILTER (with Mapping) ---
+        let matchesGender = true;
+        if (activeFilters.gender) {
+            const selected = activeFilters.gender.toLowerCase();
+            const dbGender = (p["form-sType"] || '').toLowerCase();
+            if (selected === "both-sex") matchesGender = dbGender === "both";
+            else matchesGender = dbGender === selected;
+        }
+
+        // Logical AND: Item must pass EVERY active filter
+        return matchesSearch && matchesLang && matchesType && matchesGender;
+    });
+
+    // Update the UI
+    resultCount.textContent = filtered.length;
+    renderGrid(filtered);
+    updateFilterPills();
+}
+
+/**
+ * Renders the HTML cards into the grid
+ */
+function renderGrid(data) {
+    const schoolGrid = document.getElementById('schoolGrid');
+    
+    if (data.length === 0) {
+        schoolGrid.innerHTML = `
+            <div style="grid-column: 1/-1; text-align: center; padding: 100px 20px; color: var(--text-muted);">
+                <i class="fas fa-search" style="font-size: 3rem; margin-bottom: 15px; opacity: 0.3;"></i>
+                <p style="font-size: 1.2rem;">No matches found for this combination of filters.</p>
+            </div>`;
+        return;
+    }
+
+    schoolGrid.innerHTML = data.map(p => {
+        const heroImg = p.images?.[0]?.src || 'default-school.jpg';
+        const location = p.branches?.[0]?.name || 'Ethiopia';
+        
+        // Map raw DB language codes to display names
+        const langRaw = (p["form-lType"] || 'amh').toLowerCase();
+        let langDisp = langRaw === "amh" ? "Amharic" : langRaw === "orm" ? "Afaan Oromo" : "English";
+
+        return `
+            <div class="course-card" onclick="viewProject(${p.id})">
+                <div class="card-img-wrap">
+                    <img src="${heroImg}" class="card-image" alt="${p["form-name"]}">
+                </div>
+                <div class="card-body">
+                    <span class="card-label">${p["form-scType"] || 'Private'}</span>
+                    <h3 class="card-title">${p["form-name"] || 'Untitled Project'}</h3>
+                    <div class="meta-list">
+                        <div class="meta-item"><i data-lucide="map-pin"></i> ${location}</div>
+                        <div class="meta-item"><i data-lucide="globe"></i> ${langDisp}</div>
+                        <div class="meta-item"><i data-lucide="user"></i> ${p["form-sType"] || 'Both'} Sex</div>
+                    </div>
+                </div>
+            </div>`;
+    }).join('');
+
+    if (window.lucide) lucide.createIcons();
+}
+
+/**
+ * Updates the visual "YouTube-style" pills
+ */
+function updateFilterPills() {
+    const container = document.getElementById('activeFilters');
+    container.innerHTML = "";
+
+    // Iterate through state to create pills for non-null values
+    for (const [key, value] of Object.entries(activeFilters)) {
+        if (key !== 'search' && value) {
+            const pill = document.createElement('div');
+            pill.className = 'filter-pill';
+            pill.style = `
+                background: var(--primary-blue); 
+                color: white; 
+                padding: 4px 10px; 
+                border-radius: 4px; 
+                display: inline-flex; 
+                align-items: center; 
+                gap: 8px; 
+                margin-right: 8px; 
+                font-size: 0.75rem;
+                font-weight: 600;
+            `;
+            pill.innerHTML = `
+                ${value} 
+                <span style="cursor:pointer; font-size: 1.1rem; line-height: 1;" onclick="clearSingleFilter('${key}')">&times;</span>
+            `;
+            container.appendChild(pill);
+        }
+    }
+}
+
+/**
+ * UI EVENT HANDLERS
+ */
+
+// 1. Search Bar
+document.getElementById('searchInput').addEventListener('input', (e) => {
+    activeFilters.search = e.target.value;
+    applyLogic();
+});
+
+// 2. Dropdown Menu Clicks
+document.querySelectorAll('.category').forEach(el => {
+    el.addEventListener('click', (e) => {
+        const text = el.innerText.trim();
+        
+        // Determine category by looking at the preceding .filterHeader
+        let headerText = "";
+        let prev = el.previousElementSibling;
+        while (prev) {
+            if (prev.classList.contains('filterHeader')) {
+                headerText = prev.innerText.toLowerCase();
+                break;
+            }
+            prev = prev.previousElementSibling;
+        }
+
+        if (headerText.includes("language")) activeFilters.language = text;
+        else if (headerText.includes("type")) activeFilters.type = text;
+        else if (headerText.includes("student")) activeFilters.gender = text;
+
+        // Close menu and refresh
+        document.getElementById('filterMenu').classList.remove('show');
+        applyLogic();
+    });
+});
+
+// 3. Pill Removal
+window.clearSingleFilter = function(key) {
+    activeFilters[key] = null;
+    applyLogic();
+};
+
+// 4. Clear All Logic
+document.getElementById('clearAll').addEventListener('click', () => {
+    activeFilters = { search: "", language: null, type: null, gender: null };
+    document.getElementById('searchInput').value = "";
+    applyLogic();
+});
+
+// 5. Dropdown Toggle
+document.getElementById('filterBtn').addEventListener('click', (e) => {
+    e.stopPropagation();
+    document.getElementById('filterMenu').classList.toggle('show');
+});
+
+window.addEventListener('click', () => {
+    document.getElementById('filterMenu').classList.remove('show');
+});
+
+/**
+ * Navigation: Launching to Details Page
+ */
+async function viewProject(id) {
+    const p = await db.projects.get(id);
+    await db.shared.put({ key: 'current_active', data: p });
+    window.open('../home/eb.html', '_blank');
+}
+
+// Initial Load
+window.onload = applyLogic;
+</script>
+</body>
+</html>
+        <div class="filter-pill" style="background: var(--primary-blue); color: white; padding: 4px 12px; border-radius: 4px; display: inline-flex; align-items: center; gap: 8px; font-size: 0.8rem; margin-left: 40px;">

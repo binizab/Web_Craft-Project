@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Responsive Multi-Input Grid</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        :root {
+            --primary: #6366f1;
+            --primary-light: #eef2ff;
+            --border: #e2e8f0;
+            --text: #1e293b;
+            --text-muted: #64748b;
+            --bg: #ffffff;
+            --radius: 12px;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background-color: #f8fafc;
+            display: flex;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+
+        .inventory-card {
+            background: var(--bg);
+            padding: 24px;
+            border-radius: 20px;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05);
+            width: 100%;
+            max-width: 500px;
+            border: 1px solid var(--border);
+        }
+
+        .header {
+            margin-bottom: 24px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 16px;
+        }
+
+        .header h2 { font-size: 1.2rem; color: var(--text); }
+        .header p { font-size: 0.85rem; color: var(--text-muted); }
+
+        /* The List Layout */
+        .item-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        /* Each Row */
+        .item-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            transition: all 0.2s ease;
+        }
+
+        .item-row.active {
+            border-color: var(--primary);
+            background-color: var(--primary-light);
+        }
+
+        /* Checkbox Side */
+        .item-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            flex-grow: 1;
+        }
+
+        .hidden-check { display: none; }
+
+        .custom-check {
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--border);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            color: transparent;
+            transition: 0.2s;
+            flex-shrink: 0;
+        }
+
+        .hidden-check:checked + .custom-check {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+
+        .item-name {
+            font-weight: 500;
+            font-size: 0.95rem;
+            color: var(--text);
+        }
+
+        /* Number Input Side */
+        .qty-wrapper {
+            width: 100px;
+            position: relative;
+        }
+
+        .qty-input {
+            width: 100%;
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            font-family: inherit;
+            font-size: 0.9rem;
+            text-align: center;
+            outline: none;
+            transition: 0.2s;
+            background: #f1f5f9;
+        }
+
+        .qty-input:disabled {
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        .qty-input:not(:disabled) {
+            background: white;
+            border-color: var(--primary);
+            font-weight: 600;
+        }
+
+        /* Hide arrows */
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+
+<div class="inventory-card">
+    <div class="header">
+        <h2>Order Items</h2>
+        <p>Select an item and enter the quantity.</p>
+    </div>
+
+    <div class="item-list">
+        <div class="item-row" id="row-1">
+            <label class="item-info">
+                <input type="checkbox" class="hidden-check" onchange="toggleRow(this, 'qty-1', 'row-1')">
+                <div class="custom-check"><i data-lucide="check" size="16"></i></div>
+                <span class="item-name">Wireless Mouse</span>
+            </label>
+            <div class="qty-wrapper">
+                <input type="number" id="qty-1" class="qty-input" placeholder="0" disabled>
+            </div>
+        </div>
+
+        <div class="item-row" id="row-2">
+            <label class="item-info">
+                <input type="checkbox" class="hidden-check" onchange="toggleRow(this, 'qty-2', 'row-2')">
+                <div class="custom-check"><i data-lucide="check" size="16"></i></div>
+                <span class="item-name">Mechanical Keyboard</span>
+            </label>
+            <div class="qty-wrapper">
+                <input type="number" id="qty-2" class="qty-input" placeholder="0" disabled>
+            </div>
+        </div>
+
+        <div class="item-row" id="row-3">
+            <label class="item-info">
+                <input type="checkbox" class="hidden-check" onchange="toggleRow(this, 'qty-3', 'row-3')">
+                <div class="custom-check"><i data-lucide="check" size="16"></i></div>
+                <span class="item-name">USB-C Hub</span>
+            </label>
+            <div class="qty-wrapper">
+                <input type="number" id="qty-3" class="qty-input" placeholder="0" disabled>
+            </div>
+        </div>
+
+        <div class="item-row" id="row-4">
+            <label class="item-info">
+                <input type="checkbox" class="hidden-check" onchange="toggleRow(this, 'qty-4', 'row-4')">
+                <div class="custom-check"><i data-lucide="check" size="16"></i></div>
+                <span class="item-name">Monitor Stand</span>
+            </label>
+            <div class="qty-wrapper">
+                <input type="number" id="qty-4" class="qty-input" placeholder="0" disabled>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    lucide.createIcons();
+
+    function toggleRow(checkbox, inputId, rowId) {
+        const input = document.getElementById(inputId);
+        const row = document.getElementById(rowId);
+        
+        if (checkbox.checked) {
+            input.disabled = false;
+            row.classList.add('active');
+            input.focus();
+        } else {
+            input.disabled = true;
+            input.value = "";
+            row.classList.remove('active');
+        }
+    }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduDrive | School Transport Command</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --primary: #f97316; /* Safety Orange */
+            --primary-light: #fff7ed;
+            --secondary: #0f172a; /* Navy Night */
+            --bg: #f1f5f9;
+            --white: #ffffff;
+            --text: #334155;
+            --danger: #ef4444;
+            --success: #22c55e;
+            --info: #3b82f6;
+            --border: #e2e8f0;
+            --radius: 12px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+        }
+
+        .wrapper {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            min-height: 100vh;
+        }
+
+        /* --- Sidebar --- */
+        .sidebar {
+            background: var(--secondary);
+            color: white;
+            padding: 2rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 800;
+            font-size: 1.4rem;
+            color: var(--primary);
+            margin-bottom: 3rem;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0.8rem 1rem;
+            text-decoration: none;
+            color: #94a3b8;
+            font-weight: 600;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            transition: 0.3s;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+
+        .nav-item.active { border-left: 4px solid var(--primary); }
+
+        /* --- Main --- */
+        .main { padding: 2.5rem; }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .btn-start {
+            background: var(--success);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 14px 0 rgba(34, 197, 94, 0.39);
+        }
+
+        /* --- Stats --- */
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .stat-card {
+            background: var(--white);
+            padding: 1.5rem;
+            border-radius: var(--radius);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border-bottom: 3px solid var(--border);
+        }
+
+        .stat-card h4 { font-size: 0.75rem; color: #64748b; text-transform: uppercase; }
+        .stat-card p { font-size: 1.5rem; font-weight: 800; margin-top: 0.5rem; color: var(--secondary); }
+
+        /* --- Dashboard Body --- */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1.6fr 1fr;
+            gap: 2rem;
+        }
+
+        .panel {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+        }
+
+        .panel-title { 
+            font-weight: 800; 
+            margin-bottom: 1.5rem; 
+            font-size: 1.1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* --- Route Table --- */
+        .route-list { width: 100%; border-collapse: collapse; }
+        .route-list th { text-align: left; font-size: 0.75rem; color: #94a3b8; padding-bottom: 1rem; }
+        .route-list td { padding: 1rem 0; border-top: 1px solid var(--border); font-size: 0.9rem; }
+
+        .status-tag {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        .on-time { background: #dcfce7; color: #16a34a; }
+        .delayed { background: #fee2e2; color: #dc2626; }
+        .pending { background: #f1f5f9; color: #64748b; }
+
+        /* --- Student Manifest Card --- */
+        .stop-card {
+            background: var(--bg);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--info);
+        }
+
+        @media (max-width: 1024px) {
+            .wrapper { grid-template-columns: 1fr; }
+            .sidebar { display: none; }
+            .stat-grid { grid-template-columns: repeat(2, 1fr); }
+            .content-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="wrapper">
+        <aside class="sidebar">
+            <div class="logo">
+                <i data-lucide="bus"></i>
+                <span>EduDrive</span>
+            </div>
+            <nav>
+                <a href="#" class="nav-item active"><i data-lucide="map"></i> Live Routes</a>
+                <a href="#" class="nav-item"><i data-lucide="users"></i> Student Roster</a>
+                <a href="#" class="nav-item"><i data-lucide="clipboard-check"></i> Inspection Logs</a>
+                <a href="#" class="nav-item"><i data-lucide="fuel"></i> Fuel Reports</a>
+                <a href="#" class="nav-item"><i data-lucide="settings"></i> Settings</a>
+            </nav>
+        </aside>
+
+        <main class="main">
+            <header class="header">
+                <div>
+                    <h1 style="font-weight: 800;">Driver Command</h1>
+                    <p style="color: #64748b;">Assigned Vehicle: <strong>Bus #42 (Yellow Dragon)</strong></p>
+                </div>
+                <button class="btn-start"><i data-lucide="play"></i> Start Morning Route</button>
+            </header>
+
+            <div class="stat-grid">
+                <div class="stat-card">
+                    <h4>Total Students</h4>
+                    <p>34</p>
+                </div>
+                <div class="stat-card">
+                    <h4>Next Stop</h4>
+                    <p>Oak Ridge</p>
+                </div>
+                <div class="stat-card" style="border-bottom-color: var(--primary);">
+                    <h4>Fuel Level</h4>
+                    <p style="color: var(--primary);">78%</p>
+                </div>
+                <div class="stat-card">
+                    <h4>Duty Hours</h4>
+                    <p>4.5h</p>
+                </div>
+            </div>
+
+            <div class="content-grid">
+                <section class="panel">
+                    <div class="panel-title">
+                        <span>Route Timeline</span>
+                        <span style="font-size: 0.8rem; color: var(--info);">Today, April 6</span>
+                    </div>
+                    <table class="route-list">
+                        <thead>
+                            <tr>
+                                <th>Stop Name</th>
+                                <th>ETA</th>
+                                <th>Students</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Blueberry Lane</strong></td>
+                                <td>07:10 AM</td>
+                                <td>5</td>
+                                <td><span class="status-tag on-time">Completed</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Oak Ridge Heights</strong></td>
+                                <td>07:25 AM</td>
+                                <td>8</td>
+                                <td><span class="status-tag on-time">Next Stop</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Willow Creek Apt.</strong></td>
+                                <td>07:40 AM</td>
+                                <td>12</td>
+                                <td><span class="status-tag pending">Pending</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Central Middle School</strong></td>
+                                <td>08:05 AM</td>
+                                <td>-</td>
+                                <td><span class="status-tag pending">Destination</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </section>
+
+                <aside>
+                    <div class="panel">
+                        <h3 class="panel-title">Absence Alerts</h3>
+                        
+                        <div class="stop-card" style="border-left-color: var(--danger);">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                                <strong style="font-size: 0.9rem;">Sarah Jenkins</strong>
+                                <span style="font-size: 0.7rem; color: #64748b;">Reported by Parent</span>
+                            </div>
+                            <p style="font-size: 0.8rem;">Stop: <strong>Willow Creek</strong></p>
+                            <p style="font-size: 0.75rem; color: #64748b;">Note: Sick day - do not stop for pickup.</p>
+                        </div>
+
+                        <div class="stop-card" style="border-left-color: var(--info);">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                                <strong style="font-size: 0.9rem;">Leo Miller</strong>
+                                <span style="font-size: 0.7rem; color: #64748b;">Permanent Change</span>
+                            </div>
+                            <p style="font-size: 0.8rem;">Stop: <strong>Oak Ridge</strong></p>
+                            <p style="font-size: 0.75rem; color: #64748b;">Note: Afternoon drop-off at After School Club.</p>
+                        </div>
+
+                        <button style="width: 100%; padding: 0.75rem; background: var(--secondary); color: white; border: none; border-radius: 8px; font-weight: 700; cursor: pointer;">View Full Roster</button>
+                    </div>
+
+                    <div class="panel" style="margin-top: 1.5rem; background: var(--primary-light); border: 1px dashed var(--primary);">
+                        <h4 style="font-size: 0.8rem; color: var(--primary); display: flex; align-items: center; gap: 5px;">
+                            <i data-lucide="alert-triangle" size="16"></i> Maintenance Reminder
+                        </h4>
+                        <p style="font-size: 0.75rem; margin-top: 5px;">Tire pressure check and oil change due in <strong>120 miles</strong>.</p>
+                    </div>
+                </aside>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>

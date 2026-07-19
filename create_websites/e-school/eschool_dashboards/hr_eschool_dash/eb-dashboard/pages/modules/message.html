@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>EB Transfer | P2P Telegram Style</title>
+    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-dark: #0a0f1c;
+            --bg-sidebar: #111827;
+            --bg-main: #0f172a;
+            --bg-card: #1e293b;
+            --accent: #38bdf8;
+            --accent-hover: #0ea5e9;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --border: #334155;
+            --success: #22c55e;
+            --success-dark: #16a34a;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --online: #22c55e;
+            --shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+            --shadow-lg: 0 25px 40px -12px rgba(0, 0, 0, 0.6);
+            --transition: all 0.25s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+        }
+
+        body {
+            font-family: 'Poppins', system-ui, -apple-system, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Telegram-style layout */
+        .app-container {
+            display: flex;
+            height: 100vh;
+            width: 100%;
+        }
+
+        /* Sidebar - Contact / ID Panel */
+        .sidebar {
+            width: 280px;
+            background: var(--bg-sidebar);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            transition: var(--transition);
+            z-index: 10;
+        }
+
+        .sidebar-header {
+            padding: 24px 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .sidebar-header h2 {
+            background: linear-gradient(135deg, var(--accent), #60a5fa);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .id-card {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(8px);
+            padding: 16px;
+            border-radius: 20px;
+            border: 1px solid var(--accent);
+            margin: 20px;
+            margin-top: 0;
+        }
+
+        .id-label {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .id-value {
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.8rem;
+            word-break: break-all;
+            background: var(--bg-dark);
+            padding: 8px 10px;
+            border-radius: 12px;
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .copy-btn {
+            background: none;
+            border: none;
+            color: var(--accent);
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 8px;
+            transition: var(--transition);
+        }
+
+        .copy-btn:hover {
+            background: var(--border);
+        }
+
+        .nav-menu {
+            flex: 1;
+            padding: 20px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 16px;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: var(--transition);
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .nav-item:hover {
+            background: var(--border);
+            color: var(--text-primary);
+        }
+
+        .nav-item.active {
+            background: var(--accent);
+            color: #0f172a;
+        }
+
+        .nav-item.active i {
+            color: #0f172a;
+        }
+
+        .badge {
+            background: var(--accent);
+            color: #0f172a;
+            border-radius: 30px;
+            padding: 2px 8px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            margin-left: auto;
+        }
+
+        /* Main Content Area */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--bg-main);
+            overflow: hidden;
+        }
+
+        .chat-header {
+            padding: 20px 32px;
+            border-bottom: 1px solid var(--border);
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .peer-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .online-dot {
+            width: 10px;
+            height: 10px;
+            background: var(--online);
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1);}
+            50% { opacity: 0.5; transform: scale(1.2);}
+        }
+
+        /* Chat / Message Area */
+        .messages-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px 32px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .input-area {
+            padding: 20px 32px;
+            background: var(--bg-sidebar);
+            border-top: 1px solid var(--border);
+        }
+
+        .compose-card {
+            background: var(--bg-card);
+            border-radius: 24px;
+            padding: 20px;
+            border: 1px solid var(--border);
+        }
+
+        .input-group {
+            margin-bottom: 16px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+            letter-spacing: 0.5px;
+        }
+
+        .input-group input, 
+        .input-group textarea {
+            width: 100%;
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 12px 16px;
+            color: var(--text-primary);
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.9rem;
+            transition: var(--transition);
+        }
+
+        .input-group input:focus, 
+        .input-group textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
+        }
+
+        .file-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--bg-dark);
+            padding: 10px 16px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: var(--transition);
+            border: 1px solid var(--border);
+        }
+
+        .file-label:hover {
+            border-color: var(--accent);
+            background: #1a2538;
+        }
+
+        .send-btn {
+            background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+            color: #0f172a;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 40px;
+            font-weight: 700;
+            font-family: 'Poppins', sans-serif;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .send-btn:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.05);
+            box-shadow: 0 4px 15px rgba(56, 189, 248, 0.3);
+        }
+
+        /* Message Bubbles */
+        .message-bubble {
+            background: var(--bg-card);
+            border-radius: 18px;
+            padding: 14px 18px;
+            max-width: 80%;
+            align-self: flex-start;
+            border: 1px solid var(--border);
+            animation: fadeInUp 0.3s ease;
+        }
+
+        .message-bubble h4 {
+            color: var(--accent);
+            font-size: 0.9rem;
+            margin-bottom: 6px;
+        }
+
+        .message-bubble p {
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .message-time {
+            font-size: 0.65rem;
+            color: var(--text-secondary);
+            margin-top: 6px;
+        }
+
+        .file-attachment {
+            margin-top: 10px;
+            background: var(--bg-dark);
+            border-radius: 14px;
+            padding: 10px;
+        }
+
+        .file-attachment img {
+            max-width: 100%;
+            border-radius: 12px;
+            max-height: 200px;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Inbox specific */
+        .inbox-container {
+            height: 100%;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .empty-inbox {
+            text-align: center;
+            color: var(--text-secondary);
+            padding: 60px 20px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                left: -280px;
+                height: 100%;
+                z-index: 100;
+                transition: left 0.3s ease;
+            }
+            .sidebar.mobile-open {
+                left: 0;
+                box-shadow: 4px 0 20px rgba(0,0,0,0.5);
+            }
+            .menu-toggle {
+                display: flex;
+                background: none;
+                border: none;
+                color: var(--accent);
+                cursor: pointer;
+                padding: 8px;
+            }
+            .messages-area {
+                padding: 16px;
+            }
+            .input-area {
+                padding: 16px;
+            }
+            .message-bubble {
+                max-width: 95%;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .menu-toggle {
+                display: none;
+            }
+        }
+
+        .menu-toggle {
+            background: none;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 8px;
+            cursor: pointer;
+            color: var(--accent);
+        }
+
+        .hidden-view {
+            display: none !important;
+        }
+
+        .flex-col {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h2><i data-lucide="send"></i> EB Transfer</h2>
+        </div>
+        <div class="id-card">
+            <div class="id-label">📡 YOUR PEER ID</div>
+            <div class="id-value">
+                <span id="my-id" style="flex:1; font-size:0.7rem;">Connecting...</span>
+                <button class="copy-btn" onclick="copyMyId()"><i data-lucide="copy" size="14"></i></button>
+            </div>
+        </div>
+        <div class="nav-menu">
+            <div class="nav-item" id="nav-send" onclick="switchView('send')">
+                <i data-lucide="edit-3"></i> <span>New Message</span>
+            </div>
+            <div class="nav-item" id="nav-inbox" onclick="switchView('inbox')">
+                <i data-lucide="inbox"></i> <span>Inbox</span>
+                <span id="inbox-badge" class="badge" style="display: none;">0</span>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Area -->
+    <main class="main-content">
+        <div class="chat-header">
+            <button class="menu-toggle" id="menuToggle"><i data-lucide="menu"></i></button>
+            <div class="peer-status">
+                <div class="online-dot"></div>
+                <span>P2P Active</span>
+            </div>
+            <div style="flex:1; text-align:right; font-size:0.75rem; color:var(--text-secondary);" id="connStatusText">● Ready</div>
+        </div>
+
+        <!-- Send View (Chat style) -->
+        <div id="sendView" class="flex-col" style="height:100%">
+            <div class="messages-area" id="chatMessages">
+                <div class="message-bubble" style="background: #111827;">
+                    <p>💬 <strong>Telegram-style P2P</strong><br>Your messages and files will appear here once sent/received.</p>
+                </div>
+            </div>
+            <div class="input-area">
+                <div class="compose-card">
+                    <div class="input-group">
+                        <label>RECIPIENT PEER ID</label>
+                        <input type="text" id="remote-id" placeholder="Enter peer ID to transfer...">
+                    </div>
+                    <div class="input-group">
+                        <label>SUBJECT</label>
+                        <input type="text" id="subject" placeholder="Message subject">
+                    </div>
+                    <div class="input-group">
+                        <label>MESSAGE</label>
+                        <textarea id="message" rows="2" placeholder="Write something..."></textarea>
+                    </div>
+                    <div class="input-group">
+                        <label style="display:flex; justify-content:space-between;">
+                            <span>📎 ATTACHMENT</span>
+                            <span id="fileName" style="font-size:0.7rem;"></span>
+                        </label>
+                        <input type="file" id="file-input" style="display:none;" accept="image/*,application/pdf,text/plain">
+                        <button class="file-label" onclick="document.getElementById('file-input').click()">
+                            <i data-lucide="paperclip"></i> Choose File
+                        </button>
+                    </div>
+                    <button class="send-btn" onclick="sendData()">
+                        <i data-lucide="send"></i> Transfer P2P
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Inbox View -->
+        <div id="inboxView" class="hidden-view" style="height:100%; display: flex; flex-direction: column;">
+            <div class="inbox-container" id="inboxContainer">
+                <div class="empty-inbox">
+                    <i data-lucide="inbox" size="48" style="width:48px; height:48px; margin-bottom:16px; opacity:0.5;"></i>
+                    <p>No messages yet<br>Share your Peer ID to receive files securely</p>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script>
+    lucide.createIcons();
+
+    let peer = new Peer();
+    let connections = new Map(); // Store active connections
+    let inboxMessages = [];       // Store received messages
+    
+    const myIdSpan = document.getElementById('my-id');
+    const remoteIdInput = document.getElementById('remote-id');
+    const subjectInput = document.getElementById('subject');
+    const messageInput = document.getElementById('message');
+    const fileInput = document.getElementById('file-input');
+    const chatContainer = document.getElementById('chatMessages');
+    const inboxContainer = document.getElementById('inboxContainer');
+    const inboxBadge = document.getElementById('inbox-badge');
+    const connStatusSpan = document.getElementById('connStatusText');
+
+    // Peer initialization
+    peer.on('open', (id) => {
+        myIdSpan.innerText = id;
+        connStatusSpan.innerHTML = '● Online (Public)';
+        connStatusSpan.style.color = 'var(--success)';
+        updateStatusMessage('Your Peer ID ready. Share it to receive files!', false);
+    });
+
+    // Handle incoming connections (data channels)
+    peer.on('connection', (conn) => {
+        connections.set(conn.peer, conn);
+        updateStatusMessage(`📡 Incoming connection from ${conn.peer.substring(0,8)}...`, false);
+        
+        conn.on('data', (data) => {
+            // Receive message / file
+            const receivedMsg = {
+                id: Date.now(),
+                from: conn.peer,
+                subject: data.subject || 'No Subject',
+                message: data.message || '',
+                file: data.file || null,
+                fileName: data.fileName || null,
+                fileType: data.fileType || null,
+                timestamp: data.timestamp || new Date().toLocaleTimeString(),
+                date: new Date().toLocaleString()
+            };
+            inboxMessages.unshift(receivedMsg);
+            updateInboxUI();
+            updateBadge();
+            
+            // Also show in chat view (if send view is active or global)
+            addMessageToChat(receivedMsg, true);
+            
+            // Alert sound / notification
+            if (Notification.permission === 'granted') {
+                new Notification('📬 New P2P Transfer', { body: `${receivedMsg.subject} from ${receivedMsg.from.substring(0,8)}...` });
+            }
+            updateStatusMessage(`📥 New message from ${conn.peer.substring(0,8)}...`, false);
+        });
+        
+        conn.on('close', () => {
+            connections.delete(conn.peer);
+            updateStatusMessage(`🔌 Connection closed with peer`, false);
+        });
+    });
+
+    peer.on('error', (err) => {
+        console.error(err);
+        updateStatusMessage(`⚠️ Peer error: ${err.type}`, true);
+    });
+
+    // Request notification permission
+    if (Notification.permission !== 'granted' && Notification.permission !== 'denied') {
+        Notification.requestPermission();
+    }
+
+    // Helper: add message to chat UI
+    function addMessageToChat(msg, isReceived = true) {
+        const msgDiv = document.createElement('div');
+        msgDiv.className = 'message-bubble';
+        if (!isReceived) msgDiv.style.alignSelf = 'flex-end';
+        msgDiv.style.backgroundColor = isReceived ? '#1e293b' : '#0f2a3a';
+        msgDiv.style.border = isReceived ? '1px solid #334155' : '1px solid #38bdf8';
+        
+        let fileHtml = '';
+        if (msg.file && msg.fileType) {
+            if (msg.fileType.startsWith('image/')) {
+                fileHtml = `<div class="file-attachment"><img src="${msg.file}" alt="attachment"></div>`;
+            } else {
+                fileHtml = `<div class="file-attachment"><i data-lucide="file"></i> 📎 ${msg.fileName || 'Attachment'}</div>`;
+            }
+        }
+        
+        msgDiv.innerHTML = `
+            <h4>${isReceived ? '📩 ' + (msg.from?.substring(0,10) || 'Peer') : '📤 You'} • ${msg.subject}</h4>
+            <p>${msg.message || '📄 No text message'}</p>
+            ${fileHtml}
+            <div class="message-time">${msg.timestamp || new Date().toLocaleTimeString()}</div>
+        `;
+        chatContainer.appendChild(msgDiv);
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+        setTimeout(() => lucide.createIcons(), 50);
+    }
+
+    // Send Data Function
+    function sendData() {
+        const remoteId = remoteIdInput.value.trim();
+        if (!remoteId) {
+            alert("Please enter recipient Peer ID");
+            return;
+        }
+        
+        const subject = subjectInput.value.trim() || "P2P Transfer";
+        const textMsg = messageInput.value.trim();
+        const file = fileInput.files[0];
+        
+        updateStatusMessage(`⏳ Connecting to ${remoteId.substring(0,8)}...`, false);
+        
+        const conn = peer.connect(remoteId);
+        
+        conn.on('open', () => {
+            const payload = {
+                subject: subject,
+                message: textMsg || "(No text message)",
+                timestamp: new Date().toLocaleTimeString(),
+                fromMe: true
+            };
+            
+            const sendFinal = (finalPayload) => {
+                conn.send(finalPayload);
+                // Add to local chat as sent
+                const sentItem = {
+                    subject: subject,
+                    message: textMsg,
+                    timestamp: new Date().toLocaleTimeString(),
+                    file: finalPayload.file || null,
+                    fileName: finalPayload.fileName,
+                    fileType: finalPayload.fileType
+                };
+                addMessageToChat(sentItem, false);
+                updateStatusMessage(`✅ Delivered to ${remoteId.substring(0,8)}!`, false);
+                
+                // Clear fields
+                subjectInput.value = '';
+                messageInput.value = '';
+                fileInput.value = '';
+                document.getElementById('fileName').innerText = '';
+                remoteIdInput.value = ''; // optional reset
+            };
+            
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = () => {
+                    payload.file = reader.result;
+                    payload.fileName = file.name;
+                    payload.fileType = file.type;
+                    sendFinal(payload);
+                };
+                reader.readAsDataURL(file);
+            } else {
+                sendFinal(payload);
+            }
+        });
+        
+        conn.on('error', (err) => {
+            updateStatusMessage(`❌ Connection failed: Peer offline or invalid ID`, true);
+            alert("Cannot connect. Check Peer ID and ensure recipient is online.");
+        });
+    }
+
+    // Update Inbox UI
+    function updateInboxUI() {
+        if (!inboxContainer) return;
+        if (inboxMessages.length === 0) {
+            inboxContainer.innerHTML = `<div class="empty-inbox">
+                <i data-lucide="inbox" style="width:48px; height:48px; margin-bottom:16px; opacity:0.5;"></i>
+                <p>No messages yet<br>Share your Peer ID to receive files securely</p>
+            </div>`;
+            lucide.createIcons();
+            return;
+        }
+        
+        inboxContainer.innerHTML = inboxMessages.map(msg => `
+            <div class="message-bubble" style="margin-bottom:16px; width:100%; max-width:100%;">
+                <h4 style="display:flex; justify-content:space-between;">
+                    <span>📨 From: ${msg.from?.substring(0,12)}</span>
+                    <small style="color:var(--text-secondary);">${msg.timestamp}</small>
+                </h4>
+                <strong>${escapeHtml(msg.subject)}</strong>
+                <p style="margin-top:8px;">${escapeHtml(msg.message)}</p>
+                ${msg.file ? renderAttachmentInbox(msg) : ''}
+                <div class="message-time">${msg.date || msg.timestamp}</div>
+            </div>
+        `).join('');
+        lucide.createIcons();
+    }
+    
+    function renderAttachmentInbox(msg) {
+        if (msg.fileType && msg.fileType.startsWith('image/')) {
+            return `<div style="margin-top:12px;"><img src="${msg.file}" style="max-width:100%; border-radius:16px; max-height:200px;"></div>`;
+        } else if (msg.fileName) {
+            return `<div style="background:#0f172a; border-radius:14px; padding:12px; margin-top:10px;"><i data-lucide="file"></i> 📎 ${msg.fileName}</div>`;
+        }
+        return '';
+    }
+    
+    function updateBadge() {
+        const count = inboxMessages.length;
+        if (count > 0) {
+            inboxBadge.style.display = 'inline-block';
+            inboxBadge.innerText = count > 9 ? '9+' : count;
+        } else {
+            inboxBadge.style.display = 'none';
+        }
+    }
+    
+    function updateStatusMessage(msg, isError = false) {
+        connStatusSpan.innerHTML = isError ? `⚠️ ${msg}` : `● ${msg}`;
+        connStatusSpan.style.color = isError ? 'var(--danger)' : 'var(--success)';
+        setTimeout(() => {
+            if (!isError && connStatusSpan.innerHTML.includes(msg)) {
+                connStatusSpan.innerHTML = '● Online & Ready';
+                connStatusSpan.style.color = 'var(--success)';
+            }
+        }, 3000);
+    }
+    
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+    
+    // Display selected file name
+    fileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        document.getElementById('fileName').innerText = file ? `📎 ${file.name}` : '';
+    });
+    
+    // Copy Peer ID
+    window.copyMyId = function() {
+        const id = myIdSpan.innerText;
+        if (id && id !== 'Connecting...') {
+            navigator.clipboard.writeText(id);
+            updateStatusMessage("✅ Peer ID copied!", false);
+        } else {
+            alert("Waiting for Peer ID...");
+        }
+    };
+    
+    // View Switching (Telegram style)
+    function switchView(view) {
+        const sendView = document.getElementById('sendView');
+        const inboxView = document.getElementById('inboxView');
+        const navSend = document.getElementById('nav-send');
+        const navInbox = document.getElementById('nav-inbox');
+        
+        if (view === 'send') {
+            sendView.classList.remove('hidden-view');
+            inboxView.classList.add('hidden-view');
+            navSend.classList.add('active');
+            navInbox.classList.remove('active');
+        } else {
+            sendView.classList.add('hidden-view');
+            inboxView.classList.remove('hidden-view');
+            navInbox.classList.add('active');
+            navSend.classList.remove('active');
+            updateInboxUI();
+        }
+        
+        // Close sidebar on mobile
+        if (window.innerWidth <= 768) {
+            document.getElementById('sidebar').classList.remove('mobile-open');
+        }
+    }
+    
+    // Mobile menu toggle
+    document.getElementById('menuToggle').addEventListener('click', () => {
+        document.getElementById('sidebar').classList.toggle('mobile-open');
+    });
+    
+    // Close sidebar on click outside for mobile? (basic)
+    document.addEventListener('click', (e) => {
+        const sidebar = document.getElementById('sidebar');
+        const toggle = document.getElementById('menuToggle');
+        if (window.innerWidth <= 768 && sidebar.classList.contains('mobile-open')) {
+            if (!sidebar.contains(e.target) && e.target !== toggle && !toggle.contains(e.target)) {
+                sidebar.classList.remove('mobile-open');
+            }
+        }
+    });
+    
+    // default view active
+    switchView('send');
+    window.switchView = switchView;
+    
+    // Keep icons refreshed
+    setInterval(() => lucide.createIcons(), 500);
+</script>
+</body>
+</html>

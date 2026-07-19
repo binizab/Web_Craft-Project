@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>EB Academy | Secure Billing & Ledger</title>
+    <!-- Poppins Font + Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Lucide CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-deep: #050a14;
+            --bg-card: #0d1626;
+            --accent-blue: #3a86ff;
+            --accent-light: #60a5fa;
+            --accent-glow: rgba(58, 134, 255, 0.2);
+            --text-main: #f1f5f9;
+            --text-dim: #94a3b8;
+            --danger: #ef4444;
+            --danger-glow: rgba(239, 68, 68, 0.15);
+            --success: #10b981;
+            --warning: #f59e0b;
+            --border: #1e293b;
+            --card-radius: 28px;
+        }
+
+        body {
+            font-family: 'Poppins', 'Inter', system-ui, sans-serif;
+            background: radial-gradient(ellipse at 20% 30%, #0a0f1c, var(--bg-deep));
+            color: var(--text-main);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 24px;
+        }
+
+        /* responsive container */
+        .ledger-container {
+            width: 100%;
+            max-width: 1280px;
+            background: rgba(13, 22, 38, 0.7);
+            backdrop-filter: blur(2px);
+            border-radius: var(--card-radius);
+            border: 1px solid var(--border);
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            overflow: hidden;
+            box-shadow: 0 30px 60px -15px rgba(0,0,0,0.6);
+            transition: all 0.3s ease;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: linear-gradient(145deg, rgba(0,0,0,0.3), rgba(8,18,30,0.5));
+            padding: 36px 28px;
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+            backdrop-filter: blur(8px);
+        }
+
+        .profile-badge {
+            text-align: center;
+            margin-bottom: 8px;
+        }
+        .logo-circle {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, var(--accent-blue), #1e40af);
+            border-radius: 25px;
+            margin: 0 auto 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 12px 20px -8px rgba(58,134,255,0.3);
+        }
+        .logo-circle i {
+            width: 38px;
+            height: 38px;
+            color: white;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            background: linear-gradient(135deg, #fff, var(--accent-light));
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+
+        .stat-card {
+            background: rgba(255,255,255,0.03);
+            padding: 20px 18px;
+            border-radius: 24px;
+            border: 1px solid var(--border);
+            transition: transform 0.2s;
+        }
+        .stat-card:hover {
+            background: rgba(58,134,255,0.05);
+            border-color: var(--accent-blue);
+        }
+        .stat-card small {
+            color: var(--text-dim);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .stat-card div {
+            font-size: 1.6rem;
+            font-weight: 800;
+            margin-top: 10px;
+            font-family: 'Poppins', monospace;
+            letter-spacing: -0.5px;
+        }
+        .info-note {
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            line-height: 1.5;
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Main Content */
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .month-scroller {
+            display: flex;
+            overflow-x: auto;
+            padding: 24px 28px;
+            gap: 14px;
+            background: rgba(0,0,0,0.2);
+            border-bottom: 1px solid var(--border);
+            scrollbar-width: thin;
+        }
+        .month-scroller::-webkit-scrollbar {
+            height: 5px;
+        }
+        .month-scroller::-webkit-scrollbar-track {
+            background: var(--border);
+            border-radius: 10px;
+        }
+        .month-scroller::-webkit-scrollbar-thumb {
+            background: var(--accent-blue);
+            border-radius: 10px;
+        }
+
+        .month-item {
+            min-width: 120px;
+            padding: 14px 8px;
+            border-radius: 24px;
+            background: #121e30;
+            border: 1px solid var(--border);
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .month-item:hover {
+            background: #1e2a3e;
+            transform: translateY(-3px);
+        }
+        .month-item.active {
+            background: var(--accent-blue);
+            border-color: var(--accent-light);
+            box-shadow: 0 10px 20px -5px rgba(58,134,255,0.4);
+            color: white;
+        }
+        .month-status-badge {
+            font-size: 0.6rem;
+            font-weight: 700;
+            margin-top: 6px;
+            letter-spacing: 0.3px;
+        }
+
+        /* Payment Body */
+        .payment-body {
+            padding: 36px 40px;
+            flex-grow: 1;
+        }
+
+        .bill-header {
+            margin-bottom: 28px;
+        }
+        .bill-header h2 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 6px 16px;
+            border-radius: 40px;
+            margin-top: 12px;
+        }
+
+        .bill-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 0;
+            border-bottom: 1px solid var(--border);
+            font-weight: 500;
+        }
+        .bill-row span:first-child {
+            color: var(--text-dim);
+        }
+        .penalty-row {
+            color: var(--danger);
+            background: rgba(239,68,68,0.05);
+            margin-top: 4px;
+            padding-left: 8px;
+            border-radius: 12px;
+        }
+        .penalty-notice {
+            display: none;
+            background: var(--danger-glow);
+            color: var(--danger);
+            padding: 14px 18px;
+            border-radius: 20px;
+            margin-top: 24px;
+            font-size: 0.8rem;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            align-items: center;
+            gap: 12px;
+        }
+
+        /* Checkout Bar */
+        .checkout-bar {
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(12px);
+            padding: 24px 40px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 18px;
+        }
+        .total-section small {
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            letter-spacing: 1px;
+        }
+        .total-amount {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--success);
+            font-family: 'Poppins', monospace;
+        }
+        .pay-btn {
+            background: linear-gradient(95deg, #ffffff, #f0f4ff);
+            color: #0a0f1c;
+            border: none;
+            padding: 16px 36px;
+            border-radius: 60px;
+            font-weight: 800;
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.3s;
+            box-shadow: 0 8px 18px rgba(0,0,0,0.2);
+            font-family: 'Poppins', sans-serif;
+        }
+        .pay-btn:hover {
+            background: var(--accent-blue);
+            color: white;
+            transform: scale(1.02);
+            gap: 14px;
+        }
+
+        /* Responsive */
+        @media (max-width: 880px) {
+            .ledger-container {
+                grid-template-columns: 1fr;
+                border-radius: 32px;
+            }
+            .sidebar {
+                border-right: none;
+                border-bottom: 1px solid var(--border);
+                flex-direction: row;
+                flex-wrap: wrap;
+                padding: 24px;
+                gap: 16px;
+            }
+            .profile-badge {
+                flex: 1;
+                text-align: left;
+                display: flex;
+                gap: 18px;
+                align-items: center;
+            }
+            .logo-circle {
+                margin: 0;
+                width: 55px;
+                height: 55px;
+            }
+            .stat-card {
+                flex: 1;
+                min-width: 150px;
+            }
+            .month-scroller {
+                padding: 16px 20px;
+            }
+            .payment-body {
+                padding: 28px 24px;
+            }
+            .checkout-bar {
+                padding: 20px 24px;
+                flex-direction: column;
+                align-items: stretch;
+                text-align: center;
+            }
+            .pay-btn {
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 550px) {
+            body {
+                padding: 12px;
+            }
+            .bill-header h2 {
+                font-size: 1.4rem;
+            }
+            .total-amount {
+                font-size: 1.6rem;
+            }
+            .month-item {
+                min-width: 100px;
+                font-size: 0.85rem;
+            }
+        }
+
+        .fade-in {
+            animation: fadeSlide 0.3s ease;
+        }
+        @keyframes fadeSlide {
+            from { opacity: 0; transform: translateY(6px);}
+            to { opacity: 1; transform: translateY(0);}
+        }
+    </style>
+</head>
+<body>
+
+<div class="ledger-container">
+    <aside class="sidebar">
+        <div class="profile-badge">
+            <div class="logo-circle">
+                <i data-lucide="graduation-cap"></i>
+            </div>
+            <div>
+                <h3>EB Academy</h3>
+                <p style="font-size: 0.7rem; color: var(--text-dim);">Secure Billing Portal</p>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <small><i data-lucide="hourglass" style="width: 14px;"></i> Time Remaining</small>
+            <div id="daysLeft">-- Days</div>
+        </div>
+
+        <div class="stat-card">
+            <small><i data-lucide="alert-triangle" style="width: 14px;"></i> Outstanding Debt</small>
+            <div id="sidebarTotal" style="color: var(--danger);">0.00 ETB</div>
+        </div>
+
+        <div class="info-note">
+            <i data-lucide="info" style="width: 16px;"></i> 5% late penalty applies to overdue months
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <div class="month-scroller" id="monthScroll"></div>
+
+        <div class="payment-body" id="paymentBody">
+            <div class="bill-header">
+                <h2 id="viewingMonth">
+                    <i data-lucide="calendar"></i> 
+                    <span>--</span>
+                </h2>
+                <div id="statusLabelContainer"></div>
+            </div>
+
+            <div class="bill-row">
+                <span><i data-lucide="book-open" style="width: 16px; vertical-align: middle;"></i> Monthly Tuition</span>
+                <span>4,800.00 ETB</span>
+            </div>
+            <div class="bill-row">
+                <span><i data-lucide="calendar-range"></i> Saturday Support</span>
+                <span>1,200.00 ETB</span>
+            </div>
+            <div class="bill-row penalty-row" id="penaltyRow" style="display: none;">
+                <span><i data-lucide="alert-circle"></i> Overdue Penalty (5%)</span>
+                <span id="penaltyValue">300.00 ETB</span>
+            </div>
+
+            <div class="penalty-notice" id="penaltyWarning">
+                <i data-lucide="clock"></i> This payment period is past due. A 5% late fee has been automatically applied.
+            </div>
+        </div>
+
+        <div class="checkout-bar">
+            <div class="total-section">
+                <small><i data-lucide="credit-card"></i> TOTAL AMOUNT</small>
+                <div class="total-amount" id="grandTotal">6,000.00 ETB</div>
+            </div>
+            <button class="pay-btn" onclick="processPayment()">
+                <i data-lucide="lock"></i> 
+                Pay Now
+                <i data-lucide="arrow-right"></i>
+            </button>
+        </div>
+    </main>
+</div>
+
+<script>
+    // Ethiopian months (contextual)
+    const months = ["Meskerem", "Tikimt", "Hidar", "Tahsas", "Tir", "Yekatit", "Megabit", "Miyazia", "Ginbot", "Sene"];
+    const BASE_PRICE = 6000;
+    const PENALTY_RATE = 0.05;
+
+    // Dynamic Ethiopian month logic
+    const today = new Date();
+    const dayOfMonth = today.getDate();
+    const daysInMonth = 30;
+    const daysRemaining = Math.max(0, daysInMonth - dayOfMonth);
+    
+    // Determine current month index (Ethiopian approx: Sept=Meskerem index0)
+    let currentMonthIdx = (today.getMonth() + 4) % 12;
+    if(currentMonthIdx > 9) currentMonthIdx = 9;
+    let totalOutstandingDebt = 0;
+
+    // UI elements
+    const monthScroll = document.getElementById('monthScroll');
+    const viewingMonthSpan = document.getElementById('viewingMonth').querySelector('span');
+    const statusContainer = document.getElementById('statusLabelContainer');
+    const penaltyRow = document.getElementById('penaltyRow');
+    const penaltyWarning = document.getElementById('penaltyWarning');
+    const grandTotalSpan = document.getElementById('grandTotal');
+    const sidebarTotalSpan = document.getElementById('sidebarTotal');
+    const daysLeftSpan = document.getElementById('daysLeft');
+
+    // Helper: update lucide icons after dynamic changes
+    function refreshIcons() {
+        if (typeof lucide !== 'undefined' && lucide.createIcons) {
+            lucide.createIcons();
+        }
+    }
+
+    // Calculate total debt across all past months (overdue)
+    function computeTotalDebt() {
+        let debt = 0;
+        for (let i = 0; i < currentMonthIdx; i++) {
+            debt += BASE_PRICE + (BASE_PRICE * PENALTY_RATE);
+        }
+        // current month if unpaid would be included but we show as current, for sidebar we show strictly outstanding overdue
+        return debt;
+    }
+
+    // Render months scroller
+    function renderMonths() {
+        monthScroll.innerHTML = '';
+        totalOutstandingDebt = computeTotalDebt();
+        sidebarTotalSpan.innerText = `${totalOutstandingDebt.toLocaleString()}.00 ETB`;
+        daysLeftSpan.innerText = `${daysRemaining} Days`;
+
+        months.forEach((monthName, idx) => {
+            const monthDiv = document.createElement('div');
+            monthDiv.className = `month-item ${idx === currentMonthIdx ? 'active' : ''}`;
+            
+            let statusHtml = '';
+            let statusText = '';
+            if (idx < currentMonthIdx) {
+                statusHtml = `<div class="month-status-badge" style="color: var(--danger);"><i data-lucide="alert-octagon" style="width: 10px;"></i> OVERDUE</div>`;
+                statusText = 'overdue';
+            } else if (idx === currentMonthIdx) {
+                statusHtml = `<div class="month-status-badge" style="color: var(--accent-light);"><i data-lucide="clock" style="width: 10px;"></i> CURRENT</div>`;
+                statusText = 'current';
+            } else {
+                statusHtml = `<div class="month-status-badge" style="color: #5a6e8a;">UPCOMING</div>`;
+                statusText = 'upcoming';
+            }
+            
+            monthDiv.innerHTML = `
+                <div style="font-weight: 600; font-size:0.85rem;">${monthName}</div>
+                ${statusHtml}
+            `;
+            monthDiv.addEventListener('click', () => selectMonth(monthName, idx, monthDiv));
+            monthScroll.appendChild(monthDiv);
+        });
+        refreshIcons();
+    }
+
+    // Select month and update bill details
+    function selectMonth(name, index, targetElement) {
+        // update active style
+        document.querySelectorAll('.month-item').forEach(el => el.classList.remove('active'));
+        if (targetElement) targetElement.classList.add('active');
+        
+        // Update viewing title
+        viewingMonthSpan.innerText = name;
+        
+        // Determine status and price
+        let finalPrice = BASE_PRICE;
+        let statusMessage = '';
+        let statusColor = '';
+        let showPenalty = false;
+        
+        if (index < currentMonthIdx) {
+            // Overdue month: apply penalty
+            finalPrice = BASE_PRICE + (BASE_PRICE * PENALTY_RATE);
+            statusMessage = `⚠️ Overdue Account — Late fee applied`;
+            statusColor = 'var(--danger)';
+            showPenalty = true;
+        } else if (index === currentMonthIdx) {
+            statusMessage = `✅ Active Billing Period — Due within ${daysRemaining} days`;
+            statusColor = 'var(--success)';
+            showPenalty = false;
+        } else {
+            statusMessage = `📅 Future Period — Pre-enrollment available`;
+            statusColor = 'var(--text-dim)';
+            showPenalty = false;
+        }
+        
+        // Update status label container
+        statusContainer.innerHTML = `
+            <div class="status-badge" style="background: ${statusColor}20; border: 1px solid ${statusColor}40; color: ${statusColor};">
+                <i data-lucide="info"></i>
+                <span>${statusMessage}</span>
+            </div>
+        `;
+        
+        // penalty row visibility
+        if (showPenalty) {
+            penaltyRow.style.display = 'flex';
+            penaltyWarning.style.display = 'flex';
+            const penaltyAmount = BASE_PRICE * PENALTY_RATE;
+            document.getElementById('penaltyValue').innerText = `${penaltyAmount.toLocaleString()}.00 ETB`;
+        } else {
+            penaltyRow.style.display = 'none';
+            penaltyWarning.style.display = 'none';
+        }
+        
+        // Update grand total display
+        grandTotalSpan.innerText = `${finalPrice.toLocaleString()}.00 ETB`;
+        
+        // refresh icons inside status
+        refreshIcons();
+        document.getElementById('paymentBody').classList.add('fade-in');
+        setTimeout(() => document.getElementById('paymentBody')?.classList.remove('fade-in'), 300);
+    }
+    
+    // Process payment handler (simulate gateway)
+    function processPayment() {
+        const monthName = viewingMonthSpan.innerText;
+        const amountRaw = grandTotalSpan.innerText;
+        const selectedMonthIndex = months.findIndex(m => m === monthName);
+        const isOverdue = selectedMonthIndex < currentMonthIdx;
+        
+        let paymentNote = isOverdue ? 
+            `Includes 5% late fee for overdue month.` : 
+            `Standard tuition + Saturday support.`;
+            
+        alert(`💳 EB Academy Secure Gateway\n\nMonth: ${monthName}\nAmount: ${amountRaw}\n${paymentNote}\n\n🔒 Simulated payment successful. Thank you!`);
+        // In a real app, you'd trigger a backend or Dexie ledger update.
+    }
+    
+    // Initialize all
+    function init() {
+        renderMonths();
+        // default select current month
+        const defaultMonthName = months[currentMonthIdx];
+        const defaultElement = document.querySelectorAll('.month-item')[currentMonthIdx];
+        if (defaultElement) selectMonth(defaultMonthName, currentMonthIdx, defaultElement);
+        else selectMonth(defaultMonthName, currentMonthIdx, null);
+        refreshIcons();
+    }
+    
+    // handle window resize for icon refresh
+    window.addEventListener('resize', () => refreshIcons());
+    
+    // Make payment function globally accessible
+    window.processPayment = processPayment;
+    
+    // start app
+    init();
+</script>
+</body>
+</html>

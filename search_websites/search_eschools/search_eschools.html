@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>EduCatalog • Ethiopian School Showcase | Launch Projects</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://unpkg.com/dexie@latest/dist/dexie.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    /* ---------- DARK / LIGHT MODE CSS VARIABLES ---------- */
+    :root {
+      --bg-body: #f8fafc;
+      --bg-card: #ffffff;
+      --bg-surface: #f1f5f9;
+      --border-color: #e2e8f0;
+      --text-main: #0f172a;
+      --text-muted: #475569;
+      --primary-blue: #0284c7;
+      --primary-hover: #0369a1;
+      --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
+      --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+      --filter-bg: #ffffff;
+      --header-gradient-start: #e0f2fe;
+      --header-gradient-end: #bae6fd;
+      --icon-stroke: #334155;
+    }
+
+    body.dark {
+      --bg-body: #0a0f1c;
+      --bg-card: #1e293b;
+      --bg-surface: #0f172a;
+      --border-color: #334155;
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --primary-blue: #38bdf8;
+      --primary-hover: #7dd3fc;
+      --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+      --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.6);
+      --filter-bg: #1e293b;
+      --header-gradient-start: #082f49;
+      --header-gradient-end: #08212e;
+      --icon-stroke: #cbd5e1;
+    }
+
+    body {
+      font-family: 'Poppins', 'Inter', sans-serif;
+      background-color: var(--bg-body);
+      color: var(--text-main);
+      transition: background-color 0.25s ease, color 0.2s ease;
+      line-height: 1.5;
+    }
+
+    /* ------ HEADER SECTION (HERO) ------ */
+    .catalog-header {
+      position: relative;
+      width: 100%;
+      min-height: 380px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      border-bottom: 1px solid var(--border-color);
+      background: linear-gradient(135deg, var(--header-gradient-start), var(--header-gradient-end));
+      overflow: hidden;
+    }
+    .header-bg {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.25;
+      z-index: 1;
+      pointer-events: none;
+    }
+    .overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(115deg, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.2) 100%);
+      z-index: 2;
+    }
+    .header-content {
+      position: relative;
+      z-index: 10;
+      max-width: 950px;
+      width: 90%;
+      padding: 2rem;
+    }
+    .header-content h1 {
+      font-size: 3.2rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, #ffffff, #e0f2fe);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      margin-bottom: 12px;
+      text-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+    .subhead {
+      color: #e2e8f0;
+      font-weight: 500;
+      margin-bottom: 28px;
+      font-size: 1.1rem;
+    }
+    body.dark .subhead { color: #cbd5e6; }
+
+    /* ---------- SEARCH CONTAINER (YOUTUBE STYLE) ---------- */
+    .search-container {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      background: rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(16px);
+      border-radius: 56px;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      padding: 5px 16px 5px 20px;
+      transition: all 0.2s;
+      position: relative;
+    }
+    body.dark .search-container {
+      background: #121826cc;
+    }
+    .search-container:focus-within {
+      border-color: var(--primary-blue);
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.4);
+    }
+
+    #activeFilters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+    .filter-pill {
+      background: var(--primary-blue);
+      color: #0f172a;
+      font-weight: 700;
+      padding: 6px 14px;
+      border-radius: 40px;
+      font-size: 0.75rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      backdrop-filter: blur(4px);
+      animation: pillPop 0.2s ease;
+      letter-spacing: 0.3px;
+    }
+    body.dark .filter-pill {
+      color: #020617;
+      background: #7dd3fc;
+    }
+    .filter-pill span {
+      cursor: pointer;
+      font-size: 1.2rem;
+      font-weight: 700;
+      line-height: 1;
+      transition: 0.1s;
+    }
+    .filter-pill span:hover { transform: scale(1.2); display: inline-block; }
+
+    @keyframes pillPop {
+      from { opacity: 0; transform: scale(0.8); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .search-input-wrapper {
+      flex: 1;
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .search-input-wrapper i {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #cbd5e6;
+      pointer-events: none;
+      width: 18px;
+      height: 18px;
+    }
+    .search-container input {
+      width: 100%;
+      background: transparent;
+      border: none;
+      padding: 12px 12px 12px 42px;
+      color: white;
+      font-size: 1rem;
+      outline: none;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 500;
+    }
+    .search-container input::placeholder {
+      color: #e2e8f0;
+      font-weight: 400;
+    }
+
+    .filter-trigger {
+      background: rgba(30, 41, 59, 0.8);
+      border: none;
+      color: white;
+      width: 46px;
+      height: 46px;
+      border-radius: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .filter-trigger:hover { background: var(--primary-blue); transform: scale(0.96);}
+
+    /* ---------- FILTER DROPDOWN (Z-Index fixed) ---------- */
+    .filterDrop {
+      position: absolute;
+      top: 110%;
+      right: 10px;
+      width: 270px;
+      background: var(--filter-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 28px;
+      padding: 18px;
+      display: none;
+      box-shadow: 0 25px 40px -12px rgba(0, 0, 0, 0.6);
+      z-index: 9999;
+      backdrop-filter: blur(12px);
+    }
+    .filterDrop.show { display: block; }
+    .filterHeader {
+      color: var(--primary-blue);
+      font-size: 0.7rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      margin: 14px 0 8px;
+      letter-spacing: 1.2px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .filterContent {
+      padding: 8px 14px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      border-radius: 40px;
+      transition: 0.2s;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .filterContent i {
+      width: 18px;
+      height: 18px;
+    }
+    .filterContent:hover {
+      background: var(--primary-blue);
+      color: #000;
+      transform: translateX(5px);
+    }
+
+    /* ---------- STATS & GRID ---------- */
+    .catalog-container {
+      max-width: 1400px;
+      margin: 48px auto;
+      padding: 0 28px;
+    }
+    .stats-info {
+      background: var(--bg-card);
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 24px;
+      border-radius: 60px;
+      margin-bottom: 36px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      border: 1px solid var(--border-color);
+      backdrop-filter: blur(4px);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .course-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 32px;
+    }
+
+    /* ---------- SCHOOL CARD (PREMIUM) ---------- */
+    .course-card {
+      background: var(--bg-card);
+      border-radius: 32px;
+      border: 1px solid var(--border-color);
+      overflow: hidden;
+      transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--shadow-sm);
+    }
+    .course-card:hover {
+      transform: translateY(-6px) scale(1.01);
+      border-color: var(--primary-blue);
+      box-shadow: var(--shadow-md);
+    }
+    .card-img-wrap {
+      height: 190px;
+      overflow: hidden;
+      background: #1e293b;
+      position: relative;
+    }
+    .card-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s ease;
+    }
+    .course-card:hover .card-image {
+      transform: scale(1.08);
+    }
+    .card-body {
+      padding: 1.6rem;
+      flex: 1;
+    }
+    .card-label {
+      color: var(--primary-blue);
+      font-weight: 700;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+    .card-title {
+      font-size: 1.45rem;
+      font-weight: 700;
+      margin: 0 0 16px;
+      line-height: 1.3;
+    }
+    .meta-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .meta-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+    .meta-item i {
+      width: 18px;
+      height: 18px;
+      color: var(--primary-blue);
+    }
+
+    /* Empty state */
+    .empty-state {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 70px 30px;
+      background: var(--bg-card);
+      border-radius: 48px;
+      border: 1px dashed var(--border-color);
+    }
+
+    /* Theme toggle button (floating) */
+    .theme-toggle {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 60px;
+      padding: 12px 18px;
+      cursor: pointer;
+      z-index: 1050;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 5px 14px rgba(0, 0, 0, 0.2);
+      transition: 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 500;
+    }
+    .theme-toggle:hover {
+      transform: scale(1.05);
+      background: var(--primary-blue);
+      color: white;
+    }
+
+    @media (max-width: 700px) {
+      .catalog-header { min-height: 320px; }
+      .header-content h1 { font-size: 2rem; }
+      .course-grid { gap: 20px; }
+      .search-container { border-radius: 28px; }
+      .filterDrop { width: calc(100% - 30px); left: 15px; right: auto; }
+      .stats-info { font-size: 0.75rem; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="catalog-header">
+  <div class="overlay"></div>
+  <div class="header-content">
+    <h1>📚 EduCatalog • Launch Your School Hub</h1>
+    <p class="subhead">Click any project card → Opens full interactive homepage (same as Maker preview)</p>
+    <div class="search-container">
+      <div id="activeFilters"></div>
+      <div class="search-input-wrapper">
+        <i data-lucide="search"></i>
+        <input type="text" id="searchInput" placeholder="Search by name, location, program...">
+      </div>
+      <button class="filter-trigger" id="filterBtn">
+        <i data-lucide="sliders-horizontal"></i>
+      </button>
+      <div class="filterDrop" id="filterMenu">
+        <div class="filterContent" id="clearAll" style="color: var(--primary); font-weight: bold; border-bottom: 1px solid var(--border-color);">
+          <i data-lucide="eraser"></i> Clear filters
+        </div>
+        <div class="filterHeader"><i data-lucide="layers"></i> School Type</div>
+        <div class="filterContent filter-type">Private</div>
+        <div class="filterContent filter-type">Public</div>
+        <div class="filterContent filter-type">International</div>
+        <div class="filterHeader"><i data-lucide="users"></i> Student Type</div>
+        <div class="filterContent filter-gender">Mixed</div>
+        <div class="filterContent filter-gender">Boys Only</div>
+        <div class="filterContent filter-gender">Girls Only</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="catalog-container" style="max-width: 1400px; margin: 48px auto; padding: 0 28px;">
+  <div class="stats-info">
+    <i data-lucide="school"></i>
+    <span id="resultCount">0</span> institutions · Click any card to open full website preview
+  </div>
+  <main class="course-grid" id="schoolGrid"></main>
+</div>
+
+<div class="theme-toggle" id="themeToggle">
+  <i data-lucide="moon" id="themeIcon"></i>
+  <span>Dark/Light</span>
+</div>
+
+<script>
+  (function(){
+    // ---- Connect to ProjectEngineDB (same as maker) ----
+    const makerDB = new Dexie("ProjectEngineDB");
+    // Ensure schema is defined but avoid version conflict chain error
+    try {
+      if (!makerDB.tables || !makerDB.tables.some(t => t.name === 'projects')) {
+        makerDB.version(4).stores({
+          projects: '++id, name, category, date',
+          gallery: '++id, projectId, slotId',
+          shared: 'key'
+        });
+      }
+    } catch(e) { console.warn(e); }
+    makerDB.open().catch(err => console.warn("DB open warning", err));
+
+    let allProjects = [];
+    let activeFilters = { search: "", type: null, gender: null };
+
+    // Searchable content
+    function searchableFields(p) {
+      const name = p["form-name"] || "";
+      const city = (p.branches && p.branches[0]?.location) || "";
+      const program = p["form-lType"] || "";
+      return `${name} ${city} ${program}`.toLowerCase();
+    }
+
+    // Load projects + hero image enrichment
+    async function loadProjectsFromMaker() {
+      try {
+        let projects = await makerDB.projects.toArray();
+        for (let proj of projects) {
+          // attach hero image from gallery or images array
+          if (!proj.images || proj.images.length === 0) {
+            try {
+              const galleryItems = await makerDB.gallery.where("projectId").equals(proj.id).toArray();
+              if (galleryItems && galleryItems.length) {
+                proj.heroImage = galleryItems[0]?.src || null;
+              } else {
+                proj.heroImage = null;
+              }
+            } catch(e) { proj.heroImage = null; }
+          } else {
+            proj.heroImage = proj.images[0]?.src || null;
+          }
+        }
+        allProjects = projects;
+        applyFiltersAndRender();
+      } catch (err) {
+        console.error("Failed to load projects:", err);
+        document.getElementById('schoolGrid').innerHTML = `<div class="empty-state"><i data-lucide="alert-circle"></i><h3>Cannot fetch projects</h3><p>Make sure you have created projects in Web Engine Pro.</p></div>`;
+        lucide.createIcons();
+      }
+    }
+
+    function filterProjects() {
+      return allProjects.filter(proj => {
+        const searchMatch = activeFilters.search === "" || searchableFields(proj).includes(activeFilters.search.toLowerCase());
+        let typeMatch = true;
+        if (activeFilters.type) {
+          const schoolType = proj["form-scType"] || "";
+          typeMatch = schoolType.toLowerCase() === activeFilters.type.toLowerCase();
+        }
+        let genderMatch = true;
+        if (activeFilters.gender) {
+          const studentType = proj["form-sType"] || "";
+          genderMatch = studentType.toLowerCase() === activeFilters.gender.toLowerCase();
+        }
+        return searchMatch && typeMatch && genderMatch;
+      });
+    }
+
+    function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, m => m==='&'?'&amp;':m==='<'?'&lt;':'&gt;'); }
+
+    // ---- CORE: OPEN THE FULL HOMEPAGE (standalone preview) ----
+    // The maker expects that launching a project stores it in shared table and opens home.html
+    // Replicate exactly what "Launch Project" does in eschool_maker.js: launchProject()
+    async function launchProjectHomepage(projectId) {
+      const project = allProjects.find(p => p.id === projectId);
+      if (!project) {
+        showToast("Project data missing, cannot launch.", true);
+        return;
+      }
+      try {
+        // Store the active project into shared table (same as maker's launchProject)
+        await makerDB.shared.put({ key: 'current_active', data: project });
+        showToast("Opening school website...", false);
+        const previewUrl = '../../../../create_websites/e-school/eschool_home/eschool_home.html';
+            window.open(previewUrl, '_blank');
+      } catch (err) {
+        console.error("Launch error:", err);
+        showToast("Failed to launch project. Check if home.html exists.", true);
+      }
+    }
+
+    // Helper toast
+    let toastTimeout;
+    function showToast(msg, isError = false) {
+      const existing = document.querySelector('.toast-msg');
+      if(existing) existing.remove();
+      const toast = document.createElement('div');
+      toast.className = 'toast-msg';
+      toast.style.backgroundColor = isError ? 'var(--error-bg, #450a0a)' : 'var(--bg-card)';
+      toast.style.borderLeftColor = isError ? '#ef4444' : 'var(--primary)';
+      toast.innerHTML = `<i data-lucide="${isError ? 'alert-triangle' : 'external-link'}" style="width:14px; margin-right:8px;"></i> ${msg}`;
+      document.body.appendChild(toast);
+      lucide.createIcons();
+      if(toastTimeout) clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => toast.remove(), 2500);
+    }
+
+    function renderSchoolCards() {
+      const filtered = filterProjects();
+      const grid = document.getElementById('schoolGrid');
+      document.getElementById('resultCount').innerText = filtered.length;
+      if (filtered.length === 0) {
+        grid.innerHTML = `<div class="empty-state"><i data-lucide="compass"></i><h3>No matching schools</h3><p>Try adjusting filters or create projects in Maker.</p></div>`;
+        lucide.createIcons();
+        return;
+      }
+
+      grid.innerHTML = filtered.map(proj => {
+        const name = proj["form-name"] || "Unnamed Project";
+        const schoolType = proj["form-scType"] || "Private";
+        const studentType = proj["form-sType"] || "Mixed";
+        const program = proj["form-lType"] || "Day";
+        const estDate = proj["form-date"] || "Est. Recent";
+        const heroImg = proj.heroImage || "https://images.pexels.com/photos/5212345/pexels-photo-5212345.jpeg?auto=compress&cs=tinysrgb&w=400&h=240&fit=crop";
+        const branchesCount = proj.branches?.length || 1;
+        return `
+          <div class="course-card" data-id="${proj.id}">
+            <div class="card-img-wrap">
+              <img src="${escapeHtml(heroImg)}" class="card-image" alt="${escapeHtml(name)}" onerror="this.src='https://picsum.photos/id/20/400/240'">
+            </div>
+            <div class="card-body">
+              <div class="card-label"><i data-lucide="award"></i> ${escapeHtml(schoolType)}</div>
+              <h3 class="card-title">${escapeHtml(name)}</h3>
+              <div class="meta-list">
+                <div class="meta-item"><i data-lucide="calendar"></i> ${escapeHtml(estDate)}</div>
+                <div class="meta-item"><i data-lucide="users"></i> ${escapeHtml(studentType)} | ${escapeHtml(program)}</div>
+                <div class="meta-item"><i data-lucide="map-pin"></i> ${branchesCount} campus location(s)</div>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+      lucide.createIcons();
+
+      // attach click handlers - each card opens the full homepage preview
+      document.querySelectorAll('.course-card').forEach(card => {
+        const existingHandler = card._launchHandler;
+        if(existingHandler) card.removeEventListener('click', existingHandler);
+        const handler = (e) => {
+          e.stopPropagation();
+          const id = parseInt(card.getAttribute('data-id'));
+          launchProjectHomepage(id);
+        };
+        card.addEventListener('click', handler);
+        card._launchHandler = handler;
+      });
+    }
+
+    function updateFilterPills() {
+      const container = document.getElementById('activeFilters');
+      if(container) {
+        container.innerHTML = '';
+        if(activeFilters.type) {
+          const pill = document.createElement('div'); pill.className = 'filter-pill'; pill.innerHTML = `${activeFilters.type} <span onclick="window.clearSingleFilter('type')">&times;</span>`;
+          container.appendChild(pill);
+        }
+        if(activeFilters.gender) {
+          const pill = document.createElement('div'); pill.className = 'filter-pill'; pill.innerHTML = `${activeFilters.gender} <span onclick="window.clearSingleFilter('gender')">&times;</span>`;
+          container.appendChild(pill);
+        }
+      }
+    }
+    window.clearSingleFilter = function(type) {
+      if(type === 'type') activeFilters.type = null;
+      if(type === 'gender') activeFilters.gender = null;
+      applyFiltersAndRender();
+    };
+    
+    function applyFiltersAndRender() {
+      renderSchoolCards();
+      updateFilterPills();
+    }
+    
+    // Event handlers
+    document.getElementById('searchInput').addEventListener('input', (e) => {
+      activeFilters.search = e.target.value;
+      applyFiltersAndRender();
+    });
+    document.querySelectorAll('.filter-type').forEach(el => {
+      el.addEventListener('click', () => {
+        activeFilters.type = el.innerText.trim();
+        applyFiltersAndRender();
+        document.getElementById('filterMenu').classList.remove('show');
+      });
+    });
+    document.querySelectorAll('.filter-gender').forEach(el => {
+      el.addEventListener('click', () => {
+        activeFilters.gender = el.innerText.trim();
+        applyFiltersAndRender();
+        document.getElementById('filterMenu').classList.remove('show');
+      });
+    });
+    document.getElementById('clearAll').addEventListener('click', () => {
+      activeFilters = { search: activeFilters.search, type: null, gender: null };
+      applyFiltersAndRender();
+      document.getElementById('filterMenu').classList.remove('show');
+    });
+    const filterBtn = document.getElementById('filterBtn');
+    const filterMenu = document.getElementById('filterMenu');
+    filterBtn.addEventListener('click', (e) => { e.stopPropagation(); filterMenu.classList.toggle('show'); });
+    window.addEventListener('click', (e) => { if (filterMenu && !filterMenu.contains(e.target) && e.target !== filterBtn) filterMenu.classList.remove('show'); });
+    
+    // Theme toggle
+    const themeToggle = document.getElementById('themeToggle');
+    function setTheme(theme) {
+      if (theme === 'dark') document.body.classList.add('dark');
+      else document.body.classList.remove('dark');
+      localStorage.setItem('catalogTheme', theme);
+      const icon = document.getElementById('themeIcon');
+      if(icon) icon.setAttribute('data-lucide', theme === 'dark' ? 'sun' : 'moon');
+      lucide.createIcons();
+    }
+    themeToggle.addEventListener('click', () => {
+      const isDark = document.body.classList.contains('dark');
+      setTheme(isDark ? 'light' : 'dark');
+    });
+    const savedTheme = localStorage.getItem('catalogTheme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    setTheme(savedTheme);
+    
+    // Initial load and auto-refresh to see newly created projects
+    loadProjectsFromMaker();
+    setInterval(() => { loadProjectsFromMaker(); }, 6000);
+  })();
+</script>
+</body>
+</html>

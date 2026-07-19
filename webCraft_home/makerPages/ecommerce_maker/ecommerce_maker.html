@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>eCommerce Maker | Store Builder</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --primary: #00a2ff;
+            --primary-glow: rgba(0, 162, 255, 0.4);
+            --bg-dark: #050801;
+            --glass: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(74, 67, 67, 0.1);
+            --card-blue: #0a0e1a;
+            --card: #0a0e1a;
+            --border: rgba(255, 255, 255, 0.06);
+            --text-main: #ffffff;
+            --text-dim: #94a3b8;
+            --error: #ff4d4d;
+            --success-green: #34d399;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #050801; }
+        ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 10px; }
+
+        .main-wrapper {
+            width: 95%;
+            max-width: 1400px;
+            margin: 30px auto;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 40px;
+            backdrop-filter: blur(10px);
+            overflow: hidden;
+        }
+
+        .hero-banner {
+            height: 300px;
+            position: relative;
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            display: flex;
+            align-items: center;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            padding: 0 60px;
+        }
+
+        .hero-content h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            background: linear-gradient(to right, #fff, var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            border: none;
+            color: white;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .btn-primary { background: var(--primary); box-shadow: 0 10px 20px var(--primary-glow); }
+        .btn-primary:hover { transform: translateY(-2px); }
+        .btn-outline { background: transparent; border: 1px solid var(--glass-border); }
+        .btn-outline:hover { background: var(--glass-border); }
+        .btn-danger { background: rgba(255, 77, 77, 0.1); color: var(--error); border: 1px solid rgba(255, 77, 77, 0.2); }
+        .btn-danger:hover { background: var(--error); color: white; }
+        .btn-sm { padding: 6px 12px; font-size: 0.8rem; }
+
+        .controls-bar {
+            padding: 30px 60px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .search-box { position: relative; width: 300px; }
+        .search-box input {
+            width: 100%; padding: 10px 15px 10px 40px;
+            background: var(--glass); border: 1px solid var(--text-dim);
+            border-radius: 12px; color: white; outline: none;
+        }
+        .search-box i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-dim); }
+
+        .project-section { padding: 30px 60px 60px; }
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 25px;
+        }
+
+        .site-card {
+            background: var(--card-blue);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            overflow: hidden;
+            transition: 0.3s;
+        }
+        .site-card:hover { transform: translateY(-5px); border-color: var(--primary); }
+        .card-banner { height: 160px; position: relative; background: #1a1f2e; }
+        .card-banner img { width: 100%; height: 100%; object-fit: cover; }
+        .card-badge { position: absolute; top: 12px; right: 12px; background: var(--primary); padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; }
+        .card-body { padding: 20px; }
+        .card-body h3 { color: var(--primary); margin-bottom: 10px; font-size: 1.2rem; }
+        .info-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; font-size: 0.8rem; color: var(--text-dim); }
+        .card-footer { padding: 15px 20px; border-top: 1px solid var(--glass-border); display: flex; gap: 10px; }
+
+        .modal-mask {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.95);
+            backdrop-filter: blur(15px); display: none;
+            justify-content: center; align-items: center; z-index: 9999;
+        }
+
+        .modal-box {
+            width: 100%; max-width: 750px; max-height: 90vh;
+            background: var(--card-blue); border-radius: 30px;
+            border: 1px solid var(--glass-border); overflow: hidden;
+            display: flex; flex-direction: column;
+        }
+
+        .modal-header-area { padding: 25px 30px 10px; }
+        .step-scroll-viewport { padding: 0 30px 20px; overflow-y: auto; flex: 1; }
+
+        .modal-nav {
+            padding: 15px 30px;
+            border-top: 1px solid var(--glass-border);
+            background: #0d1117;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .input-wrap {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 1.2rem;
+        }
+
+        .input-wrap label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: var(--text-dim);
+        }
+
+        .input-wrap input, .input-wrap select, .input-wrap textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--text-dim);
+            color: white;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            background-color: var(--card-blue);
+            outline: none;
+        }
+        .input-wrap input:focus, .input-wrap select:focus, .input-wrap textarea:focus { border-color: var(--primary); }
+        .input-wrap textarea { resize: vertical; }
+
+        .form-row-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .form-section {
+            background: rgba(255,255,255,0.03);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border);
+        }
+        .form-section h3 {
+            color: var(--primary);
+            margin-bottom: 15px;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .checkbox-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 10px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            cursor: pointer;
+        }
+        .checkbox-item:hover { border-color: var(--primary); }
+        .checkbox-item input { display: none; }
+        .custom-box {
+            width: 18px; height: 18px;
+            border: 2px solid var(--border);
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .checkbox-item input:checked + .custom-box { background: var(--primary); border-color: var(--primary); color: white; }
+
+        .image-preview-area { margin-top: 10px; display: flex; gap: 10px; flex-wrap: wrap; }
+        .preview-item { position: relative; width: 80px; height: 80px; border-radius: 10px; overflow: hidden; border: 1px solid var(--border); }
+        .preview-item img { width: 100%; height: 100%; object-fit: cover; }
+        .preview-item .remove-img {
+            position: absolute; top: 2px; right: 2px;
+            background: rgba(0,0,0,0.7); border-radius: 50%;
+            width: 18px; height: 18px; display: flex;
+            align-items: center; justify-content: center;
+            cursor: pointer; font-size: 10px;
+        }
+
+        .testimonial-item { margin-bottom: 15px; padding: 15px; background: rgba(255,255,255,0.02); border-radius: 16px; }
+
+        .error-hint { color: var(--error); font-size: 0.7rem; display: none; margin-top: 4px; }
+
+        @media (max-width: 768px) {
+            .hero-content { padding: 0 30px; }
+            .hero-content h1 { font-size: 2rem; }
+            .controls-bar { padding: 20px 30px 0; flex-direction: column; align-items: stretch; }
+            .search-box { width: 100%; }
+            .project-section { padding: 20px 30px 40px; }
+            .form-row-2 { grid-template-columns: 1fr; }
+        }
+
+        .theme-toggle-btn {
+            position: fixed; top: 20px; right: 20px; z-index: 9999;
+            width: 40px; height: 40px; border-radius: 50%;
+            border: 1px solid var(--glass-border); background: var(--card-blue);
+            color: var(--text-main); cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+        }
+    </style>
+</head>
+<body class="dark">
+<button class="theme-toggle-btn" id="themeToggleBtn"><i data-lucide="moon" id="themeIcon"></i></button>
+
+    <div class="main-wrapper">
+        <header class="hero-banner">
+            <div class="hero-content">
+                <h1>eCommerce <span style="color:var(--primary)">Maker</span></h1>
+                <p>Create and manage your online store. Fill the details below and preview your store.</p>
+                <div style="display: flex; gap: 15px; margin-top: 20px;">
+                    <button class="btn btn-primary" onclick="handleOpenModal()">
+                        <i class="fas fa-plus-circle"></i> Create New Store
+                    </button>
+                    <button class="btn btn-outline" onclick="scrollToProjects()">
+                        View Stores
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <div class="controls-bar">
+            <h2>Your Stores</h2>
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="projectSearch" placeholder="Filter by name ..." onkeyup="filterProjects()">
+            </div>
+        </div>
+
+        <main class="project-section">
+            <div id="gridDisplay" class="grid-container"></div>
+        </main>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal-mask" id="projectModal">
+        <div class="modal-box">
+            <div class="modal-header-area">
+                <h2 id="modalMainHeading">Store Information</h2>
+                <p style="color: var(--text-dim);">Fill in your store details</p>
+            </div>
+
+            <div class="step-scroll-viewport">
+                <form id="storeForm">
+                    <div class="form-section">
+                        <h3><i class="fas fa-store"></i> Basic Information</h3>
+                        <div class="input-wrap">
+                            <label>Store Name</label>
+                            <input type="text" id="storeName" placeholder="e.g., VoltShop">
+                            <span class="error-hint" id="err-storeName">Store name is required</span>
+                        </div>
+                        <div class="form-row-2">
+                            <div class="input-wrap">
+                                <label>Store Type</label>
+                                <select id="storeType">
+                                    <option value="B2C">B2C - Business to Consumer</option>
+                                    <option value="B2B">B2B - Business to Business</option>
+                                    <option value="Marketplace">Marketplace</option>
+                                </select>
+                            </div>
+                            <div class="input-wrap">
+                                <label>Customer Segment</label>
+                                <select id="customerSegment">
+                                    <option value="All Audiences">All Audiences</option>
+                                    <option value="Wholesale">Wholesale</option>
+                                    <option value="Retail">Retail</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3><i class="fas fa-image"></i> Hero Section</h3>
+                        <div class="input-wrap">
+                            <label>Main Headline</label>
+                            <input type="text" id="heroHeadline" placeholder="e.g., Tech that moves with you.">
+                        </div>
+                        <div class="input-wrap">
+                            <label>Hero Description</label>
+                            <textarea id="heroDescription" rows="2" placeholder="Describe your store..."></textarea>
+                        </div>
+                        <div class="input-wrap">
+                            <label>Hero Image</label>
+                            <input type="file" id="heroImage" accept="image/*">
+                            <div id="heroImagePreview" class="image-preview-area"></div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3><i class="fas fa-book-open"></i> About Your Store</h3>
+                        <div class="input-wrap">
+                            <label>Welcome Message</label>
+                            <textarea id="welcomeText" rows="2" placeholder="Welcome message..."></textarea>
+                        </div>
+                        <div class="input-wrap">
+                            <label>Bio / Story</label>
+                            <textarea id="bioText" rows="3" placeholder="Tell your brand's story..."></textarea>
+                        </div>
+                        <div class="input-wrap">
+                            <label>Footer Text</label>
+                            <textarea id="footerText" rows="2" placeholder="Footer message..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3><i class="fas fa-chart-line"></i> Key Statistics</h3>
+                        <div class="form-row-2">
+                            <div class="input-wrap"><label>Years Experience</label><input type="text" id="yearsExperience" placeholder="5+"></div>
+                            <div class="input-wrap"><label>Projects/Products</label><input type="text" id="projectsCount" placeholder="40+"></div>
+                            <div class="input-wrap"><label>Happy Clients</label><input type="text" id="clientsCount" placeholder="30+"></div>
+                            <div class="input-wrap"><label>Awards</label><input type="text" id="awardsCount" placeholder="12"></div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3><i class="fas fa-star"></i> Customer Testimonials</h3>
+                        <div id="testimonialsList"></div>
+                        <button type="button" id="addTestimonialBtn" class="btn btn-outline btn-sm"><i class="fas fa-plus"></i> Add Testimonial</button>
+                    </div>
+
+                    <div class="form-section">
+                        <h3><i class="fas fa-gem"></i> Store Features</h3>
+                        <div class="checkbox-grid" id="featuresGrid">
+                            <label class="checkbox-item"><input type="checkbox" class="feature-check" value="Free Shipping"><div class="custom-box"><i data-lucide="check" size="12"></i></div><span>Free Shipping</span></label>
+                            <label class="checkbox-item"><input type="checkbox" class="feature-check" value="2-Year Warranty"><div class="custom-box"><i data-lucide="check" size="12"></i></div><span>2-Year Warranty</span></label>
+                            <label class="checkbox-item"><input type="checkbox" class="feature-check" value="30-Day Returns"><div class="custom-box"><i data-lucide="check" size="12"></i></div><span>30-Day Returns</span></label>
+                            <label class="checkbox-item"><input type="checkbox" class="feature-check" value="24/7 Support"><div class="custom-box"><i data-lucide="check" size="12"></i></div><span>24/7 Support</span></label>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3><i class="fas fa-share-alt"></i> Contact & Social</h3>
+                        <div class="form-row-2">
+                            <div class="input-wrap"><label>Email</label><input type="email" id="contactEmail" placeholder="store@example.com"></div>
+                            <div class="input-wrap"><label>Phone</label><input type="text" id="contactPhone" placeholder="+1 234 567 890"></div>
+                        </div>
+                        <div class="input-wrap"><label>Location</label><input type="text" id="contactLocation" placeholder="City, Country"></div>
+                        <div class="form-row-2">
+                            <div class="input-wrap"><label><i class="fab fa-youtube"></i> YouTube</label><input type="text" id="youtubeLink" placeholder="https://youtube.com/..."></div>
+                            <div class="input-wrap"><label><i class="fab fa-linkedin"></i> LinkedIn</label><input type="text" id="linkedinLink" placeholder="https://linkedin.com/..."></div>
+                            <div class="input-wrap"><label><i class="fab fa-instagram"></i> Instagram</label><input type="text" id="instagramLink" placeholder="https://instagram.com/..."></div>
+                            <div class="input-wrap"><label><i class="fab fa-facebook"></i> Facebook</label><input type="text" id="facebookLink" placeholder="https://facebook.com/..."></div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3><i class="fas fa-palette"></i> Brand Colors</h3>
+                        <div class="form-row-2">
+                            <div class="input-wrap"><label>Primary Color</label><input type="color" id="primaryColor" value="#4f46e5"></div>
+                            <div class="input-wrap"><label>Secondary Color</label><input type="color" id="secondaryColor" value="#f97316"></div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="modal-nav">
+                <button class="btn btn-outline" onclick="handleCloseModal()">Cancel</button>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn btn-primary" id="saveStoreBtn" onclick="saveStore()">Save Store</button>
+                    <button class="btn btn-primary" id="previewStoreBtn" onclick="previewStore()" style="background: linear-gradient(135deg, #7c3aed, #2563eb);">Live Preview</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/dexie@latest/dist/dexie.js"></script>
+    <script>
+        lucide.createIcons();
+
+        const db = new Dexie("EcommerceStoreDB");
+        db.version(1).stores({
+            stores: '++id, storeName, createdAt, updatedAt'
+        });
+
+        let currentEditId = null;
+        let heroImageData = null;
+        let testimonialImages = {};
+
+        // Theme toggle
+        (function() {
+            const saved = localStorage.getItem('ecmTheme') || 'dark';
+            document.body.classList.remove('dark', 'light');
+            document.body.classList.add(saved);
+            function setIcon() {
+                const ic = document.getElementById('themeIcon');
+                if (ic) {
+                    ic.setAttribute('data-lucide', document.body.classList.contains('light') ? 'sun' : 'moon');
+                    lucide.createIcons();
+                }
+            }
+            document.getElementById('themeToggleBtn')?.addEventListener('click', () => {
+                const isLight = document.body.classList.toggle('light');
+                document.body.classList.toggle('dark', !isLight);
+                localStorage.setItem('ecmTheme', isLight ? 'light' : 'dark');
+                setIcon();
+            });
+            setIcon();
+        })();
+
+        function scrollToProjects() {
+            document.querySelector('.project-section').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        async function handleOpenModal(editId = null) {
+            currentEditId = editId;
+            document.getElementById('projectModal').style.display = 'flex';
+            document.getElementById('modalMainHeading').innerText = editId ? "Edit Store" : "Create New Store";
+            
+            if (editId) {
+                const store = await db.stores.get(editId);
+                if (store) populateForm(store);
+            } else {
+                resetForm();
+            }
+        }
+
+        function handleCloseModal() {
+            document.getElementById('projectModal').style.display = 'none';
+            resetForm();
+            currentEditId = null;
+        }
+
+        function resetForm() {
+            document.getElementById('storeForm').reset();
+            heroImageData = null;
+            testimonialImages = {};
+            document.getElementById('heroImagePreview').innerHTML = '';
+            document.getElementById('testimonialsList').innerHTML = '';
+            addTestimonialRow();
+        }
+
+        function populateForm(store) {
+            document.getElementById('storeName').value = store.storeName || '';
+            document.getElementById('storeType').value = store.storeType || 'B2C';
+            document.getElementById('customerSegment').value = store.customerSegment || 'All Audiences';
+            document.getElementById('heroHeadline').value = store.heroHeadline || '';
+            document.getElementById('heroDescription').value = store.heroDescription || '';
+            document.getElementById('welcomeText').value = store.welcomeText || '';
+            document.getElementById('bioText').value = store.bioText || '';
+            document.getElementById('footerText').value = store.footerText || '';
+            document.getElementById('yearsExperience').value = store.yearsExperience || '';
+            document.getElementById('projectsCount').value = store.projectsCount || '';
+            document.getElementById('clientsCount').value = store.clientsCount || '';
+            document.getElementById('awardsCount').value = store.awardsCount || '';
+            document.getElementById('contactEmail').value = store.contactEmail || '';
+            document.getElementById('contactPhone').value = store.contactPhone || '';
+            document.getElementById('contactLocation').value = store.contactLocation || '';
+            document.getElementById('youtubeLink').value = store.youtubeLink || '';
+            document.getElementById('linkedinLink').value = store.linkedinLink || '';
+            document.getElementById('instagramLink').value = store.instagramLink || '';
+            document.getElementById('facebookLink').value = store.facebookLink || '';
+            document.getElementById('primaryColor').value = store.primaryColor || '#4f46e5';
+            document.getElementById('secondaryColor').value = store.secondaryColor || '#f97316';
+            
+            if (store.heroImage) {
+                heroImageData = store.heroImage;
+                document.getElementById('heroImagePreview').innerHTML = `<div class="preview-item"><img src="${store.heroImage}"><div class="remove-img" onclick="removeHeroImage()">×</div></div>`;
+            }
+            
+            document.querySelectorAll('.feature-check').forEach(cb => {
+                cb.checked = store.features && store.features.includes(cb.value);
+            });
+            
+            if (store.testimonials && store.testimonials.length) {
+                document.getElementById('testimonialsList').innerHTML = '';
+                store.testimonials.forEach((t, idx) => {
+                    addTestimonialRow(t.name, t.role, t.text, t.image);
+                });
+            }
+        }
+
+        function addTestimonialRow(name = '', role = '', text = '', image = '') {
+            const container = document.getElementById('testimonialsList');
+            const idx = container.children.length;
+            const div = document.createElement('div');
+            div.className = 'testimonial-item';
+            div.setAttribute('data-idx', idx);
+            div.innerHTML = `
+                <div class="form-row-2">
+                    <input type="text" placeholder="Customer Name" class="testimonial-name" value="${escapeHtml(name)}">
+                    <input type="text" placeholder="Role/Title" class="testimonial-role" value="${escapeHtml(role)}">
+                </div>
+                <textarea placeholder="Testimonial text..." class="testimonial-text" rows="2">${escapeHtml(text)}</textarea>
+                <input type="file" accept="image/*" class="testimonial-image" style="margin: 10px 0;">
+                <div class="testimonial-preview"></div>
+                <button type="button" class="btn btn-danger btn-sm remove-testimonial" ${container.children.length === 0 ? 'style="display:none"' : ''}>Remove</button>
+                <hr style="margin: 10px 0;">
+            `;
+            if (image) {
+                testimonialImages[idx] = image;
+                div.querySelector('.testimonial-preview').innerHTML = `<div class="preview-item"><img src="${image}" style="width:60px;height:60px;border-radius:50%;"><div class="remove-img" onclick="removeTestimonialImage(${idx})">×</div></div>`;
+            }
+            container.appendChild(div);
+            attachTestimonialEvents(div, idx);
+        }
+
+        function attachTestimonialEvents(div, idx) {
+            const imgInput = div.querySelector('.testimonial-image');
+            imgInput.onchange = (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (ev) => {
+                        testimonialImages[idx] = ev.target.result;
+                        div.querySelector('.testimonial-preview').innerHTML = `<div class="preview-item"><img src="${ev.target.result}" style="width:60px;height:60px;border-radius:50%;"><div class="remove-img" onclick="removeTestimonialImage(${idx})">×</div></div>`;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            };
+            const removeBtn = div.querySelector('.remove-testimonial');
+            if (removeBtn) {
+                removeBtn.onclick = () => {
+                    div.remove();
+                    delete testimonialImages[idx];
+                };
+            }
+        }
+
+        function removeTestimonialImage(idx) {
+            delete testimonialImages[idx];
+            const preview = document.querySelector(`.testimonial-item[data-idx="${idx}"] .testimonial-preview`);
+            if (preview) preview.innerHTML = '';
+        }
+
+        function removeHeroImage() {
+            heroImageData = null;
+            document.getElementById('heroImagePreview').innerHTML = '';
+            document.getElementById('heroImage').value = '';
+        }
+
+        document.getElementById('heroImage')?.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    heroImageData = ev.target.result;
+                    document.getElementById('heroImagePreview').innerHTML = `<div class="preview-item"><img src="${ev.target.result}"><div class="remove-img" onclick="removeHeroImage()">×</div></div>`;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        document.getElementById('addTestimonialBtn')?.addEventListener('click', () => addTestimonialRow());
+
+        async function collectStoreData() {
+            const testimonials = [];
+            const rows = document.querySelectorAll('.testimonial-item');
+            rows.forEach((row, idx) => {
+                const name = row.querySelector('.testimonial-name')?.value || '';
+                const role = row.querySelector('.testimonial-role')?.value || '';
+                const text = row.querySelector('.testimonial-text')?.value || '';
+                if (name || text) {
+                    testimonials.push({ name, role, text, image: testimonialImages[idx] || '' });
+                }
+            });
+            
+            const features = [];
+            document.querySelectorAll('.feature-check:checked').forEach(cb => features.push(cb.value));
+            
+            return {
+                storeName: document.getElementById('storeName').value,
+                storeType: document.getElementById('storeType').value,
+                customerSegment: document.getElementById('customerSegment').value,
+                heroHeadline: document.getElementById('heroHeadline').value,
+                heroDescription: document.getElementById('heroDescription').value,
+                heroImage: heroImageData || '',
+                welcomeText: document.getElementById('welcomeText').value,
+                bioText: document.getElementById('bioText').value,
+                footerText: document.getElementById('footerText').value,
+                yearsExperience: document.getElementById('yearsExperience').value,
+                projectsCount: document.getElementById('projectsCount').value,
+                clientsCount: document.getElementById('clientsCount').value,
+                awardsCount: document.getElementById('awardsCount').value,
+                contactEmail: document.getElementById('contactEmail').value,
+                contactPhone: document.getElementById('contactPhone').value,
+                contactLocation: document.getElementById('contactLocation').value,
+                youtubeLink: document.getElementById('youtubeLink').value,
+                linkedinLink: document.getElementById('linkedinLink').value,
+                instagramLink: document.getElementById('instagramLink').value,
+                facebookLink: document.getElementById('facebookLink').value,
+                primaryColor: document.getElementById('primaryColor').value,
+                secondaryColor: document.getElementById('secondaryColor').value,
+                features: features,
+                testimonials: testimonials,
+                updatedAt: new Date().toISOString()
+            };
+        }
+
+        async function saveStore() {
+            const storeName = document.getElementById('storeName').value.trim();
+            if (!storeName) {
+                document.getElementById('err-storeName').style.display = 'block';
+                setTimeout(() => document.getElementById('err-storeName').style.display = 'none', 3000);
+                return;
+            }
+            
+            const data = await collectStoreData();
+            
+            if (currentEditId) {
+                await db.stores.update(currentEditId, { ...data, updatedAt: new Date().toISOString() });
+                alert('Store updated!');
+            } else {
+                await db.stores.add({ ...data, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() });
+                alert('Store saved!');
+            }
+            await renderStores();
+            handleCloseModal();
+        }
+
+        async function previewStore() {
+            const storeName = document.getElementById('storeName').value.trim();
+            if (!storeName) {
+                document.getElementById('err-storeName').style.display = 'block';
+                setTimeout(() => document.getElementById('err-storeName').style.display = 'none', 3000);
+                return;
+            }
+            
+            const data = await collectStoreData();
+            let storeId = currentEditId;
+            
+            if (!storeId) {
+                storeId = await db.stores.add({ ...data, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() });
+            } else {
+                await db.stores.update(storeId, { ...data, updatedAt: new Date().toISOString() });
+            }
+            
+            localStorage.setItem('currentPreviewStoreId', storeId);
+            // Path to ecommerce_home.html (relative from maker to home)
+            const previewUrl = '../../../../create_websites/e-commerce/ecommerce_home/ecommerce_home.html';
+            window.open(previewUrl, '_blank');
+        }
+
+        async function renderStores() {
+            const grid = document.getElementById('gridDisplay');
+            const stores = await db.stores.toArray();
+            
+            if (stores.length === 0) {
+                grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:50px;"><i class="fas fa-store" style="font-size:3rem;margin-bottom:15px;"></i><p>No stores yet. Click "Create New Store" to start.</p></div>`;
+                return;
+            }
+            
+            grid.innerHTML = stores.map(store => `
+                <div class="site-card">
+                    <div class="card-banner">
+                        <span class="card-badge">${store.storeType || 'Store'}</span>
+                        <img src="${store.heroImage || 'https://placehold.co/400x200/1a1a2e/white?text=No+Image'}" onerror="this.src='https://placehold.co/400x200/1a1a2e/white?text=No+Image'">
+                    </div>
+                    <div class="card-body">
+                        <h3>${escapeHtml(store.storeName)}</h3>
+                        <div class="info-row"><i class="fas fa-users"></i> ${store.customerSegment || 'All Audiences'}</div>
+                        <div class="info-row"><i class="fas fa-calendar"></i> ${new Date(store.createdAt).toLocaleDateString()}</div>
+                    </div>
+                    <div class="card-footer">
+                        <button class="btn btn-outline btn-sm" onclick="handleOpenModal(${store.id})">Edit</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteStore(${store.id})">Delete</button>
+                        <button class="btn btn-primary btn-sm" onclick="previewStoreById(${store.id})">Preview</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function deleteStore(id) {
+            if (confirm('Delete this store?')) {
+                await db.stores.delete(id);
+                await renderStores();
+            }
+        }
+
+        async function previewStoreById(id) {
+            localStorage.setItem('currentPreviewStoreId', id);
+            const previewUrl = '../../../../create_websites/e-commerce/ecommerce_home/ecommerce_home.html';
+            window.open(previewUrl, '_blank');
+        }
+
+        async function filterProjects() {
+            const q = document.getElementById('projectSearch')?.value.toLowerCase() || "";
+            const allStores = await db.stores.toArray();
+            const filtered = allStores.filter(s => s.storeName && s.storeName.toLowerCase().includes(q));
+            const grid = document.getElementById('gridDisplay');
+            if (filtered.length === 0) {
+                grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:50px;"><i class="fas fa-search" style="font-size:3rem;"></i><p>No stores matching "${escapeHtml(q)}"</p></div>`;
+            } else {
+                grid.innerHTML = filtered.map(store => `
+                    <div class="site-card">
+                        <div class="card-banner"><span class="card-badge">${store.storeType || 'Store'}</span><img src="${store.heroImage || 'https://placehold.co/400x200/1a1a2e/white?text=No+Image'}"></div>
+                        <div class="card-body"><h3>${escapeHtml(store.storeName)}</h3><div class="info-row"><i class="fas fa-users"></i> ${store.customerSegment || 'All Audiences'}</div></div>
+                        <div class="card-footer"><button class="btn btn-outline btn-sm" onclick="handleOpenModal(${store.id})">Edit</button><button class="btn btn-danger btn-sm" onclick="deleteStore(${store.id})">Delete</button><button class="btn btn-primary btn-sm" onclick="previewStoreById(${store.id})">Preview</button></div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str).replace(/[&<>]/g, m => m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;');
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await renderStores();
+        });
+
+        window.handleOpenModal = handleOpenModal;
+        window.handleCloseModal = handleCloseModal;
+        window.saveStore = saveStore;
+        window.previewStore = previewStore;
+        window.deleteStore = deleteStore;
+        window.previewStoreById = previewStoreById;
+        window.filterProjects = filterProjects;
+        window.scrollToProjects = scrollToProjects;
+        window.removeHeroImage = removeHeroImage;
+        window.removeTestimonialImage = removeTestimonialImage;
+    </script>
+</body>
+</html>

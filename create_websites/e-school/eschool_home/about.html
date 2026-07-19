@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About EB Academy</title>
+    <style>
+        :root {
+            --bg-body: #050a18;       /* Darkest Navy */
+            --bg-card: #0f172a;       /* Card Slate Blue */
+            --electric-blue: #3b82f6; 
+            --text-main: #ffffff;
+            --text-dim: #94a3b8;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .about-section {
+            display: flex;
+            max-width: 1100px;
+            width: 90%;
+            gap: 40px;
+            padding: 40px;
+        }
+
+        /* LEFT SIDE: Vertical List */
+        .pillars-list {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .pillar-item {
+            padding: 20px;
+            background: var(--bg-card);
+            border-left: 4px solid var(--electric-blue);
+            border-radius: 0 12px 12px 0;
+            transition: 0.3s;
+        }
+
+        .pillar-item:hover {
+            background: #1e293b;
+            transform: translateX(10px);
+        }
+
+        .pillar-item h3 {
+            margin: 0 0 10px 0;
+            color: var(--electric-blue);
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+
+        .pillar-item p {
+            margin: 0;
+            color: var(--text-dim);
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        /* RIGHT SIDE: Details with Logo Background */
+        .details-container {
+            flex: 1.2;
+            position: relative;
+            background: linear-gradient(135deg, #0f172a 0%, #050a18 100%);
+            padding: 50px;
+            border-radius: 24px;
+            border: 1px solid rgba(59, 130, 246, 0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        /* The EB Logo Watermark */
+        .logo-watermark {
+            position: absolute;
+            top: 20%;
+            left: 40%;
+            transform: translate(-50%, -50%);
+            width: 70%;
+            height: 70%;
+            background-image: url('eb-logo.png'); /* Replace with your image link */
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            opacity: 0.05; /* Subtle watermark */
+            filter: brightness(2) grayscale(1);
+            z-index: 1;
+        }
+
+        .content-overlay {
+            position: relative;
+            z-index: 2;
+        }
+
+        .content-overlay h2 {
+            font-size: 2.2rem;
+            margin-bottom: 20px;
+            color: var(--text-main);
+        }
+
+        .content-overlay p {
+            color: var(--text-dim);
+            font-size: 1.05rem;
+            line-height: 1.8;
+            margin-bottom: 15px;
+        }
+
+        /* Responsive */
+        @media (max-width: 850px) {
+            .about-section {
+                flex-direction: column;
+            }
+            .pillars-list {
+                order: 2;
+            }
+            .details-container {
+                order: 1;
+                padding: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <section class="about-section">
+        
+        <div class="pillars-list">
+            <div class="pillar-item">
+                <h3>Vision</h3>
+                <p>To lead the digital frontier by empowering the next generation of tech-savvy professionals.</p>
+            </div>
+            <div class="pillar-item">
+                <h3>Mission</h3>
+                <p>Delivering practical, industry-first training that transforms students into market leaders.</p>
+            </div>
+            <div class="pillar-item">
+                <h3>Values</h3>
+                <p>Unwavering integrity, excellence in every detail, and a focus on measurable student success.</p>
+            </div>
+        </div>
+
+        <div class="details-container">
+            <div class="logo-watermark"><img src="eb_removes.png" alt=""></div>
+            <div class="content-overlay">
+                <h2>EB Academy</h2>
+                <p>
+                    EB Academy is a premier learning hub designed for ambitious individuals. We bridge the gap between traditional learning and the fast-paced demands of the modern industry.
+                </p>
+                <p>
+                    Our curriculum is built by experts to ensure that every graduate possesses the confidence and technical prowess to excel in their chosen field.
+                </p>
+            </div>
+        </div>
+
+    </section>
+
+</body>
+</html>

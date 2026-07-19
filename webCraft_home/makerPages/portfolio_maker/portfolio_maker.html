@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portfolio Manager — Dexie Save/Load | Live Preview</title>
+  <meta name="description" content="Portfolio data manager: store portfolio fields with Dexie/IndexedDB and live preview.">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/dexie@latest/dist/dexie.js"></script>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <style>
+    :root {
+      --bg-body: #f5f7fb;
+      --bg-card: #ffffff;
+      --bg-input: #ffffff;
+      --text-main: #0e1c2f;
+      --text-muted: #5b6e8c;
+      --text-label: #4b5565;
+      --text-soft: #475569;
+      --border-color: #e2e8f0;
+      --border-card: #e9eef3;
+      --border-soft: #eef2f8;
+      --bg-nav-hover: #f8fafc;
+      --bg-nav-active: #eef2ff;
+      --bg-array-item: #fafcff;
+      --bg-saved: #f8fafc;
+      --bg-saved-hover: #f1f5f9;
+      --bg-empty: #f9fbfd;
+      --accent: #2563eb;
+      --accent-2: #7c3aed;
+      --accent-soft: #eef2ff;
+      --accent-soft-text: #1e40af;
+      --danger-bg: #fee2e2;
+      --danger-text: #b91c1c;
+      --danger-border: #fecaca;
+      --error-border: #ef4444;
+      --error-bg: rgba(239, 68, 68, 0.08);
+      --shadow-card: 0 8px 24px rgba(0,0,0,0.02);
+      --shadow-soft: 0 8px 20px rgba(0,0,0,0.03);
+    }
+
+    [data-theme="dark"] {
+      --bg-body: #0b1329;
+      --bg-card: #1c2541;
+      --bg-input: #151b30;
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --text-label: #cbd5e1;
+      --text-soft: #cbd5e1;
+      --border-color: #334155;
+      --border-card: #2e3a59;
+      --border-soft: #2a3556;
+      --bg-nav-hover: #243056;
+      --bg-nav-active: #1e294b;
+      --bg-array-item: #131a30;
+      --bg-saved: #131a30;
+      --bg-saved-hover: #1a2342;
+      --bg-empty: #131a30;
+      --accent: #60a5fa;
+      --accent-2: #a78bfa;
+      --accent-soft: #1e294b;
+      --accent-soft-text: #93c5fd;
+      --danger-bg: #3f1d1d;
+      --danger-text: #fca5a5;
+      --danger-border: #5b2a2a;
+      --error-border: #f87171;
+      --error-bg: rgba(248, 113, 113, 0.12);
+      --shadow-card: 0 8px 24px rgba(0,0,0,0.4);
+      --shadow-soft: 0 8px 20px rgba(0,0,0,0.3);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Poppins', system-ui, -apple-system, sans-serif;
+      background: var(--bg-body);
+      color: var(--text-main);
+      padding: 32px 24px;
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+
+    .container { max-width: 1280px; margin: 0 auto; }
+
+    .header {
+      margin-bottom: 32px; display: flex; justify-content: space-between;
+      align-items: center; flex-wrap: wrap; gap: 16px;
+    }
+
+    h1 {
+      font-size: 1.8rem; font-weight: 700;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      background-clip: text; -webkit-background-clip: text;
+      color: transparent; letter-spacing: -0.02em;
+      display: inline-flex; align-items: center; gap: 10px;
+    }
+    h1 .icon-wrap { color: var(--accent); -webkit-text-fill-color: var(--accent); }
+
+    .badge {
+      background: var(--accent-soft); color: var(--accent-soft-text);
+      padding: 6px 14px; border-radius: 40px; font-size: 0.8rem; font-weight: 500;
+    }
+
+    .btn {
+      padding: 10px 20px; border-radius: 60px; font-weight: 600;
+      font-size: 0.9rem; border: none; cursor: pointer;
+      transition: all 0.2s ease; background: var(--bg-card); color: var(--text-main);
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05); font-family: inherit;
+      display: inline-flex; align-items: center; gap: 8px;
+    }
+    .btn svg { width: 16px; height: 16px; }
+
+    .btn-primary { background: var(--accent); color: #fff; box-shadow: 0 4px 8px rgba(37,99,235,0.2); }
+    .btn-primary:hover { filter: brightness(0.95); transform: translateY(-1px); }
+
+    .btn-preview {
+      background: linear-gradient(135deg, var(--accent-2), var(--accent));
+      color: #fff; box-shadow: 0 4px 8px rgba(124,58,237,0.2);
+    }
+    .btn-preview:hover { transform: translateY(-1px); opacity: 0.95; }
+
+    .btn-outline {
+      border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-main);
+    }
+    .btn-outline:hover { background: var(--bg-nav-hover); }
+
+    .btn-danger {
+      background: var(--danger-bg); color: var(--danger-text);
+      border: 1px solid var(--danger-border);
+    }
+    .btn-danger:hover { filter: brightness(0.95); }
+
+    .btn-sm { padding: 6px 14px; font-size: 0.8rem; }
+
+    .icon-btn {
+      border-radius: 50%; width: 42px; height: 42px; padding: 0;
+      display: inline-flex; align-items: center; justify-content: center;
+    }
+    .icon-btn svg { width: 18px; height: 18px; }
+
+    .maker-grid { display: grid; grid-template-columns: 280px 1fr; gap: 28px; }
+    @media (max-width: 780px) { .maker-grid { grid-template-columns: 1fr; gap: 24px; } }
+
+    .sidebar {
+      background: var(--bg-card); border-radius: 28px;
+      box-shadow: var(--shadow-soft); border: 1px solid var(--border-card);
+      padding: 20px 12px; position: sticky; top: 24px; height: fit-content;
+    }
+
+    .nav-item {
+      display: flex; align-items: center; gap: 12px; padding: 12px 16px;
+      border-radius: 18px; font-weight: 500; color: var(--text-soft);
+      cursor: pointer; transition: all 0.2s; margin-bottom: 4px;
+    }
+    .nav-item svg { width: 20px; height: 20px; stroke-width: 1.7; }
+    .nav-item:hover { background: var(--bg-nav-hover); color: var(--text-main); }
+    .nav-item.active { background: var(--bg-nav-active); color: var(--accent); font-weight: 600; }
+
+    .main-card {
+      background: var(--bg-card); border-radius: 28px;
+      border: 1px solid var(--border-card); box-shadow: var(--shadow-card);
+      padding: 32px 36px;
+    }
+
+    .tab-content { animation: fade 0.2s ease; }
+    @keyframes fade { from { opacity: 0; transform: translateY(6px);} to { opacity: 1; transform: translateY(0);} }
+
+    h2 { font-size: 1.65rem; font-weight: 700; margin-bottom: 6px; letter-spacing: -0.01em; }
+
+    .muted-text {
+      color: var(--text-muted); margin-bottom: 28px; font-size: 0.9rem;
+      border-left: 3px solid var(--border-color); padding-left: 12px;
+    }
+
+    .form-group { margin-bottom: 24px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
+
+    label {
+      display: block; font-weight: 600; font-size: 0.8rem;
+      text-transform: uppercase; letter-spacing: 0.02em;
+      color: var(--text-label); margin-bottom: 6px;
+    }
+    label .req { color: var(--error-border); margin-left: 4px; }
+
+    input, textarea, select {
+      width: 100%; padding: 12px 16px; border-radius: 16px;
+      border: 1.5px solid var(--border-color);
+      font-family: 'Poppins', sans-serif; font-size: 0.95rem;
+      background: var(--bg-input); color: var(--text-main);
+      transition: 0.2s; outline: none;
+    }
+    input::placeholder, textarea::placeholder { color: var(--text-muted); opacity: 0.7; }
+    input:focus, textarea:focus, select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
+    }
+    textarea { resize: vertical; }
+
+    /* Error state */
+    .field-error input, .field-error textarea, .field-error select,
+    input.input-error, textarea.input-error {
+      border-color: var(--error-border) !important;
+      background: var(--error-bg) !important;
+    }
+    .error-msg {
+      color: var(--error-border); font-size: 0.75rem;
+      margin-top: 6px; display: flex; align-items: center; gap: 4px;
+    }
+    .error-msg svg { width: 14px; height: 14px; }
+
+    .array-item {
+      background: var(--bg-array-item); border: 1px solid var(--border-soft);
+      border-radius: 24px; padding: 20px; margin-bottom: 20px; transition: all 0.1s;
+    }
+    .array-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 16px; font-weight: 600; color: var(--text-main);
+    }
+
+    .skill-tag {
+      background: var(--accent-soft); padding: 4px 12px; border-radius: 30px;
+      font-size: 0.7rem; font-weight: 600; color: var(--accent);
+    }
+
+    .icon-btn-sm {
+      background: none; border: none; cursor: pointer;
+      color: var(--text-muted); padding: 6px 10px; border-radius: 20px;
+      display: inline-flex; align-items: center; gap: 4px; font-size: 0.75rem;
+      font-family: inherit;
+    }
+    .icon-btn-sm svg { width: 14px; height: 14px; }
+    .icon-btn-sm:hover { color: var(--danger-text); background: var(--danger-bg); }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+    .saved-list {
+      max-height: 500px; overflow-y: auto;
+      display: flex; flex-direction: column; gap: 14px; margin-bottom: 28px;
+    }
+
+    .saved-card {
+      background: var(--bg-saved); border-radius: 20px; padding: 16px 20px;
+      border: 1px solid var(--border-card); transition: all 0.2s; cursor: pointer;
+    }
+    .saved-card:hover { background: var(--bg-saved-hover); border-left: 4px solid var(--accent); }
+
+    .saved-name {
+      font-weight: 700; font-size: 1rem; margin-bottom: 6px;
+      display: flex; align-items: center; gap: 8px; color: var(--text-main);
+    }
+    .saved-name svg { width: 16px; height: 16px; color: var(--accent); }
+
+    .saved-meta {
+      font-size: 0.7rem; color: var(--text-muted);
+      display: flex; gap: 16px; align-items: center;
+    }
+    .saved-meta svg { width: 12px; height: 12px; }
+
+    .empty-state {
+      text-align: center; padding: 48px 20px;
+      color: var(--text-muted); background: var(--bg-empty);
+      border-radius: 28px; display: flex; flex-direction: column;
+      align-items: center; gap: 8px;
+    }
+    .empty-state svg { width: 32px; height: 32px; }
+
+    hr { margin: 24px 0; border: 0; border-top: 1px solid var(--border-soft); }
+
+    footer {
+      margin-top: 48px; text-align: center; font-size: 0.75rem;
+      color: var(--text-muted); padding-top: 24px;
+    }
+
+    .toast {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+      padding: 12px 24px; border-radius: 60px; font-weight: 500;
+      font-size: 0.85rem; z-index: 9999;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.2); animation: fadeUp 0.3s ease;
+      display: inline-flex; align-items: center; gap: 8px; color: #fff;
+    }
+    .toast svg { width: 16px; height: 16px; }
+    .toast.success { background: #10b981; }
+    .toast.error { background: #ef4444; }
+    .toast.info { background: var(--accent); }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+      to { opacity: 1; transform: translateX(-50%) translateY(0); }
+    }
+
+    .image-upload-area, .file-upload-area {
+      border: 2px dashed var(--border-color); border-radius: 20px;
+      padding: 20px; text-align: center; cursor: pointer;
+      transition: all 0.2s; background: var(--bg-input); color: var(--text-muted);
+    }
+    .image-upload-area:hover, .file-upload-area:hover {
+      border-color: var(--accent); background: var(--bg-nav-hover); transform: translateY(-2px);
+    }
+    .image-upload-area.dragover, .file-upload-area.dragover {
+      border-color: var(--accent); background: var(--bg-nav-active);
+    }
+    .upload-remove-btn {
+      margin-top: 8px; background: var(--danger-bg); color: var(--danger-text);
+      border: none; padding: 4px 12px; border-radius: 20px;
+      cursor: pointer; font-size: 0.7rem; font-family: inherit;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div>
+      <h1><span class="icon-wrap"><i data-lucide="folder-open"></i></span> Portfolio Keeper</h1>
+      <div class="badge" style="margin-top: 8px;">save to Dexie · live preview your portfolio</div>
+    </div>
+    <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+      <button id="themeToggleBtn" class="btn btn-outline icon-btn" title="Toggle theme">
+        <i data-lucide="moon"></i>
+      </button>
+      <button id="saveBtn" class="btn btn-primary"><i data-lucide="save"></i> Save to Dexie</button>
+      <button id="livePreviewBtn" class="btn btn-preview"><i data-lucide="eye"></i> Live Preview</button>
+      <button id="clearAllBtn" class="btn btn-danger"><i data-lucide="trash-2"></i> Clear all saved</button>
+    </div>
+  </div>
+
+  <div class="maker-grid">
+    <aside class="sidebar">
+      <div class="nav-item active" data-tab="basic"><i data-lucide="user"></i><span>Basic info</span></div>
+      <div class="nav-item" data-tab="about"><i data-lucide="align-left"></i><span>About & stats</span></div>
+      <div class="nav-item" data-tab="skills"><i data-lucide="sparkles"></i><span>Skills</span></div>
+      <div class="nav-item" data-tab="projects"><i data-lucide="layout-grid"></i><span>Projects</span></div>
+      <div class="nav-item" data-tab="experience"><i data-lucide="briefcase"></i><span>Experience</span></div>
+      <div class="nav-item" data-tab="contact"><i data-lucide="mail"></i><span>Contact</span></div>
+      <div class="nav-item" data-tab="saved"><i data-lucide="database"></i><span>Saved portfolios</span></div>
+    </aside>
+
+    <div class="main-card" id="formPanel">
+      <!-- BASIC TAB -->
+      <div id="tab-basic" class="tab-content">
+        <h2>Profile identity</h2>
+        <div class="muted-text">Name, headline, contact basics</div>
+        <div class="form-group">
+          <label>Full name<span class="req">*</span></label>
+          <input type="text" id="fullName" data-required placeholder="e.g., Alex Carter">
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Initials (avatar)<span class="req">*</span></label><input type="text" id="initials" data-required maxlength="3" placeholder="AC"></div>
+          <div class="form-group"><label>Role / Title<span class="req">*</span></label><input type="text" id="role" data-required placeholder="Full-Stack Developer & UI Engineer"></div>
+        </div>
+        <div class="form-group"><label>Tagline<span class="req">*</span></label><input type="text" id="tagline" data-required placeholder="Crafting digital experiences that truly matter"></div>
+        <div class="form-group"><label>Short bio / intro<span class="req">*</span></label><textarea id="bio" data-required rows="2" placeholder="I build fast, accessible, beautifully detailed products..."></textarea></div>
+        <div class="form-row">
+          <div class="form-group"><label>Email<span class="req">*</span></label><input type="email" id="email" data-required placeholder="alex@carter.dev"></div>
+          <div class="form-group"><label>Phone<span class="req">*</span></label><input type="text" id="phone" data-required placeholder="+1 (415) 555-0123"></div>
+        </div>
+        <div class="form-group"><label>Location<span class="req">*</span></label><input type="text" id="location" data-required placeholder="San Francisco · Remote"></div>
+        <div class="form-row">
+          <div class="form-group"><label>GitHub URL<span class="req">*</span></label><input type="text" id="github" data-required placeholder="github.com/alexcarter"></div>
+          <div class="form-group"><label>LinkedIn URL<span class="req">*</span></label><input type="text" id="linkedin" data-required placeholder="linkedin.com/in/alexcarter"></div>
+        </div>
+        <div class="form-group"><label>Twitter / X<span class="req">*</span></label><input type="text" id="twitter" data-required placeholder="@alexcarter"></div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Profile Picture (for orbit ring)</label>
+            <div class="image-upload-area" id="profileImageArea">
+              <div id="profileImagePreview" style="display: none;">
+                <img id="profileImagePreviewImg" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; margin: 0 auto;">
+                <button type="button" id="removeProfileImageBtn" class="upload-remove-btn">Remove</button>
+              </div>
+              <div id="profileImagePlaceholder">
+                <i data-lucide="image-up" style="width:40px;height:40px;"></i>
+                <p style="font-size: 0.8rem; margin-top: 8px;">Click to upload profile picture</p>
+                <p style="font-size: 0.7rem; opacity: 0.7;">Recommended: Square image, 300x300px</p>
+              </div>
+              <input type="file" id="profileImageInput" accept="image/jpeg,image/png,image/gif,image/webp" style="display: none;">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Resume/CV (PDF)</label>
+            <div class="file-upload-area" id="resumeArea">
+              <div id="resumePreview" style="display: none;">
+                <i data-lucide="file-text" style="width:40px;height:40px;"></i>
+                <p id="resumeFileName" style="font-size: 0.8rem; font-weight: 600; margin-top: 8px;"></p>
+                <button type="button" id="removeResumeBtn" class="upload-remove-btn">Remove</button>
+              </div>
+              <div id="resumePlaceholder">
+                <i data-lucide="file-up" style="width:40px;height:40px;"></i>
+                <p style="font-size: 0.8rem; margin-top: 8px;">Click to upload Resume/CV (PDF)</p>
+                <p style="font-size: 0.7rem; opacity: 0.7;">Max 10MB, PDF only</p>
+              </div>
+              <input type="file" id="resumeInput" accept=".pdf" style="display: none;">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ABOUT TAB -->
+      <div id="tab-about" class="tab-content" style="display: none;">
+        <h2>About & achievements</h2>
+        <div class="muted-text">Story + key numbers</div>
+        <div class="form-group"><label>Bio paragraph 1<span class="req">*</span></label><textarea id="about1" data-required rows="3" placeholder="Write something about your journey..."></textarea></div>
+        <div class="form-group"><label>Bio paragraph 2<span class="req">*</span></label><textarea id="about2" data-required rows="3" placeholder="Your passions or mission..."></textarea></div>
+        <div class="form-row">
+          <div class="form-group"><label>Years of experience<span class="req">*</span></label><input id="yearsExperience" data-required placeholder="8+"></div>
+          <div class="form-group"><label>Projects count<span class="req">*</span></label><input id="projectsCount" data-required placeholder="50+"></div>
+          <div class="form-group"><label>Happy clients<span class="req">*</span></label><input id="clientsCount" data-required placeholder="35+"></div>
+          <div class="form-group"><label>Awards<span class="req">*</span></label><input id="awardsCount" data-required placeholder="12"></div>
+        </div>
+      </div>
+
+      <!-- SKILLS TAB -->
+      <div id="tab-skills" class="tab-content" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+          <h2>Technical skills</h2>
+          <button id="addSkillBtn" class="btn btn-outline btn-sm"><i data-lucide="plus"></i> Add skill</button>
+        </div>
+        <div id="skillsList"></div>
+      </div>
+
+      <!-- PROJECTS TAB -->
+      <div id="tab-projects" class="tab-content" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+          <h2>Featured projects</h2>
+          <button id="addProjectBtn" class="btn btn-outline btn-sm"><i data-lucide="plus"></i> Add project</button>
+        </div>
+        <div id="projectsList"></div>
+      </div>
+
+      <!-- EXPERIENCE TAB -->
+      <div id="tab-experience" class="tab-content" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+          <h2>Work experience</h2>
+          <button id="addExpBtn" class="btn btn-outline btn-sm"><i data-lucide="plus"></i> Add experience</button>
+        </div>
+        <div id="experienceList"></div>
+      </div>
+
+      <!-- CONTACT TAB -->
+      <div id="tab-contact" class="tab-content" style="display: none;">
+        <h2>Contact & social links</h2>
+        <div class="muted-text">These will be saved as part of portfolio data</div>
+        <div class="form-group"><label>Contact email<span class="req">*</span></label><input id="contactEmail" data-required placeholder="work@alex.dev"></div>
+        <div class="form-group"><label>Contact phone<span class="req">*</span></label><input id="contactPhone" data-required placeholder="+1 (415) 555-0123"></div>
+        <div class="form-group"><label>Contact location<span class="req">*</span></label><input id="contactLocation" data-required placeholder="Remote / SF"></div>
+      </div>
+
+      <!-- SAVED PORTFOLIOS TAB -->
+      <div id="tab-saved" class="tab-content" style="display: none;">
+        <h2>Your Dexie storage</h2>
+        <div class="muted-text">Click any card to load portfolio data into forms — edit and re-save.</div>
+        <div id="savedContainer" class="saved-list">
+          <div class="empty-state"><i data-lucide="inbox"></i> No saved portfolios yet. Fill the form and click "Save to Dexie".</div>
+        </div>
+        <button id="clearAllPortfoliosBtn" class="btn btn-danger" style="width: 100%; margin-top: 8px; justify-content: center;"><i data-lucide="trash-2"></i> Delete all saved records</button>
+      </div>
+    </div>
+  </div>
+  <footer>Portfolio Keeper — save to Dexie, then click Live Preview to see your portfolio.</footer>
+</div>
+
+<script>
+  const db = new Dexie("PortfolioMakerCoreDB");
+  db.version(1).stores({ portfolios: "++id, fullName, createdAt, updatedAt" });
+
+  let portfolioData = {
+    fullName: "", initials: "", role: "", tagline: "", bio: "",
+    about1: "", about2: "", yearsExperience: "", projectsCount: "", clientsCount: "", awardsCount: "",
+    email: "", phone: "", location: "", github: "", linkedin: "", twitter: "",
+    contactEmail: "", contactPhone: "", contactLocation: "",
+    profileImage: "", resumeData: "", resumeName: "",
+    skills: [], projects: [], experience: []
+  };
+  let currentEditId = null;
+
+  const SIMPLE_MAP = {
+    fullName: "fullName", initials: "initials", role: "role", tagline: "tagline", bio: "bio",
+    about1: "about1", about2: "about2", yearsExperience: "yearsExperience", projectsCount: "projectsCount",
+    clientsCount: "clientsCount", awardsCount: "awardsCount", email: "email", phone: "phone",
+    location: "location", github: "github", linkedin: "linkedin", twitter: "twitter",
+    contactEmail: "contactEmail", contactPhone: "contactPhone", contactLocation: "contactLocation"
+  };
+
+  const TAB_OF = {
+    fullName: "basic", initials: "basic", role: "basic", tagline: "basic", bio: "basic",
+    email: "basic", phone: "basic", location: "basic", github: "basic", linkedin: "basic", twitter: "basic",
+    about1: "about", about2: "about", yearsExperience: "about", projectsCount: "about",
+    clientsCount: "about", awardsCount: "about",
+    contactEmail: "contact", contactPhone: "contact", contactLocation: "contact"
+  };
+
+  function collectFormData() {
+    for (const [id, key] of Object.entries(SIMPLE_MAP)) {
+      const el = document.getElementById(id);
+      if (el) portfolioData[key] = el.value;
+    }
+  }
+
+  function populateFormFromData() {
+    for (const [id, key] of Object.entries(SIMPLE_MAP)) {
+      const el = document.getElementById(id);
+      if (el && portfolioData[key] !== undefined) el.value = portfolioData[key];
+    }
+    if (portfolioData.profileImage) {
+      const img = document.getElementById('profileImagePreviewImg');
+      const pv = document.getElementById('profileImagePreview');
+      const ph = document.getElementById('profileImagePlaceholder');
+      if (img && pv && ph) { img.src = portfolioData.profileImage; pv.style.display='block'; ph.style.display='none'; }
+    }
+    if (portfolioData.resumeData && portfolioData.resumeName) {
+      const pv = document.getElementById('resumePreview');
+      const ph = document.getElementById('resumePlaceholder');
+      const fn = document.getElementById('resumeFileName');
+      if (pv && ph && fn) { fn.textContent = portfolioData.resumeName; pv.style.display='block'; ph.style.display='none'; }
+    }
+    renderSkillsUI(); renderProjectsUI(); renderExperienceUI();
+    lucide.createIcons();
+  }
+
+  // ---------- VALIDATION ----------
+  function clearFieldErrors() {
+    document.querySelectorAll('.input-error').forEach(el => el.classList.remove('input-error'));
+    document.querySelectorAll('.error-msg').forEach(el => el.remove());
+  }
+  function markFieldError(el, msg) {
+    el.classList.add('input-error');
+    const err = document.createElement('div');
+    err.className = 'error-msg';
+    err.innerHTML = '<i data-lucide="alert-circle"></i> ' + msg;
+    el.parentElement.appendChild(err);
+  }
+  function validateAll() {
+    clearFieldErrors();
+    const missing = [];
+    let firstEl = null, firstTab = null;
+    document.querySelectorAll('[data-required]').forEach(el => {
+      if (!el.value || !el.value.trim()) {
+        markFieldError(el, 'This field is required');
+        missing.push(el.id);
+        if (!firstEl) { firstEl = el; firstTab = TAB_OF[el.id]; }
+      }
+    });
+    if (!portfolioData.skills.length) missing.push('skills');
+    if (!portfolioData.projects.length) missing.push('projects');
+    if (!portfolioData.experience.length) missing.push('experience');
+    lucide.createIcons();
+    if (missing.length) {
+      if (firstTab) {
+        const navItem = document.querySelector(`.nav-item[data-tab="${firstTab}"]`);
+        if (navItem) navItem.click();
+      }
+      if (firstEl) setTimeout(() => firstEl.focus(), 100);
+      showToast(`Please fill in all required fields (${missing.length} missing)`, 'error');
+      return false;
+    }
+    return true;
+  }
+
+  // ---------- ARRAYS ----------
+  function renderSkillsUI() {
+    const container = document.getElementById("skillsList");
+    if (!container) return;
+    if (!portfolioData.skills.length) {
+      container.innerHTML = `<div class="empty-state"><i data-lucide="sparkles"></i> No skills yet. Add at least one.</div>`;
+    } else {
+      container.innerHTML = portfolioData.skills.map((skill, idx) => `
+        <div class="array-item" data-skill-index="${idx}">
+          <div class="array-header"><span class="skill-tag">skill ${idx+1}</span><button class="icon-btn-sm" onclick="removeSkillItem(${idx})"><i data-lucide="trash-2"></i> remove</button></div>
+          <div class="grid-2">
+            <input type="text" placeholder="Skill name" value="${escapeHtml(skill.name)}" onchange="updateSkillField(${idx}, 'name', this.value)">
+            <input type="text" placeholder="Icon name (e.g., react, node, figma)" value="${escapeHtml(skill.icon)}" onchange="updateSkillField(${idx}, 'icon', this.value)">
+          </div>
+          <label style="margin-top: 12px; font-size:0.7rem;">Proficiency (1-100)</label>
+          <input type="range" min="0" max="100" value="${skill.level}" onchange="updateSkillField(${idx}, 'level', parseInt(this.value))">
+          <span style="font-size:0.8rem;">${skill.level}%</span>
+        </div>`).join('');
+    }
+    lucide.createIcons();
+  }
+
+  function renderProjectsUI() {
+    const container = document.getElementById("projectsList");
+    if (!container) return;
+    if (!portfolioData.projects.length) {
+      container.innerHTML = `<div class="empty-state"><i data-lucide="layout-grid"></i> No projects added. Add at least one.</div>`;
+    } else {
+      container.innerHTML = portfolioData.projects.map((proj, idx) => `
+        <div class="array-item">
+          <div class="array-header"><span class="skill-tag">project</span><button class="icon-btn-sm" onclick="removeProjectItem(${idx})"><i data-lucide="trash-2"></i></button></div>
+          <input type="text" value="${escapeHtml(proj.title)}" placeholder="Title" style="margin-bottom: 12px;" onchange="updateProjectField(${idx}, 'title', this.value)">
+          <textarea rows="2" placeholder="Description" style="margin-bottom:12px;" onchange="updateProjectField(${idx}, 'desc', this.value)">${escapeHtml(proj.desc)}</textarea>
+          <input type="text" value="${proj.tags ? proj.tags.join(', ') : ''}" placeholder="Tags (comma separated)" onchange="updateProjectField(${idx}, 'tags', this.value.split(',').map(t=>t.trim()))" style="margin-bottom:12px;">
+          <input type="text" placeholder="Cover gradient or image URL" value="${escapeHtml(proj.gradient || '')}" onchange="updateProjectField(${idx}, 'gradient', this.value)">
+        </div>`).join('');
+    }
+    lucide.createIcons();
+  }
+
+  function renderExperienceUI() {
+    const container = document.getElementById("experienceList");
+    if (!container) return;
+    if (!portfolioData.experience.length) {
+      container.innerHTML = `<div class="empty-state"><i data-lucide="briefcase"></i> No experience entries yet. Add at least one.</div>`;
+    } else {
+      container.innerHTML = portfolioData.experience.map((exp, idx) => `
+        <div class="array-item">
+          <div class="array-header"><span class="skill-tag">role</span><button class="icon-btn-sm" onclick="removeExperienceItem(${idx})"><i data-lucide="trash-2"></i></button></div>
+          <div class="grid-2" style="margin-bottom:8px;">
+            <input type="text" value="${escapeHtml(exp.role)}" placeholder="Role" onchange="updateExpField(${idx}, 'role', this.value)">
+            <input type="text" value="${escapeHtml(exp.org)}" placeholder="Company" onchange="updateExpField(${idx}, 'org', this.value)">
+          </div>
+          <input type="text" value="${escapeHtml(exp.period)}" placeholder="Period e.g., 2022–2025" style="margin-bottom:8px;" onchange="updateExpField(${idx}, 'period', this.value)">
+          <textarea rows="2" placeholder="Description" onchange="updateExpField(${idx}, 'desc', this.value)">${escapeHtml(exp.desc)}</textarea>
+        </div>`).join('');
+    }
+    lucide.createIcons();
+  }
+
+  window.removeSkillItem = (idx) => { portfolioData.skills.splice(idx,1); renderSkillsUI(); };
+  window.updateSkillField = (idx, field, val) => { portfolioData.skills[idx][field] = val; renderSkillsUI(); };
+  window.removeProjectItem = (idx) => { portfolioData.projects.splice(idx,1); renderProjectsUI(); };
+  window.updateProjectField = (idx, field, val) => { portfolioData.projects[idx][field] = val; renderProjectsUI(); };
+  window.removeExperienceItem = (idx) => { portfolioData.experience.splice(idx,1); renderExperienceUI(); };
+  window.updateExpField = (idx, field, val) => { portfolioData.experience[idx][field] = val; renderExperienceUI(); };
+
+  document.getElementById("addSkillBtn")?.addEventListener("click", () => {
+    portfolioData.skills.push({ name: "New skill", icon: "code-2", level: 75 });
+    renderSkillsUI();
+  });
+  document.getElementById("addProjectBtn")?.addEventListener("click", () => {
+    portfolioData.projects.push({ title: "New Project", desc: "Describe your awesome work", tags: ["React", "Node"], gradient: "linear-gradient(135deg, #2563eb, #7c3aed)" });
+    renderProjectsUI();
+  });
+  document.getElementById("addExpBtn")?.addEventListener("click", () => {
+    portfolioData.experience.push({ role: "Engineer", org: "Company X", period: "2024 - present", desc: "Accomplished major milestones." });
+    renderExperienceUI();
+  });
+
+  function escapeHtml(str) { if(!str) return ''; return String(str).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+
+  function showToast(msg, type = 'success') {
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    const icon = type === 'success' ? 'check-circle' : type === 'error' ? 'alert-circle' : 'info';
+    toast.innerHTML = `<i data-lucide="${icon}"></i> <span>${escapeHtml(msg)}</span>`;
+    document.body.appendChild(toast);
+    lucide.createIcons();
+    setTimeout(() => toast.remove(), 2800);
+  }
+
+  // ----- SAVE -----
+  async function saveCurrentToDexie() {
+    collectFormData();
+    if (!validateAll()) return;
+
+    const payload = { ...portfolioData, updatedAt: new Date().toISOString() };
+    if (currentEditId) {
+      await db.portfolios.update(currentEditId, payload);
+      showToast(`Updated "${payload.fullName}" successfully`, "success");
+    } else {
+      await db.portfolios.add({ ...payload, createdAt: new Date().toISOString() });
+      showToast(`Saved "${payload.fullName}" to IndexedDB`, "success");
+    }
+    await loadSavedList();
+  }
+
+  async function livePreview() {
+    collectFormData();
+    if (!validateAll()) return;
+
+    let portfolioId = currentEditId;
+    if (!portfolioId) {
+      const existing = await db.portfolios.where("fullName").equals(portfolioData.fullName).first();
+      if (existing) {
+        portfolioId = existing.id;
+        await db.portfolios.update(portfolioId, { ...portfolioData, updatedAt: new Date().toISOString() });
+      } else {
+        portfolioId = await db.portfolios.add({ ...portfolioData, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() });
+      }
+      currentEditId = portfolioId;
+      await loadSavedList();
+    } else {
+      await db.portfolios.update(currentEditId, { ...portfolioData, updatedAt: new Date().toISOString() });
+    }
+
+    localStorage.setItem('currentPreviewPortfolioId', portfolioId);
+    const previewUrl = '../../../../create_websites/portfolio/portfolio_home/portfolio_home.html?id=' + portfolioId;
+    window.open(previewUrl, '_blank');
+  }
+
+  async function loadSavedList() {
+    const all = await db.portfolios.orderBy("updatedAt").reverse().toArray();
+    const container = document.getElementById("savedContainer");
+    if (!container) return;
+    if (all.length === 0) {
+      container.innerHTML = `<div class="empty-state"><i data-lucide="inbox"></i> No saved portfolios. Create your data and hit "Save to Dexie".</div>`;
+      lucide.createIcons();
+      return;
+    }
+    container.innerHTML = all.map(entry => `
+      <div class="saved-card" data-id="${entry.id}">
+        <div class="saved-name"><i data-lucide="user"></i> ${escapeHtml(entry.fullName) || "Unnamed portfolio"}</div>
+        <div class="saved-meta"><i data-lucide="calendar"></i> ${new Date(entry.updatedAt).toLocaleString()} <span>·</span> <i data-lucide="briefcase"></i> ${escapeHtml(entry.role) || '—'}</div>
+        <div style="display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap;">
+          <button class="btn btn-outline btn-sm load-single" data-id="${entry.id}"><i data-lucide="folder-open"></i> Load</button>
+          <button class="btn btn-primary btn-sm preview-single" data-id="${entry.id}"><i data-lucide="eye"></i> Preview</button>
+          <button class="btn btn-danger btn-sm delete-single" data-id="${entry.id}"><i data-lucide="x"></i> Delete</button>
+        </div>
+      </div>`).join('');
+    lucide.createIcons();
+
+    document.querySelectorAll(".load-single").forEach(btn => {
+      btn.addEventListener("click", async (e) => {
+        e.stopPropagation();
+        const id = parseInt(btn.dataset.id);
+        const record = await db.portfolios.get(id);
+        if (record) {
+          const { id:_, createdAt, updatedAt, ...cleanData } = record;
+          portfolioData = { ...portfolioData, ...cleanData };
+          currentEditId = id;
+          populateFormFromData();
+          showToast(`Loaded "${portfolioData.fullName || 'portfolio'}"`, "success");
+          document.querySelector('.nav-item[data-tab="basic"]').click();
+        }
+      });
+    });
+
+    document.querySelectorAll(".preview-single").forEach(btn => {
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const id = parseInt(btn.dataset.id);
+        localStorage.setItem('currentPreviewPortfolioId', id);
+        window.open('../../../../create_websites/portfolio/portfolio_home/portfolio_home.html?id=' + id, '_blank');
+      });
+    });
+
+    document.querySelectorAll(".delete-single").forEach(btn => {
+      btn.addEventListener("click", async (e) => {
+        e.stopPropagation();
+        const id = parseInt(btn.dataset.id);
+        if (confirm("Delete this portfolio permanently?")) {
+          await db.portfolios.delete(id);
+          if (currentEditId === id) {
+            currentEditId = null;
+            resetPortfolioData();
+            populateFormFromData();
+          }
+          await loadSavedList();
+          showToast("Deleted.", "success");
+        }
+      });
+    });
+  }
+
+  function resetPortfolioData() {
+    portfolioData = {
+      fullName: "", initials: "", role: "", tagline: "", bio: "",
+      about1: "", about2: "", yearsExperience: "", projectsCount: "", clientsCount: "", awardsCount: "",
+      email: "", phone: "", location: "", github: "", linkedin: "", twitter: "",
+      contactEmail: "", contactPhone: "", contactLocation: "",
+      profileImage: "", resumeData: "", resumeName: "",
+      skills: [], projects: [], experience: []
+    };
+  }
+
+  async function clearAllPortfoliosHandler() {
+    if (confirm("This will delete ALL saved portfolios from Dexie. Cannot undo.")) {
+      await db.portfolios.clear();
+      currentEditId = null;
+      resetPortfolioData();
+      populateFormFromData();
+      await loadSavedList();
+      showToast("All portfolios erased", "success");
+    }
+  }
+
+  // ---------- TABS ----------
+  document.querySelectorAll(".nav-item").forEach(item => {
+    item.addEventListener("click", () => {
+      const tabId = item.dataset.tab;
+      document.querySelectorAll(".nav-item").forEach(nav => nav.classList.remove("active"));
+      item.classList.add("active");
+      document.querySelectorAll(".tab-content").forEach(c => c.style.display = "none");
+      const activeTab = document.getElementById(`tab-${tabId}`);
+      if (activeTab) activeTab.style.display = "block";
+      if (tabId === "skills") renderSkillsUI();
+      if (tabId === "projects") renderProjectsUI();
+      if (tabId === "experience") renderExperienceUI();
+      if (tabId === "saved") loadSavedList();
+    });
+  });
+
+  document.getElementById("saveBtn")?.addEventListener("click", saveCurrentToDexie);
+  document.getElementById("livePreviewBtn")?.addEventListener("click", livePreview);
+  document.getElementById("clearAllBtn")?.addEventListener("click", clearAllPortfoliosHandler);
+  document.getElementById("clearAllPortfoliosBtn")?.addEventListener("click", clearAllPortfoliosHandler);
+
+  // ---------- UPLOAD HANDLERS ----------
+  function setupImageUpload() {
+    const imageArea = document.getElementById('profileImageArea');
+    const imageInput = document.getElementById('profileImageInput');
+    const previewDiv = document.getElementById('profileImagePreview');
+    const placeholderDiv = document.getElementById('profileImagePlaceholder');
+    const previewImg = document.getElementById('profileImagePreviewImg');
+    const removeBtn = document.getElementById('removeProfileImageBtn');
+
+    imageArea?.addEventListener('click', () => imageInput.click());
+    imageArea?.addEventListener('dragover', (e) => { e.preventDefault(); imageArea.classList.add('dragover'); });
+    imageArea?.addEventListener('dragleave', () => imageArea.classList.remove('dragover'));
+    imageArea?.addEventListener('drop', (e) => {
+      e.preventDefault(); imageArea.classList.remove('dragover');
+      const file = e.dataTransfer.files[0];
+      if (file && file.type.startsWith('image/')) handleImageFile(file);
+    });
+    imageInput?.addEventListener('change', (e) => { if (e.target.files[0]) handleImageFile(e.target.files[0]); });
+    removeBtn?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      portfolioData.profileImage = "";
+      previewDiv.style.display = 'none';
+      placeholderDiv.style.display = 'block';
+      imageInput.value = '';
+    });
+
+    function handleImageFile(file) {
+      if (file.size > 5 * 1024 * 1024) return showToast('Image too large! Max 5MB', 'error');
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        portfolioData.profileImage = e.target.result;
+        previewImg.src = e.target.result;
+        previewDiv.style.display = 'block';
+        placeholderDiv.style.display = 'none';
+        showToast('Profile picture uploaded!', 'success');
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  function setupResumeUpload() {
+    const resumeArea = document.getElementById('resumeArea');
+    const resumeInput = document.getElementById('resumeInput');
+    const previewDiv = document.getElementById('resumePreview');
+    const placeholderDiv = document.getElementById('resumePlaceholder');
+    const fileNameSpan = document.getElementById('resumeFileName');
+    const removeBtn = document.getElementById('removeResumeBtn');
+
+    resumeArea?.addEventListener('click', () => resumeInput.click());
+    resumeArea?.addEventListener('dragover', (e) => { e.preventDefault(); resumeArea.classList.add('dragover'); });
+    resumeArea?.addEventListener('dragleave', () => resumeArea.classList.remove('dragover'));
+    resumeArea?.addEventListener('drop', (e) => {
+      e.preventDefault(); resumeArea.classList.remove('dragover');
+      const file = e.dataTransfer.files[0];
+      if (file && file.type === 'application/pdf') handleResumeFile(file);
+      else showToast('Please upload a PDF file', 'error');
+    });
+    resumeInput?.addEventListener('change', (e) => { if (e.target.files[0]) handleResumeFile(e.target.files[0]); });
+    removeBtn?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      portfolioData.resumeData = ""; portfolioData.resumeName = "";
+      previewDiv.style.display = 'none'; placeholderDiv.style.display = 'block';
+      resumeInput.value = '';
+      showToast('Resume removed', 'info');
+    });
+
+    function handleResumeFile(file) {
+      if (file.size > 10 * 1024 * 1024) return showToast('File too large! Max 10MB', 'error');
+      if (file.type !== 'application/pdf') return showToast('Only PDF files are allowed', 'error');
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        portfolioData.resumeData = e.target.result;
+        portfolioData.resumeName = file.name;
+        fileNameSpan.textContent = file.name;
+        previewDiv.style.display = 'block'; placeholderDiv.style.display = 'none';
+        showToast(`Resume "${file.name}" uploaded!`, 'success');
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  // ---------- THEME TOGGLE ----------
+  const themeToggleBtn = document.getElementById('themeToggleBtn');
+  const savedTheme = localStorage.getItem('theme');
+  const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const initialTheme = savedTheme || (systemPrefersDark ? 'dark' : 'light');
+  document.documentElement.setAttribute('data-theme', initialTheme);
+
+  function updateToggleIcon(theme) {
+    if (!themeToggleBtn) return;
+    themeToggleBtn.innerHTML = `<i data-lucide="${theme === 'dark' ? 'sun' : 'moon'}"></i>`;
+    lucide.createIcons();
+  }
+  updateToggleIcon(initialTheme);
+
+  themeToggleBtn?.addEventListener('click', () => {
+    const current = document.documentElement.getAttribute('data-theme');
+    const next = current === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem('theme', next);
+    updateToggleIcon(next);
+  });
+
+  // Clear field error when user types
+  document.addEventListener('input', (e) => {
+    if (e.target.matches('[data-required]') && e.target.classList.contains('input-error') && e.target.value.trim()) {
+      e.target.classList.remove('input-error');
+      const err = e.target.parentElement.querySelector('.error-msg');
+      if (err) err.remove();
+    }
+  });
+
+  // ---------- INIT ----------
+  populateFormFromData();
+  loadSavedList();
+  setupImageUpload();
+  setupResumeUpload();
+  lucide.createIcons();
+</script>
+</body>
+</html>

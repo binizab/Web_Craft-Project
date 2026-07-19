@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Multi-File Uploader</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        :root {
+            --primary: #6366f1;
+            --primary-light: #eef2ff;
+            --bg: #ffffff;
+            --border: #e2e8f0;
+            --text: #1e293b;
+            --text-muted: #64748b;
+            --radius: 16px;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background-color: #f8fafc;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+            gap: 24px;
+        }
+
+        .upload-card {
+            background: var(--bg);
+            padding: 32px;
+            border-radius: 24px;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05);
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+            border: 1px solid var(--border);
+        }
+
+        h2 { font-size: 1.1rem; margin-bottom: 4px; color: var(--text); }
+        p { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 20px; }
+
+        .file-input-hidden { display: none; }
+
+        /* The Custom Dropzone */
+        .dropzone {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 30px 20px;
+            border: 2px dashed var(--border);
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: #fafafa;
+        }
+
+        .dropzone.dragover {
+            border-color: var(--primary);
+            background: #f5f7ff;
+            transform: scale(1.02);
+        }
+
+        .dropzone:hover, .dropzone.dragover {
+            border-color: var(--primary);
+            background: #f5f7ff;
+        }
+
+        .icon-box {
+            background: var(--primary-light, #eef2ff);
+            color: var(--primary);
+            padding: 16px;
+            border-radius: 50%;
+            margin-bottom: 16px;
+            transition: transform 0.2s ease;
+        }
+
+        .dropzone:hover .icon-box {
+            transform: translateY(-5px);
+        }
+        .file-info {
+            margin-top: 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--primary);
+            display: none; /* Hidden by default */
+            background: var(--primary-light);
+            padding: 6px 12px;
+            border-radius: 20px;
+        }
+
+        .browse-text {
+            color: var(--primary);
+            font-weight: 600;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="upload-card">
+        <h2>Identity Verification</h2>
+        <p>ID Card or Passport scan</p>
+        <label class="dropzone">
+            <div class="icon-box"><i data-lucide="shield-check"></i></div>
+            <span>Upload ID or <span class="browse-text">browse</span></span>
+            <input type="file" class="file-input-hidden">
+            <span style="font-size: 0.75rem; color: var(--text-muted); margin-top: 4px;">
+            Supports JPG, PNG, PDF (Max 10MB)
+        </span>
+            <div class="file-info">
+                <i data-lucide="check" size="14" style="display:inline;"></i>
+                <span class="file-name"></span>
+            </div>
+        </label>
+    </div>
+
+    <div class="upload-card">
+        <h2>Identity Verification</h2>
+        <p>ID Card or Passport scan</p>
+        <label class="dropzone">
+            <div class="icon-box"><i data-lucide="shield-check"></i></div>
+            <span>Upload ID or <span class="browse-text">browse</span></span>
+            <input type="file" class="file-input-hidden">
+            <span style="font-size: 0.75rem; color: var(--text-muted); margin-top: 4px;">
+            Supports JPG, PNG, PDF (Max 10MB)
+        </span>
+            <div class="file-info">
+                <i data-lucide="check" size="14" style="display:inline;"></i>
+                <span class="file-name"></span>
+            </div>
+        </label>
+    </div>
+
+    <div class="upload-card">
+        <h2>Identity Verification</h2>
+        <p>ID Card or Passport scan</p>
+        <label class="dropzone">
+            <div class="icon-box"><i data-lucide="shield-check"></i></div>
+            <span>Upload ID or <span class="browse-text">browse</span></span>
+            <input type="file" class="file-input-hidden">
+            <span style="font-size: 0.75rem; color: var(--text-muted); margin-top: 4px;">
+            Supports JPG, PNG, PDF (Max 10MB)
+        </span>
+            <div class="file-info">
+                <i data-lucide="check" size="14" style="display:inline;"></i>
+                <span class="file-name"></span>
+            </div>
+        </label>
+    </div>
+
+<script>
+    lucide.createIcons();
+
+    // Select all dropzones on the page
+    const dropzones = document.querySelectorAll('.dropzone');
+
+    dropzones.forEach(zone => {
+        const input = zone.querySelector('.file-input-hidden');
+        const info = zone.querySelector('.file-info');
+        const nameSpan = zone.querySelector('.file-name');
+
+        // Drag events
+        ['dragenter', 'dragover'].forEach(eName => {
+            zone.addEventListener(eName, (e) => {
+                e.preventDefault();
+                zone.classList.add('dragover');
+            });
+        });
+
+        ['dragleave', 'drop'].forEach(eName => {
+            zone.addEventListener(eName, (e) => {
+                e.preventDefault();
+                zone.classList.remove('dragover');
+            });
+        });
+
+        // Drop event
+        zone.addEventListener('drop', (e) => {
+            input.files = e.dataTransfer.files;
+            handleDisplay(input, info, nameSpan);
+        });
+
+        // Change event (Browsing)
+        input.addEventListener('change', () => {
+            handleDisplay(input, info, nameSpan);
+        });
+    });
+
+    function handleDisplay(input, infoBox, nameLabel) {
+        if (input.files.length > 0) {
+            const count = input.files.length;
+            nameLabel.textContent = count === 1 
+                ? input.files[0].name 
+                : `${count} files ready`;
+            infoBox.style.display = 'inline-block';
+        }
+    }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Sales Analytics — ShopHub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../../style.css" />
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+</head>
+<body class="module-body">
+<div class="page-head"><div><h2>Sales Analytics</h2><p>Channel performance & growth</p></div></div><div class="kpi-grid"><div class="kpi"><div class="kpi-icon"><i data-lucide="globe"></i></div><div class="label">Online</div><div class="val">$182k</div><div class="delta up"><i data-lucide="arrow-up-right"></i>+14%</div></div><div class="kpi"><div class="kpi-icon"><i data-lucide="store"></i></div><div class="label">Retail</div><div class="val">$48k</div><div class="delta up"><i data-lucide="arrow-up-right"></i>+6%</div></div><div class="kpi"><div class="kpi-icon"><i data-lucide="building"></i></div><div class="label">Wholesale</div><div class="val">$18k</div><div class="delta down"><i data-lucide="arrow-down-right"></i>-2%</div></div></div><div class="card"><h3>Monthly Revenue</h3><div class="bars"><div class="bar" style="height:40%"><span>Jan</span></div><div class="bar" style="height:55%"><span>Feb</span></div><div class="bar" style="height:62%"><span>Mar</span></div><div class="bar" style="height:70%"><span>Apr</span></div><div class="bar" style="height:88%"><span>May</span></div><div class="bar" style="height:75%"><span>Jun</span></div><div class="bar" style="height:92%"><span>Jul</span></div></div></div>
+<script>
+(function(){
+  function paint(){ if(window.lucide) window.lucide.createIcons(); }
+  var t = (function(){ try{return localStorage.getItem('shophub-theme');}catch(e){return null;} })() || 'light';
+  document.documentElement.setAttribute('data-theme', t);
+  window.addEventListener('message', function(e){
+    if(e.data && e.data.type==='theme'){ document.documentElement.setAttribute('data-theme', e.data.theme); }
+  });
+  if(document.readyState!=='loading') paint(); else window.addEventListener('DOMContentLoaded', paint);
+  window.addEventListener('load', function(){ paint(); try{ parent.postMessage({type:'frameReady'},'*'); }catch(e){} });
+})();
+</script>
+</body>
+</html>

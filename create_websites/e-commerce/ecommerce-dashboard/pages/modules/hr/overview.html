@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Overview — ShopHub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../../style.css" />
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+</head>
+<body class="module-body">
+<div class="page-head"><div><h2>HR Overview</h2><p>People & culture</p></div></div><div class="kpi-grid"><div class="kpi"><div class="kpi-icon"><i data-lucide="users"></i></div><div class="label">Employees</div><div class="val">124</div><div class="delta up"><i data-lucide="arrow-up-right"></i>+4</div></div><div class="kpi"><div class="kpi-icon"><i data-lucide="briefcase"></i></div><div class="label">Open Roles</div><div class="val">8</div></div><div class="kpi"><div class="kpi-icon"><i data-lucide="calendar-x"></i></div><div class="label">On Leave</div><div class="val">6</div></div><div class="kpi"><div class="kpi-icon"><i data-lucide="calendar-check"></i></div><div class="label">Attendance</div><div class="val">94%</div><div class="delta up"><i data-lucide="arrow-up-right"></i>+1.2%</div></div></div><div class="grid-2"><div class="card"><h3>Headcount by Dept</h3><div class="bars"><div class="bar" style="height:85%"><span>Tech</span></div><div class="bar" style="height:55%"><span>Ops</span></div><div class="bar" style="height:70%"><span>Sales</span></div><div class="bar" style="height:30%"><span>HR</span></div><div class="bar" style="height:40%"><span>Finance</span></div></div></div><div class="card"><h3>Recent Joiners</h3><div class="list"><div class="list-item"><div class="ico"><i data-lucide="user"></i></div><div class="meta"><strong>Anya Roy</strong><small>Designer</small></div></div><div class="list-item"><div class="ico"><i data-lucide="user"></i></div><div class="meta"><strong>Ben Iyer</strong><small>Engineer</small></div></div><div class="list-item"><div class="ico"><i data-lucide="user"></i></div><div class="meta"><strong>Cara Patel</strong><small>Analyst</small></div></div></div></div></div>
+<script>
+(function(){
+  function paint(){ if(window.lucide) window.lucide.createIcons(); }
+  var t = (function(){ try{return localStorage.getItem('shophub-theme');}catch(e){return null;} })() || 'light';
+  document.documentElement.setAttribute('data-theme', t);
+  window.addEventListener('message', function(e){
+    if(e.data && e.data.type==='theme'){ document.documentElement.setAttribute('data-theme', e.data.theme); }
+  });
+  if(document.readyState!=='loading') paint(); else window.addEventListener('DOMContentLoaded', paint);
+  window.addEventListener('load', function(){ paint(); try{ parent.postMessage({type:'frameReady'},'*'); }catch(e){} });
+})();
+</script>
+</body>
+</html>

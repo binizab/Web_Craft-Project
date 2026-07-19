@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Language Dropdown</title>
+    
+    <!-- Flag Icons CDN -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons/css/flag-icons.min.css"/>
+
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; padding: 50px; background-color: #f4f4f9; }
+
+        .dropdown {
+            position: relative;
+            display: inline-block;
+            width: 200px;
+        }
+
+        .main {
+            background-color: #fff;
+            padding: 12px 15px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+        }
+
+        .selector {
+            display: none;
+            position: absolute;
+            background-color: white;
+            min-width: 100%;
+            box-shadow: 0px 8px 16px rgba(0,0,0,0.1);
+            z-index: 1;
+            border-radius: 8px;
+            margin-top: 5px;
+            overflow: hidden;
+            border: 1px solid #eee;
+        }
+
+        .selector div {
+            padding: 12px 15px;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .selector div:hover {
+            background-color: #f0f0f0;
+        }
+
+        .show {
+            display: block;
+        }
+
+        .main::after {
+            content: '▼';
+            font-size: 10px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Hello</h2> <!-- Default English greeting -->
+    
+    <div class="dropdown">
+        <!-- Default English selected -->
+        <div class="main" id="dropdownBtn"><span class="fi fi-gb"></span> English</div>
+        
+        <div class="selector" id="dropdownMenu">
+            <div onclick="selectLang('Amharic', 'fi-et')">
+                <span class="fi fi-et"></span> Amharic
+            </div>
+            <div onclick="selectLang('English', 'fi-gb')">
+                <span class="fi fi-gb"></span> English
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const btn = document.getElementById('dropdownBtn');
+        const menu = document.getElementById('dropdownMenu');
+        const h2 = document.getElementsByTagName("h2")[0];
+
+        btn.addEventListener('click', () => {
+            menu.classList.toggle('show');
+        });
+
+        window.onclick = function(event) {
+            if (!event.target.matches('.main')) {
+                if (menu.classList.contains('show')) {
+                    menu.classList.remove('show');
+                }
+            }
+        }
+
+        function selectLang(lang, flagClass) {
+            btn.innerHTML = `<span class="fi ${flagClass}"></span> ${lang}`;
+            menu.classList.remove('show');
+            
+            if(lang === 'Amharic') {
+                h2.innerHTML = 'ሰላም';
+            } else if(lang === 'English') {
+                h2.innerHTML = 'Hello';
+            }
+        }
+    </script>
+</body>
+</html>

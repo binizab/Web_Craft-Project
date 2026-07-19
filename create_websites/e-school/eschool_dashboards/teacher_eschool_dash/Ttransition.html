@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eb Academy | Teacher Dashboard</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0f111a;
+            --card-bg: rgba(30, 33, 45, 0.7);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+            --accent-blue: #38bdf8;
+            --accent-pink: #f472b6;
+            --accent-green: #34d399;
+            --accent-purple: #a78bfa;
+            --accent-orange: #fb923c;
+        }
+
+        * {
+            box-sizing: border-box;
+            transition: all 0.25s ease;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            background-image: radial-gradient(circle at 50% 0%, #1e293b 0%, #0f111a 100%);
+            color: var(--text-main);
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 0;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -1px;
+        }
+
+        .subtitle {
+            color: var(--text-dim);
+            margin-top: 10px;
+            font-size: 1.1rem;
+        }
+
+        .card-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 30px 24px;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(255, 255, 255, 0.3);
+            background: rgba(45, 50, 65, 0.8);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .icon-wrapper {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* Functional Color Coding */
+        .blue .icon-wrapper { color: var(--accent-blue); }
+        .pink .icon-wrapper { color: var(--accent-pink); }
+        .green .icon-wrapper { color: var(--accent-green); }
+        .purple .icon-wrapper { color: var(--accent-purple); }
+        .orange .icon-wrapper { color: var(--accent-orange); }
+
+        .card h3 {
+            margin: 0 0 10px 0;
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .card p {
+            margin: 0;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            color: var(--text-dim);
+        }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 1.8rem; }
+            .card-container { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>Teacher Dashboard</h1>
+        <p class="subtitle">Eb Academy Faculty Management Portal</p>
+    </div>
+
+    <div class="card-container">
+        
+        <a href="attendance.html" class="card green">
+            <div class="icon-wrapper"><i data-lucide="clipboard-check"></i></div>
+            <h3>Attendance</h3>
+            <p>Monitor daily presence and weekday participation records.</p>
+        </a>
+
+        <a href="schedule.html" class="card blue">
+            <div class="icon-wrapper"><i data-lucide="calendar"></i></div>
+            <h3>Schedule</h3>
+            <p>Plan lessons with automated reminders and task tracking.</p>
+        </a>
+
+        <a href="marklist.html" class="card orange">
+            <div class="icon-wrapper"><i data-lucide="bar-chart-3"></i></div>
+            <h3>Mark List</h3>
+            <p>Analyze student progress and generate academic insights.</p>
+        </a>
+
+        <a href="checklist.html" class="card purple">
+            <div class="icon-wrapper"><i data-lucide="list-checks"></i></div>
+            <h3>Checklist</h3>
+            <p>Monitor and record daily student behavioral patterns.</p>
+        </a>
+
+        <a href="book.html" class="card green">
+            <div class="icon-wrapper"><i data-lucide="book-marked"></i></div>
+            <h3>Books</h3>
+            <p>Access student textbooks and teacher reference guides.</p>
+        </a>
+
+        <a href="club.html" class="card pink">
+            <div class="icon-wrapper"><i data-lucide="tent"></i></div>
+            <h3>School Clubs</h3>
+            <p>Manage and lead your assigned school organizations.</p>
+        </a>
+
+        <a href="videos.html" class="card purple">
+            <div class="icon-wrapper"><i data-lucide="clapperboard"></i></div>
+            <h3>Tutorials</h3>
+            <p>Upload and distribute video tutorials to your classes.</p>
+        </a>
+
+        <a href="Exampublisher.html" class="card orange">
+            <div class="icon-wrapper"><i data-lucide="file-signature"></i></div>
+            <h3>Exam Publisher</h3>
+            <p>Create digital exams, quizzes, and tests for students.</p>
+        </a>
+
+        <a href="message.html" class="card blue">
+            <div class="icon-wrapper"><i data-lucide="mail"></i></div>
+            <h3>Messenger</h3>
+            <p>Communicate with students, parents, and principals.</p>
+        </a>
+
+        <a href="webcam.html" class="card pink">
+            <div class="icon-wrapper"><i data-lucide="video"></i></div>
+            <h3>Webcam</h3>
+            <p>Host virtual classes and parent-teacher consultations.</p>
+        </a>
+
+        <a href="application.html" class="card blue">
+            <div class="icon-wrapper"><i data-lucide="file-badge"></i></div>
+            <h3>Application</h3>
+            <p>Submit faculty forms and career development requests.</p>
+        </a>
+
+    </div>
+
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+    </script>
+</body>
+</html>

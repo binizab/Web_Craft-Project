@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Kids Learning Hub</title>
+    <style>
+        :root {
+            --primary: #6c5ce7;
+            --secondary: #ff7675;
+            --bg: #f8f9fa;
+            --card-bg: #ffffff;
+            --text: #2d3436;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        h1 { color: var(--primary); font-size: 2.5rem; margin-bottom: 10px; }
+        p { color: #636e72; font-size: 1.1rem; }
+
+        .section-title {
+            width: 100%;
+            max-width: 1000px;
+            margin: 40px 0 20px 0;
+            padding-left: 15px;
+            border-left: 5px solid var(--secondary);
+            font-size: 1.8rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 20px;
+            width: 100%;
+            max-width: 1000px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 25px;
+            text-align: center;
+            cursor: pointer;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            aspect-ratio: 1 / 1;
+            border: 2px solid transparent;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(108, 92, 231, 0.2);
+            border-color: var(--primary);
+        }
+
+        .card:active { transform: scale(0.9); }
+
+        .symbol { font-size: 3.5rem; font-weight: bold; margin-bottom: 10px; }
+        .label { font-size: 1.1rem; font-weight: 600; color: #636e72; }
+
+        /* Shape Styles */
+        .shape-box { margin-bottom: 15px; }
+        .circle { width: 60px; height: 60px; background: #ff7675; border-radius: 50%; }
+        .square { width: 60px; height: 60px; background: #74b9ff; }
+        .triangle { 
+            width: 0; height: 0; 
+            border-left: 35px solid transparent; 
+            border-right: 35px solid transparent; 
+            border-bottom: 60px solid #55efc4; 
+        }
+        .rectangle { width: 80px; height: 50px; background: #a29bfe; }
+
+        /* Color Card Text */
+        .color-text { color: white; text-shadow: 1px 1px 3px rgba(0,0,0,0.3); }
+
+        @media (max-width: 600px) {
+            .grid { grid-template-columns: repeat(2, 1fr); }
+            h1 { font-size: 1.8rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>🌟 Kids Learning Hub</h1>
+        <p>Click any card to hear the sound!</p>
+    </header>
+
+    <h2 class="section-title">Alphabets</h2>
+    <div class="grid" id="alphabet-grid"></div>
+
+    <h2 class="section-title">Animals</h2>
+    <div class="grid" id="animal-grid"></div>
+
+    <h2 class="section-title">Colors</h2>
+    <div class="grid" id="color-grid"></div>
+
+    <h2 class="section-title">Shapes</h2>
+    <div class="grid" id="shape-grid"></div>
+
+    <script>
+        // Use the browser's Voice Synthesis
+        function speak(text) {
+            // Cancel any current speech so it doesn't overlap
+            window.speechSynthesis.cancel();
+            const msg = new SpeechSynthesisUtterance(text);
+            msg.pitch = 1.2; // Cheerful pitch
+            msg.rate = 0.9;  // Clear speed
+            window.speechSynthesis.speak(msg);
+        }
+
+        // --- Data ---
+        const alphabets = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+        
+        const animals = [
+            { name: 'Lion', icon: '🦁' }, { name: 'Elephant', icon: '🐘' },
+            { name: 'Monkey', icon: '🐒' }, { name: 'Panda', icon: '🐼' },
+            { name: 'Cat', icon: '🐱' }, { name: 'Dog', icon: '🐶' }
+        ];
+
+        const colors = [
+            { name: 'Red', hex: '#ff7675' }, { name: 'Blue', hex: '#74b9ff' },
+            { name: 'Green', hex: '#55efc4' }, { name: 'Yellow', hex: '#ffeaa7' },
+            { name: 'Purple', hex: '#a29bfe' }, { name: 'Orange', hex: '#ffbe76' }
+        ];
+
+        const shapes = [
+            { name: 'Circle', class: 'circle' },
+            { name: 'Square', class: 'square' },
+            { name: 'Triangle', class: 'triangle' },
+            { name: 'Rectangle', class: 'rectangle' }
+        ];
+
+        // --- Generator Logic ---
+        function init() {
+            // Build Alphabets
+            const alphaGrid = document.getElementById('alphabet-grid');
+            alphabets.forEach(letter => {
+                const card = createCard(letter, 'symbol', () => speak(letter));
+                alphaGrid.appendChild(card);
+            });
+
+            // Build Animals
+            const animalGrid = document.getElementById('animal-grid');
+            animals.forEach(a => {
+                const card = createCard(a.icon, 'symbol', () => speak(a.name), a.name);
+                animalGrid.appendChild(card);
+            });
+
+            // Build Colors
+            const colorGrid = document.getElementById('color-grid');
+            colors.forEach(c => {
+                const card = createCard('', '', () => speak(c.name), c.name);
+                card.style.backgroundColor = c.hex;
+                card.classList.add('color-text');
+                colorGrid.appendChild(card);
+            });
+
+            // Build Shapes
+            const shapeGrid = document.getElementById('shape-grid');
+            shapes.forEach(s => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `<div class="shape-box ${s.class}"></div><div class="label">${s.name}</div>`;
+                card.onclick = () => speak(s.name);
+                shapeGrid.appendChild(card);
+            });
+        }
+
+        function createCard(content, contentClass, action, labelText = "") {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.innerHTML = `
+                <div class="${contentClass}">${content}</div>
+                ${labelText ? `<div class="label">${labelText}</div>` : ''}
+            `;
+            card.onclick = action;
+            return card;
+        }
+
+        // Initialize on load
+        window.onload = init;
+    </script>
+</body>
+</html>

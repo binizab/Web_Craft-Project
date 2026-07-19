@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>EB Academy | Secure Portal Access</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f4f7fc;
+            color: #0f172a;
+            line-height: 1.5;
+            min-height: 100vh;
+        }
+
+        /* navigation */
+        nav {
+            background: white;
+            backdrop-filter: blur(10px);
+            padding: 0.8rem 6%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .logo {
+            font-size: 1.6rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #0f2b6d, #00c6fb);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: 1px;
+        }
+
+        /* Hero banner */
+        .hero-portal {
+            background: linear-gradient(120deg, #0b2b5c, #0a1a3a);
+            padding: 3rem 2rem;
+            text-align: center;
+            color: white;
+            margin-bottom: 2rem;
+        }
+        .hero-portal h1 {
+            font-size: 2.2rem;
+            font-weight: 600;
+        }
+        .hero-portal p {
+            opacity: 0.9;
+            margin-top: 0.5rem;
+        }
+
+        /* Services section */
+        .section {
+            padding: 2rem 5% 4rem;
+        }
+        .section-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        .section-header h2 {
+            font-size: 2rem;
+            color: #0f2b6d;
+        }
+        .divider {
+            width: 70px;
+            height: 4px;
+            background: #00c6fb;
+            margin: 12px auto;
+            border-radius: 4px;
+        }
+
+        .serviceContainer {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 1rem;
+        }
+
+        /* modern card style (without complex hover rectangle) but clean portal cards */
+        .portal-card {
+            background: white;
+            border-radius: 28px;
+            width: 260px;
+            padding: 1.8rem 1.2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            border: 1px solid rgba(0,198,251,0.2);
+        }
+        .portal-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 25px 40px rgba(0,0,0,0.15);
+            border-color: #00c6fb;
+        }
+        .portal-card i {
+            font-size: 3rem;
+            background: linear-gradient(145deg, #0f2b6d, #00c6fb);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 1rem;
+        }
+        .portal-card h3 {
+            font-size: 1.5rem;
+            margin: 0.5rem 0;
+        }
+        .portal-card p {
+            color: #475569;
+            font-size: 0.85rem;
+            margin-bottom: 1.2rem;
+        }
+        .portal-btn {
+            background: #0f2b6d;
+            border: none;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            font-family: inherit;
+        }
+        .portal-btn:hover {
+            background: #00c6fb;
+            transform: scale(1.02);
+        }
+
+        /* MODAL OVERLAY */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .login-card {
+            background: white;
+            max-width: 420px;
+            width: 90%;
+            padding: 2rem;
+            border-radius: 32px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.4);
+            animation: fadeSlide 0.3s ease-out;
+        }
+        @keyframes fadeSlide {
+            from { opacity: 0; transform: translateY(30px);}
+            to { opacity: 1; transform: translateY(0);}
+        }
+        .login-card h2 {
+            font-size: 1.8rem;
+            margin-bottom: 0.3rem;
+            color: #0f2b6d;
+        }
+        .role-badge {
+            background: #eef2ff;
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #0f2b6d;
+            margin-bottom: 1.5rem;
+        }
+        .input-group {
+            margin-bottom: 1.3rem;
+            text-align: left;
+        }
+        .input-group label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 6px;
+            color: #334155;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 20px;
+            border: 1px solid #cbd5e1;
+            font-family: inherit;
+            transition: 0.2s;
+            font-size: 0.95rem;
+        }
+        .input-group input:focus {
+            outline: none;
+            border-color: #00c6fb;
+            box-shadow: 0 0 0 3px rgba(0,198,251,0.2);
+        }
+        .pass-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        .pass-wrapper input {
+            flex: 1;
+            padding-right: 45px;
+        }
+        .toggle-eye {
+            position: absolute;
+            right: 15px;
+            cursor: pointer;
+            color: #64748b;
+        }
+        .submit-btn {
+            width: 100%;
+            background: linear-gradient(95deg, #0f2b6d, #00a3cc);
+            border: none;
+            padding: 12px;
+            border-radius: 40px;
+            font-weight: bold;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-top: 8px;
+        }
+        .submit-btn:hover {
+            opacity: 0.9;
+            transform: scale(0.98);
+        }
+        .guest-link {
+            background: #f1f5f9;
+            margin-top: 16px;
+            padding: 10px;
+            border-radius: 40px;
+            text-align: center;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            color: #2563eb;
+            transition: 0.2s;
+        }
+        .guest-link:hover {
+            background: #e2e8f0;
+        }
+        .back-link {
+            text-align: center;
+            margin-top: 18px;
+            font-size: 0.8rem;
+            color: #64748b;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+        hr {
+            margin: 12px 0;
+            border-color: #e2e8f0;
+        }
+        footer {
+            text-align: center;
+            padding: 2rem;
+            background: #0b1120;
+            color: #94a3b8;
+            margin-top: 3rem;
+            font-size: 0.8rem;
+        }
+        @media (max-width: 700px) {
+            .portal-card { width: 220px; }
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <div class="logo"><i class="fas fa-graduation-cap"></i> EB ACADEMY</div>
+    <div style="font-size: 0.85rem; font-weight: 500;"><i class="fas fa-shield-alt"></i> Secure Portal</div>
+</nav>
+
+<div class="hero-portal">
+    <h1>🔐 Unified Access Portal</h1>
+    <p>Authenticate with your role credentials • name & passkey</p>
+</div>
+
+<section class="section" id="services">
+    <div class="section-header">
+        <h2>Services & Portals</h2>
+        <div class="divider"></div>
+        <p style="color:#334155;">Select your role to access the dedicated dashboard</p>
+    </div>
+    <div class="serviceContainer">
+        <!-- Student Card -->
+        <div class="portal-card" data-role="Student">
+            <i class="fas fa-user-graduate"></i>
+            <h3>Student</h3>
+            <p>Grades, assignments, learning path & progress</p>
+            <button class="portal-btn" onclick="openPortal('Student')">Enter Portal →</button>
+        </div>
+        <!-- Teacher Card -->
+        <div class="portal-card" data-role="Teacher">
+            <i class="fas fa-chalkboard-user"></i>
+            <h3>Teacher</h3>
+            <p>Manage classes, assignments & feedback</p>
+            <button class="portal-btn" onclick="openPortal('Teacher')">Class Management →</button>
+        </div>
+        <!-- Admin Card -->
+        <div class="portal-card" data-role="Admin">
+            <i class="fas fa-user-shield"></i>
+            <h3>Admin</h3>
+            <p>System control, analytics & user oversight</p>
+            <button class="portal-btn" onclick="openPortal('Admin')">Admin Settings →</button>
+        </div>
+        <!-- Parent Card -->
+        <div class="portal-card" data-role="Parent">
+            <i class="fas fa-users"></i>
+            <h3>Parent</h3>
+            <p>Track child's performance & school updates</p>
+            <button class="portal-btn" onclick="openPortal('Parent')">Parent View →</button>
+        </div>
+    </div>
+</section>
+
+<!-- MODAL for login -->
+<div id="loginModal" class="modal-overlay">
+    <div class="login-card" onclick="event.stopPropagation()">
+        <h2 id="modalTitle">Student Portal</h2>
+        <div class="role-badge" id="roleBadge">🔑 Role: Student</div>
+        
+        <div class="input-group">
+            <label><i class="fas fa-id-card"></i> Full Name / Username</label>
+            <input type="text" id="usernameInput" placeholder="e.g., john_doe" autocomplete="off">
+        </div>
+        
+        <div class="input-group">
+            <label><i class="fas fa-key"></i> Passkey</label>
+            <div class="pass-wrapper">
+                <input type="password" id="passkeyInput" placeholder="········">
+                <i class="fas fa-eye-slash toggle-eye" id="togglePassIcon" onclick="togglePasswordVisibility()"></i>
+            </div>
+        </div>
+        
+        <button class="submit-btn" id="verifyBtn" onclick="verifyCredentials()"><i class="fas fa-unlock-alt"></i> Verify & Access</button>
+        
+        <div id="guestActionArea" style="display: none;">
+            <hr>
+            <div class="guest-link" id="guestBtnDynamic">📝 New Student Registration</div>
+        </div>
+        
+        <div class="back-link" onclick="closeModal()">← Cancel & Go Back</div>
+    </div>
+</div>
+
+<footer>
+    <p>© 2026 EB Academy — Secure Role-Based Portal | All demo credentials are predefined for this standalone file</p>
+    <p style="margin-top: 6px;"><i class="fas fa-laptop"></i> Official portal — name & passkey authentication</p>
+</footer>
+
+<script>
+    // --------------------------------------------------------------
+    //  HARDCODED CREDENTIALS (name + passkey) for each role
+    //  Based on "portal appearing name and passkey pass" logic
+    // --------------------------------------------------------------
+    const CREDENTIALS = {
+        Student: [
+            { name: "student1", passkey: "student123" },
+            { name: "alex_j", passkey: "learn2026" },
+            { name: "mariam_e", passkey: "ebstudent" }
+        ],
+        Teacher: [
+            { name: "teacher1", passkey: "teacher123" },
+            { name: "prof_james", passkey: "teach@eb" },
+            { name: "ms_helen", passkey: "classroom22" }
+        ],
+        Admin: [
+            { name: "admin1", passkey: "admin123" },
+            { name: "superadmin", passkey: "eb_admin_2026" },
+            { name: "director_eb", passkey: "direct0r#" }
+        ],
+        Parent: [
+            { name: "parent1", passkey: "parent123" },
+            { name: "fatima_ali", passkey: "kids2026" },
+            { name: "girma_t", passkey: "ebparent" }
+        ]
+    };
+
+    // Role-specific redirect URLs (simulated dashboard pages)
+    // In a real environment you would redirect to actual dashboards,
+    // but for this self-contained file we show an alert + simulation.
+    // You can modify redirects to actual subfolders if needed.
+    const REDIRECT_MAP = {
+        Student: "student_dashboard.html",
+        Teacher: "teacher_panel.html",
+        Admin: "admin_console.html",
+        Parent: "parent_portal.html"
+    };
+
+    // Guest links for Student & Teacher (similar to original)
+    const GUEST_ACTIONS = {
+        Student: { text: "📝 New Student Registration", link: "#", action: "studentRegistration" },
+        Teacher: { text: "📄 Teacher Application", link: "#", action: "teacherApplication" }
+    };
+
+    let currentRole = "";
+    let currentGuestDiv = null;
+
+    // Open modal with role context
+    window.openPortal = (role) => {
+        currentRole = role;
+        const modal = document.getElementById('loginModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const roleBadge = document.getElementById('roleBadge');
+        const guestArea = document.getElementById('guestActionArea');
+        const guestBtn = document.getElementById('guestBtnDynamic');
+
+        // Reset fields
+        document.getElementById('usernameInput').value = "";
+        document.getElementById('passkeyInput').value = "";
+        
+        // Update UI
+        modalTitle.innerText = `${role} Portal`;
+        roleBadge.innerHTML = `🔑 Role: ${role}`;
+        
+        // Show guest action only for Student & Teacher (same as original)
+        if (role === 'Student' || role === 'Teacher') {
+            const guestInfo = GUEST_ACTIONS[role];
+            guestBtn.innerText = guestInfo.text;
+            guestArea.style.display = "block";
+            // store custom action
+            guestBtn.onclick = () => handleGuestAction(role);
+        } else {
+            guestArea.style.display = "none";
+        }
+        
+        modal.style.display = "flex";
+        document.body.style.overflow = "hidden";
+    };
+
+    window.closeModal = () => {
+        document.getElementById('loginModal').style.display = "none";
+        document.body.style.overflow = "auto";
+        currentRole = "";
+    };
+
+    // Toggle password visibility
+    window.togglePasswordVisibility = () => {
+        const passInput = document.getElementById('passkeyInput');
+        const icon = document.getElementById('togglePassIcon');
+        if (passInput.type === 'password') {
+            passInput.type = 'text';
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        } else {
+            passInput.type = 'password';
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        }
+    };
+
+    // Verify entered name & passkey against role credentials
+    window.verifyCredentials = () => {
+        const enteredName = document.getElementById('usernameInput').value.trim();
+        const enteredPass = document.getElementById('passkeyInput').value.trim();
+        
+        if (!enteredName || !enteredPass) {
+            alert("❌ Please enter both Name and Passkey.");
+            return;
+        }
+        
+        const roleCreds = CREDENTIALS[currentRole];
+        if (!roleCreds) {
+            alert("Invalid role selected.");
+            closeModal();
+            return;
+        }
+        
+        // check for match (case-sensitive but can be case-insensitive if needed)
+        const isValid = roleCreds.some(cred => 
+            cred.name.toLowerCase() === enteredName.toLowerCase() && 
+            cred.passkey === enteredPass
+        );
+        
+        if (isValid) {
+            showDashboardSimulation(currentRole, enteredName);
+            closeModal();
+        } else {
+            alert("⛔ Access Denied: Invalid credentials for " + currentRole + " role.\n\nHint: Use predefined name & passkey pairs shown in console or below.\n\nStudent: student1 / student123\nTeacher: teacher1 / teacher123\nAdmin: admin1 / admin123\nParent: parent1 / parent123");
+        }
+    };
+
+    // Function to simulate dashboard (one-file experience)
+    function showDashboardSimulation(role, userName) {
+        // Remove any existing dashboard overlay
+        const existingDash = document.getElementById('simulated-dashboard');
+        if(existingDash) existingDash.remove();
+        
+        const dashDiv = document.createElement('div');
+        dashDiv.id = 'simulated-dashboard';
+        dashDiv.style.position = 'fixed';
+        dashDiv.style.top = '0';
+        dashDiv.style.left = '0';
+        dashDiv.style.width = '100%';
+        dashDiv.style.height = '100%';
+        dashDiv.style.backgroundColor = '#f8fafc';
+        dashDiv.style.zIndex = '2000';
+        dashDiv.style.overflowY = 'auto';
+        dashDiv.style.padding = '2rem';
+        dashDiv.style.fontFamily = "'Poppins', sans-serif";
+        
+        // Different content per role
+        let roleContent = '';
+        if(role === 'Student') {
+            roleContent = `
+                <div style="max-width:800px; margin:0 auto; background:white; border-radius:36px; padding:2rem; box-shadow:0 20px 35px -12px rgba(0,0,0,0.1);">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <h2 style="color:#0f2b6d;"><i class="fas fa-user-graduate"></i> Student Dashboard</h2>
+                        <button id="closeDashboardBtn" style="background:#ef4444; border:none; padding:8px 18px; border-radius:40px; color:white; cursor:pointer;">Exit Portal</button>
+                    </div>
+                    <div style="margin: 1.5rem 0; border-bottom:2px solid #e2e8f0;"></div>
+                    <p><strong>Welcome back, ${userName}!</strong> (Role: Student)</p>
+                    <div class="dashboard-cards" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:1rem; margin-top:1.5rem;">
+                        <div style="background:#eef2ff; padding:1rem; border-radius:24px;"><i class="fas fa-chart-line"></i> <strong>Grades:</strong> A- (Math), B+ (Science)</div>
+                        <div style="background:#eef2ff; padding:1rem; border-radius:24px;"><i class="fas fa-calendar-alt"></i> <strong>Upcoming:</strong> Exam on May 20</div>
+                        <div style="background:#eef2ff; padding:1rem; border-radius:24px;"><i class="fas fa-tasks"></i> <strong>Assignments:</strong> 2 pending</div>
+                    </div>
+                    <p style="margin-top: 1rem;"><i class="fas fa-check-circle" style="color:#10b981;"></i> Secure portal access granted via EB Academy.</p>
+                </div>
+            `;
+        } else if(role === 'Teacher') {
+            roleContent = `
+                <div style="max-width:800px; margin:0 auto; background:white; border-radius:36px; padding:2rem; box-shadow:0 20px 35px -12px rgba(0,0,0,0.1);">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <h2 style="color:#0f2b6d;"><i class="fas fa-chalkboard-user"></i> Teacher Workspace</h2>
+                        <button id="closeDashboardBtn" style="background:#ef4444; border:none; padding:8px 18px; border-radius:40px; color:white; cursor:pointer;">Exit Portal</button>
+                    </div>
+                    <div style="margin: 1.5rem 0; border-bottom:2px solid #e2e8f0;"></div>
+                    <p><strong>Hello, Teacher ${userName}</strong> — Manage classes, assignments & feedback.</p>
+                    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:1rem; margin-top:1.5rem;">
+                        <div style="background:#f1f5f9; padding:1rem; border-radius:20px;"><i class="fas fa-users"></i> 3 Active Classes</div>
+                        <div style="background:#f1f5f9; padding:1rem; border-radius:20px;"><i class="fas fa-file-alt"></i> 12 Submissions pending</div>
+                        <div style="background:#f1f5f9; padding:1rem; border-radius:20px;"><i class="fas fa-chalkboard"></i> Schedule: Mon-Wed-Fri</div>
+                    </div>
+                </div>
+            `;
+        } else if(role === 'Admin') {
+            roleContent = `
+                <div style="max-width:800px; margin:0 auto; background:white; border-radius:36px; padding:2rem; box-shadow:0 20px 35px -12px rgba(0,0,0,0.1);">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <h2 style="color:#0f2b6d;"><i class="fas fa-user-shield"></i> Admin Console</h2>
+                        <button id="closeDashboardBtn" style="background:#ef4444; border:none; padding:8px 18px; border-radius:40px; color:white; cursor:pointer;">Exit Portal</button>
+                    </div>
+                    <div style="margin: 1.5rem 0; border-bottom:2px solid #e2e8f0;"></div>
+                    <p><strong>Administrator ${userName}</strong> — Full system oversight.</p>
+                    <div style="background:#e6f7ff; border-radius:24px; padding:1.2rem; margin-top:1rem;">
+                        <i class="fas fa-chart-pie"></i> System analytics: 1560 students, 87 teachers, 7 branches.<br>
+                        <button style="margin-top:12px; background:#0f2b6d; border:none; padding:6px 20px; border-radius:30px; color:white;">Manage Users</button>
+                    </div>
+                </div>
+            `;
+        } else { // Parent
+            roleContent = `
+                <div style="max-width:800px; margin:0 auto; background:white; border-radius:36px; padding:2rem; box-shadow:0 20px 35px -12px rgba(0,0,0,0.1);">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <h2 style="color:#0f2b6d;"><i class="fas fa-heart"></i> Parent Portal</h2>
+                        <button id="closeDashboardBtn" style="background:#ef4444; border:none; padding:8px 18px; border-radius:40px; color:white; cursor:pointer;">Exit Portal</button>
+                    </div>
+                    <div style="margin: 1.5rem 0; border-bottom:2px solid #e2e8f0;"></div>
+                    <p><strong>Welcome, ${userName}</strong> — Monitor your child's progress.</p>
+                    <div style="background:#fef9e3; border-radius:24px; padding:1rem;">
+                        <p><i class="fas fa-child"></i> Child: Maya S. (Grade 8) | Attendance: 96% | GPA: 3.8</p>
+                        <p><i class="fas fa-calendar-week"></i> Next parent-teacher meeting: June 12</p>
+                    </div>
+                </div>
+            `;
+        }
+        
+        dashDiv.innerHTML = roleContent;
+        document.body.appendChild(dashDiv);
+        document.body.style.overflow = 'hidden';
+        
+        const closeBtn = document.getElementById('closeDashboardBtn');
+        if(closeBtn) {
+            closeBtn.addEventListener('click', () => {
+                dashDiv.remove();
+                document.body.style.overflow = 'auto';
+            });
+        }
+        
+        // Click outside overlay to close? optional
+        dashDiv.addEventListener('click', (e) => {
+            if(e.target === dashDiv) {
+                dashDiv.remove();
+                document.body.style.overflow = 'auto';
+            }
+        });
+    }
+    
+    // Handle guest registration / application links (simulated)
+    function handleGuestAction(role) {
+        if(role === 'Student') {
+            alert("📘 Student Registration Portal (Demo)\n\nIn full version, you would be redirected to registration form.\nFor this standalone demo, registration flow is simulated.");
+            // simulate new page or open registration modal
+            window.open('#', '_blank');  // just placeholder
+        } else if(role === 'Teacher') {
+            alert("🍎 Teacher Application (Demo)\n\nSubmit your credentials to join EB Academy. This is a demonstration of the guest feature.");
+        }
+    }
+    
+    // Close modal if clicking on backdrop
+    document.getElementById('loginModal').addEventListener('click', function(e) {
+        if(e.target === this) closeModal();
+    });
+    
+    // Add enter key support in modal inputs
+    const usernameField = document.getElementById('usernameInput');
+    const passField = document.getElementById('passkeyInput');
+    const verifyBtn = document.getElementById('verifyBtn');
+    
+    function handleEnter(e) {
+        if(e.key === 'Enter') {
+            e.preventDefault();
+            verifyCredentials();
+        }
+    }
+    usernameField.addEventListener('keypress', handleEnter);
+    passField.addEventListener('keypress', handleEnter);
+    
+    // Quick info display in console for convenience
+    console.log("✅ EB Academy Portal — Predefined Credentials (name / passkey):");
+    console.log("🎓 Student: student1 / student123 , alex_j / learn2026");
+    console.log("👩‍🏫 Teacher: teacher1 / teacher123 , prof_james / teach@eb");
+    console.log("👑 Admin: admin1 / admin123 , superadmin / eb_admin_2026");
+    console.log("👪 Parent: parent1 / parent123 , fatima_ali / kids2026");
+    console.log("Use any matching pair for each role.");
+</script>
+</body>
+</html>

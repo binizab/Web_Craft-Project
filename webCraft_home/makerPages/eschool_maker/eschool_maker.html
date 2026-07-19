@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Engine Pro | Enterprise Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+    <link rel="stylesheet" href="eschool_maker.css">
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+</head>
+<body>
+
+    <div class="main-wrapper">
+        <header class="hero-banner">
+            <div class="hero-overlay"></div>
+            <div class="hero-content">
+                <h1>Web Engine <span style="color:var(--primary)">Pro</span></h1>
+                <p style="color: white;">The next generation of enterprise portal management. Create, validate, and deploy school and business engines in minutes.</p>
+                <div style="display: flex; gap: 15px; margin-top: 20px;">
+                    <button class="btn btn-primary" onclick="handleOpenModal()">
+                        <i class="fas fa-plus-circle"></i> Create New Project
+                    </button>
+                    <button class="btn btn-outline" onclick="window.scrollTo({top: 800, behavior: 'smooth'})" style="color: white;">
+                        View Projects
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <div class="controls-bar">
+    <h2>Active Deployments</h2>
+    <div style="display: flex; gap: 15px; align-items: center;">
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" id="projectSearch" placeholder="Filter by name ..." onkeyup="filterProjects()">
+        </div>
+        <button class="theme-toggle-btn" id="themeToggle" onclick="toggleTheme()" title="Toggle Theme">
+            <i class="fas fa-sun"></i>
+        </button>
+    </div>
+</div>
+
+        <main class="project-section">
+            <div id="gridDisplay" class="grid-container">
+                
+            </div>
+        </main>
+    </div>
+
+    <div class="modal-mask" id="projectModal">
+        <div class="modal-box">
+            <aside class="modal-sidebar">
+                <div class="sidebar-progress-line"><div class="sidebar-progress-fill" id="blueFlow"></div></div>
+                <div class="step-indicator active" id="node-0" onclick="goTo(0)"><div class="step-circle"><i data-lucide="clipboard" style="transform: scale(0.6);"></i></div><div><strong>Basic</strong></div></div>
+                <div class="step-indicator" id="node-1" onclick="goTo(1)"><div class="step-circle"><i data-lucide="image" style="transform: scale(0.6);"></i></div><div><strong>Images</strong></div></div>
+                <div class="step-indicator" id="node-2" onclick="goTo(2)"><div class="step-circle"><i data-lucide="credit-card" style="transform: scale(0.6);"></i></div><div><strong>Cards</strong></div></div>
+                <div class="step-indicator" id="node-3" onclick="goTo(3)"><div class="step-circle"><i data-lucide="file-text" style="transform: scale(0.6);"></i></div><div><strong>Web Content</strong></div></div>
+                <div class="step-indicator" id="node-4" onclick="goTo(4)"><div class="step-circle"><i data-lucide="git-branch" style="transform: scale(0.6);"></i></div><div><strong>Branch</strong></div></div>
+                <div class="step-indicator" id="node-4" onclick="goTo(5)"><div class="step-circle"><i data-lucide="building-2" style="transform: scale(0.6);"></i></div><div><strong>Facilities</strong></div></div>
+                <div class="step-indicator" id="node-5" onclick="goTo(6)"><div class="step-circle"><i data-lucide="rocket" style="transform: scale(0.6);"></i></div><div><strong>Finish</strong></div></div>
+            </aside>
+
+            <main class="modal-content">
+                <div class="modal-header-area">
+                    <h2 id="modalMainHeading">Project Creation</h2>
+                    <p style="color: var(--text-dim);">Follow the steps to provision your new instance.</p>
+                </div>
+
+                <div class="step-scroll-viewport" id="scrollArea">
+                    <form id="multiStepForm">
+                        <div class="step-pane active" id="pane-0">
+                            <div class="input-wrap">
+                                <label><i data-lucide="school"></i>School Name</label>
+                                <i data-lucide="school" style="position: absolute; margin-right: 5px; margin-left: 10px; transform: scale(0.8); color: var(--text-dim); top: 45px;"></i>
+                                <input type="text" id="form-name" placeholder="e.g. Eb-Academy">
+                                <span class="error-hint" id="err-name">Name must be at least 2 characters.</span>
+                            </div>
+                            <div class="input-wrap" style="position: relative;">
+    <label><i data-lucide="graduation-cap"></i> School Type</label>
+    <div class="custom-select-wrapper" id="wrapper1">
+        <div class="select-trigger" id="form-scType" onclick="toggleMenu('menu1')" style="display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: var(--card-blue); border: 2px solid var(--text-dim); border-radius: 12px; cursor: pointer;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <i data-lucide="layers" style="width: 18px; color: var(--text-dim);"></i>
+                <span id="label1" class="select-text is-placeholder">Select School Type</span>
+            </div>
+            <i data-lucide="chevron-down" class="chevron-icon" style="width: 18px;"></i>
+        </div>
+        <div class="select-options" id="menu1">
+            <div class="option-item" onclick="selectValue(this, 'Public', 'label1', 'menu1')">Public</div>
+            <div class="option-item" onclick="selectValue(this, 'Private', 'label1', 'menu1')">Private</div>
+            <div class="option-item" onclick="selectValue(this, 'International', 'label1', 'menu1')">International</div>
+        </div>
+    </div>
+    <span class="error-hint" id="err-scType">Please, Select school type.</span>
+</div>
+                            <div class="input-wrap">
+                                <label><i data-lucide="calendar"></i>Date Of Establishement</label>
+                                <div class="calendar-wrapper">
+        <div class="calendar-input" id="calInput">
+            <i data-lucide="calendar" style="color: var(--text-dim); transform: scale(0.8); margin-left: -10px;"></i>
+        <span id="selectedDateText" class="is-placeholder">Select Date</span>
+        <i data-lucide="calendar" class="calendar-icon" style="color: var(--primary); transform: scale(0.7); right: 10px; position: absolute;"></i>
+        </div>
+
+        <div class="calendar-dropdown" id="calDropdown">
+            <div class="calendar-header">
+                <button class="nav-btn" id="prevMonth" type="button"><i data-lucide="chevron-left"></i></button>
+                <h4 id="monthDisplay">Month Year</h4>
+                <button class="nav-btn" id="nextMonth" type="button"><i data-lucide="chevron-right"></i></button>
+            </div>
+            <div class="calendar-grid" id="calendarGrid">
+                </div>
+        </div>
+    </div>
+                                <span class="error-hint" id="err-date">Please, select date of establishement.</span>
+                            </div>
+                            
+                            <div class="input-wrap">
+                                <label><i data-lucide="hash"></i>Number Of School Clubs</label>
+                                <i data-lucide="hash" style="position: absolute; margin-right: 5px; margin-left: 10px; transform: scale(0.8); color: var(--text-dim); top: 45px;"></i>
+                                <input type="number" id="form-clubNo" placeholder="e.g. 25">
+                                <span class="error-hint" id="err-clubNo">Please, Type number of school clubs.</span>
+                            </div>
+                            <div class="input-wrap">
+                                <label><i data-lucide="users"></i>Number Of Students</label>
+                                <i data-lucide="users" style="position: absolute; margin-right: 5px; margin-left: 10px; transform: scale(0.8); color: var(--text-dim); top: 45px;"></i>
+                                <input type="number" id="form-studentNo" placeholder="e.g. 100">
+                                <span class="error-hint" id="err-studentNo">Please, Type number of students.</span>
+                            </div>
+
+                            <div class="input-wrap" style="position: relative;">
+    <label><i data-lucide="users"></i> Student Type</label>
+    <div class="custom-select-wrapper" id="wrapper2">
+        <div class="select-trigger" id="form-sType" onclick="toggleMenu('menu2')" style="display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: var(--card-blue); border: 2px solid var(--text-dim); border-radius: 12px; cursor: pointer;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <i data-lucide="users" style="width: 18px; color: var(--text-dim);"></i>
+                <span id="label2" class="select-text is-placeholder">Select Student Type</span>
+            </div>
+            <i data-lucide="chevron-down" class="chevron-icon" style="width: 18px;"></i>
+        </div>
+        <div class="select-options" id="menu2">
+            <div class="option-item" onclick="selectValue(this, 'Mixed', 'label2', 'menu2')">Mixed</div>
+            <div class="option-item" onclick="selectValue(this, 'Boys Only', 'label2', 'menu2')">Boys Only</div>
+            <div class="option-item" onclick="selectValue(this, 'Girls Only', 'label2', 'menu2')">Girls Only</div>
+        </div>
+    </div>
+    <span class="error-hint" id="err-sType">Please, Select student type.</span>
+</div>
+                            
+                            <div class="input-wrap">
+    <label><i data-lucide="unlock"></i> School Legal Permission</label>
+<label class="dropzone">
+            <div class="icon-box"><i data-lucide="upload"></i></div>
+            <span>Upload ID or <span class="browse-text">browse</span></span>
+            <input type="file" class="file-input-hidden" id="form-file">
+            <span style="font-size: 0.75rem; color: var(--text-muted); margin-top: 4px;">
+            Supports JPG, PNG, PDF (Max 10MB)
+        </span>
+            <div class="file-info">
+                <i data-lucide="check" style="display:inline; transform: scale(0.8); margin-bottom: -6px;"></i>
+                <span class="file-name"></span>
+            </div>
+        </label>
+            <p id="file-status-label" style="font-size: 12px; color: #666;"></p>
+    <span class="error-hint" id="err-file">Please, Select file from device.</span>
+</div>
+
+<div class="input-wrap">
+    <label><i data-lucide="database"></i> School DataBase</label>
+<label class="dropzone">
+            <div class="icon-box"><i data-lucide="upload"></i></div>
+            <span>Upload ID or <span class="browse-text">browse</span></span>
+            <input type="file" class="file-input-hidden" id="form-data">
+            <span style="font-size: 0.75rem; color: var(--text-muted); margin-top: 4px;">
+            Supports JPG, PNG, PDF (Max 10MB)
+        </span>
+            <div class="file-info">
+                <i data-lucide="check" style="display:inline; transform: scale(0.8); margin-bottom: -6px;"></i>
+                <span class="file-name"></span>
+            </div>
+        </label>
+        <p id="data-status-label" style="font-size: 12px; color: #666;"></p>
+    <span class="error-hint" id="err-data">Please, Locate your Database.</span>
+</div>
+                            
+                            <div class="input-wrap" style="position: relative;">
+    <label><i data-lucide="book-open"></i> Program</label>
+    <div class="custom-select-wrapper" id="wrapper3">
+        <div class="select-trigger" id="form-lType" onclick="toggleMenu('menu3')" style="display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: var(--card-blue); border: 2px solid var(--text-dim); border-radius: 12px; cursor: pointer;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <i data-lucide="book-open" style="width: 18px; color: var(--text-dim);"></i>
+                <span id="label3" class="select-text is-placeholder">Select Program</span>
+            </div>
+            <i data-lucide="chevron-down" class="chevron-icon" style="width: 18px;"></i>
+        </div>
+        <div class="select-options" id="menu3">
+            <div class="option-item" onclick="selectValue(this, 'Day', 'label3', 'menu3')">Day</div>
+            <div class="option-item" onclick="selectValue(this, 'Night', 'label3', 'menu3')">Night</div>
+            <div class="option-item" onclick="selectValue(this, 'Both', 'label3', 'menu3')">Both</div>
+        </div>
+    </div>
+    <span class="error-hint" id="err-lType">Please, Select program.</span>
+</div>
+                            <div class="input-wrap">
+                                <label><i data-lucide="mail"></i>Email Address</label>
+                                <i data-lucide="mail" style="position: absolute; margin-right: 5px; margin-left: 10px; transform: scale(0.8); color: var(--text-dim); top: 45px;"></i>
+                                <input type="email" id="form-email" placeholder="admin@domain.com">
+                                <span class="error-hint" id="err-email">Please enter a valid email.</span>
+                            </div>
+                        </div>
+
+                        <div class="step-pane" id="pane-1">
+                           
+<div class="gallery-container">
+<header class="header">
+<h1>Visual Assets</h1>
+<p>Ensure every slot has an image and a unique name before saving.</p>
+</header>
+
+<main class="image-grid" id="assetGrid"></main>
+
+</div>
+
+                        </div>
+
+                        <div class="step-pane" id="pane-2">
+                            <header class="header">
+        <h1>Form Mapper <span style="color: var(--primary)">Pro</span></h1>
+        <p>Map 13 Inputs + 1 Photo (ID size)</p>
+    </header>
+<div style="justify-items: center; align-content: center;">
+    <div class="page-switcher">
+        <button type="button" class="switch-btn active" id="btn-front" onclick="app.switchSide('front')">Front</button>
+<button type="button" class="switch-btn" id="btn-back" onclick="app.switchSide('back')">Back</button>
+</div>
+</div>
+    <div class="upload-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
+        <i class="fas fa-id-card"></i>
+        <p>Click to upload <span id="side-text" style="color:var(--primary)">Front</span></p>
+        <input type="file" id="file-input" hidden accept="image/*" onchange="app.handleFile(this)">
+    </div>
+
+    <div class="canvas-container" id="canvas-wrap">
+        <div id="mode-indicator" class="mode-pill">PHOTO MODE</div>
+        <canvas id="canvas"></canvas>
+        <img id="bg-img">
+        
+        <div id="floating-menu">
+            <select id="form-card" class="selector"></select>
+            <button type="button" id="add-btn" class="btn-add" onclick="app.confirmField()">Map</button>
+        </div>
+    </div>
+
+    <div class="action-bar" id="actions" style="display: none;">
+        <div id="status-label" class="status-msg">Upload images to begin mapping.</div>
+        <div class="btn-group">
+            <button type="button" class="btn-main btn-remove" onclick="app.removeCurrentSide()">Clear Side</button>
+        </div>
+    </div>
+    
+                        </div>
+
+                        <div class="step-pane" id="pane-3">
+                            
+    <div class="brand-story-container">
+        <div class="field-group full-width">
+            <span class="field-label"><i class="fa-solid fa-book-open"></i> Bio</span>
+            <textarea class="textarea" placeholder="Tell your Bio..." id="form-bio"></textarea>
+            <div class="error-hint" id="err-bio">Please, tell us what makes you different.</div>
+        </div>
+        <div class="field-group full-width">
+            <span class="field-label"><i class="fa-solid fa-book-open"></i> Welcoming Text</span>
+            <textarea class="textarea" placeholder="Show your welcoming..." id="form-welcome"></textarea>
+            <div class="error-hint" id="err-welcome">Please, welcome your users.</div>
+        </div>
+        <div class="field-group full-width">
+            <span class="field-label"><i class="fa-solid fa-book-open"></i> Footer text</span>
+            <textarea class="textarea" placeholder="Tell your brand's journey..." id="form-footer"></textarea>
+            <div class="error-hint" id="err-footer">Please, say something about your school.</div>
+        </div>
+        <div class="field-group full-width">
+            <span class="field-label"><i class="fa-solid fa-book-open"></i> Brand Narrative</span>
+            <textarea class="textarea" placeholder="Tell your brand's journey..." id="form-about" style="height: 200px;"></textarea>
+            <div class="error-hint" id="err-about">Please, say something about your school.</div>
+        </div>
+        <div class="field-group full-width">
+            <span class="field-label"><i class="fa-solid fa-wand-magic-sparkles"></i> Vision</span>
+            <textarea class="textarea" placeholder="Future goals..." id="form-vision"></textarea>
+            <div class="error-hint" id="err-vision">Please, share your vision.</div>
+        </div>
+        <div class="field-group full-width">
+            <span class="field-label"><i class="fa-solid fa-shield-halved"></i> Mission</span>
+            <textarea class="textarea" placeholder="Our purpose..." id="form-mission"></textarea>
+            <div class="error-hint" id="err-mission">Please, state your mission.</div>
+        </div>
+        <div class="field-group full-width">
+            <span class="field-label"><i class="fa-solid fa-star"></i> Values</span>
+            <textarea class="textarea" placeholder="Core principles..." id="form-value"></textarea>
+            <div class="error-hint" id="err-value">Please, share your values.</div>
+        </div>
+        <div class="field-group full-width">
+            <span class="field-label"><i class="fa-solid fa-star"></i> Innovation</span>
+            <textarea class="textarea" placeholder="Core innovation..." id="form-innovation"></textarea>
+            <div class="error-hint" id="err-innovation">Please, share your innovation.</div>
+        </div>
+        <div class="field-group full-width">
+            <span class="field-label"><i class="fa-solid fa-star"></i> Excellecnce</span>
+            <textarea class="textarea" placeholder="Core excellence..." id="form-excellence"></textarea>
+            <div class="error-hint" id="err-excellence">Please, share your excellence.</div>
+        </div>
+        <div class="field-group full-width">
+            <span class="field-label"><i class="fa-solid fa-star"></i> Community</span>
+            <textarea class="textarea" placeholder="Core community..." id="form-community"></textarea>
+            <div class="error-hint" id="err-community">Please, share your community.</div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <div style="font-weight: 600; color: var(--blue); display: flex; align-items: center; gap: 10px;">
+            <i class="fa-solid fa-grip"></i> CARDS: 
+            <input type="number" id="cardCount" value="4" min="4" max="20" style="background:rgba(255,255,255,0.1); border:none; color:white; width:50px; text-align:center; border-radius: 8px; padding: 5px;">
+        </div>
+        <button type="button" class="refresh-btn" onclick="updateSwiper()"><i class="fa-solid fa-arrows-rotate"></i> Reset Grid</button>
+    </div>
+
+    <div class="swiper mySwiper">
+        <div class="swiper-wrapper" id="swiper-wrapper"></div>
+        <div class="swiper-pagination"></div>
+        <div class="swiper-button-next"></div>
+        <div class="swiper-button-prev"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+   <div class="dashboard-header">
+    <div class="title-section">
+        <div class="badge-icon">
+            <i data-lucide="users"></i>
+        </div>
+        <h1>Faculty Sphere</h1>
+    </div>
+
+</div>
+
+<div class="teacher-grid" id="teacherGridContainer"></div>
+
+         <div class="app-container">
+    <div class="faq-header">
+        <h1>🌙 DarkMode FAQ Studio</h1>
+        <p>Lucide Icons • 4 Dynamic Metrics • Zero Pre-built FAQs</p>
+    </div>
+
+    <div class="four-inputs-panel">
+        <div class="inputs-grid">
+            <div class="input-group">
+                <label id="label1">👩‍🏫 Certified Teachers</label>
+                <input type="number" id="num1" value="5" step="1" placeholder="Number">
+            </div>
+            <div class="input-group">
+                <label id="label2">🧪 Subject Experts</label>
+                <input type="number" id="num2" value="8" step="1" placeholder="Number">
+            </div>
+            <div class="input-group">
+                <label id="label3">📅 Avg. Experience</label>
+                <input type="number" id="num3" value="6" step="1" placeholder="Years">
+            </div>
+            <div class="input-group">
+                <label id="label4">⭐ Avg. Rating</label>
+                <input type="number" id="num4" value="4" step="0.5" placeholder="1-5">
+            </div>
+        </div>
+        <div class="action-bar">
+            <button class="btn btn-primary" id="smartSortBtn">⚡ Smart Sort (Input 1+4)</button>
+            <button class="btn btn-accent" id="resetAllFaqsBtn">🗑️ Clear All FAQs</button>
+        </div>
+       
+    </div>
+
+    <div class="faq-list-section">
+        <div class="section-title">
+            <h2>📌 Frequently Asked Questions</h2>
+            <div class="faq-stats" id="faqStats">0 items</div>
+        </div>
+        <div id="faqContainer" class="faq-grid"></div>
+    </div>
+</div>
+
+<div id="faqModal" class="modal">
+    <div class="modal-content">
+        <h3 id="modalTitle">➕ Add New FAQ</h3>
+        <input type="text" id="modalQuestion" placeholder="Question (required)" autocomplete="off">
+        <textarea id="modalAnswer" placeholder="Answer (required)"></textarea>
+        <input type="number" id="modalCustomWeight" placeholder="Priority Weight" value="5">
+        <div class="modal-buttons">
+            <button class="btn btn-outline" id="closeModalBtn">Cancel</button>
+            <button class="btn btn-primary" id="saveModalBtn">Save</button>
+        </div>
+    </div>
+</div>
+<div class="input-wrap">
+    <label><i class="fab fa-youtube"></i> YouTube Link</label>
+    <input type="text" id="form-youtube" placeholder="https://..." style="padding-left: 20px;">
+    <span class="error-hint" id="err-youtube">YouTube link required.</span>
+</div>
+
+<div class="input-wrap">
+    <label><i class="fab fa-linkedin"></i> LinkedIn Link</label>
+    <input type="text" id="form-linkedin" placeholder="https://..." style="padding-left: 20px;">
+    <span class="error-hint" id="err-linkedin">LinkedIn link required.</span>
+</div>
+
+<div class="input-wrap">
+    <label><i class="fab fa-instagram"></i> Instagram Link</label>
+    <input type="text" id="form-instagram" placeholder="https://..." style="padding-left: 20px;">
+    <span class="error-hint" id="err-instagram">Instagram link required.</span>
+</div>
+
+<div class="input-wrap">
+    <label><i class="fab fa-facebook"></i> Facebook Link</label>
+    <input type="text" id="form-facebook" placeholder="https://..." style="padding-left: 20px;">
+    <span class="error-hint" id="err-facebook">Facebook link required.</span>
+</div>
+                        </div>
+
+                        <div class="step-pane" id="pane-4">
+                            <div class="master-control">
+            <i class="fas fa-layer-group" style="color: var(--accent-blue); font-size: 1.5rem;"></i>
+            <label>Branches to Add:</label>
+            <input type="number" id="branchCount" value="1" min="1" max="50" onchange="handleCountChange()">
+        </div>
+        <div class="dashboard-grid" id="branchGrid"></div>
+
+        <div class="modal-overlay" id="mapModal" style="display:none;">
+        
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+                        </div>
+
+                        <div class="step-pane" id="pane-5">
+                            <header class="header">
+        <h1><i class="factory"></i> <span style="color: var(--primary)">Facilities</span></h1>
+        <p>Select available facilities in your school.</p>
+    </header>
+
+            
+    <div style="justify-content: center; align-items: center; display: flex; flex-direction: column;">
+        
+        <div id="facilityErrors" 
+     class="error-msg" 
+     style="display: none; margin-bottom: 20px; position: sticky; top: 0; background: #f8d7da; color: #721c24; padding: 10px; border-radius: 4px;"
+     role="alert" 
+     aria-live="polite"></div>
+
+    <div class="inventory-card">
+    <div class="header">
+        <h2><i data-lucide="check-square" size="20"></i>Programs and Activities.</h2>
+        <p>Select an item and enter the limit.</p>
+    </div>
+
+    <div class="item-list">
+        <div class="item-row" id="row-1">
+            <label class="item-info">
+                <input type="checkbox" class="hidden-check" onchange="toggleRow(this, 'qty-1', 'row-1')">
+                <div class="custom-check"><i data-lucide="check" size="16"></i></div>
+                <span class="item-name">Academic Excellence</span>
+            </label>
+            <div class="qty-wrapper">
+                <input type="number" id="qty-1" class="qty-input" placeholder="0" disabled>
+            </div>
+        </div>
+
+        <div class="item-row" id="row-2">
+            <label class="item-info">
+                <input type="checkbox" class="hidden-check" onchange="toggleRow(this, 'qty-2', 'row-2')">
+                <div class="custom-check"><i data-lucide="check" size="16"></i></div>
+                <span class="item-name">Sports and Athletics</span>
+            </label>
+            <div class="qty-wrapper">
+                <input type="number" id="qty-2" class="qty-input" placeholder="0" disabled>
+            </div>
+        </div>
+
+        <div class="item-row" id="row-3">
+            <label class="item-info">
+                <input type="checkbox" class="hidden-check" onchange="toggleRow(this, 'qty-3', 'row-3')">
+                <div class="custom-check"><i data-lucide="check" size="16"></i></div>
+                <span class="item-name">Arts and Creativity</span>
+            </label>
+            <div class="qty-wrapper">
+                <input type="number" id="qty-3" class="qty-input" placeholder="0" disabled>
+            </div>
+        </div>
+
+        <div class="item-row" id="row-4">
+            <label class="item-info">
+                <input type="checkbox" class="hidden-check" onchange="toggleRow(this, 'qty-4', 'row-4')">
+                <div class="custom-check"><i data-lucide="check" size="16"></i></div>
+                <span class="item-name">Technology and STEM</span>
+            </label>
+            <div class="qty-wrapper">
+                <input type="number" id="qty-4" class="qty-input" placeholder="0" disabled>
+            </div>
+        </div>
+
+        <div class="item-row" id="row-5">
+            <label class="item-info">
+                <input type="checkbox" class="hidden-check" onchange="toggleRow(this, 'qty-5', 'row-5')">
+                <div class="custom-check"><i data-lucide="check" size="16"></i></div>
+                <span class="item-name">Music and Performing Arts</span>
+            </label>
+            <div class="qty-wrapper">
+                <input type="number" id="qty-5" class="qty-input" placeholder="0" disabled>
+            </div>
+        </div>
+        
+        <div class="item-row" id="row-6">
+            <label class="item-info">
+                <input type="checkbox" class="hidden-check" onchange="toggleRow(this, 'qty-6', 'row-6')">
+                <div class="custom-check"><i data-lucide="check" size="16"></i></div>
+                <span class="item-name">Science Programs</span>
+            </label>
+            <div class="qty-wrapper">
+                <input type="number" id="qty-6" class="qty-input" placeholder="0" disabled>
+            </div>
+        </div>
+        
+        <div class="item-row" id="row-7">
+            <label class="item-info">
+                <input type="checkbox" class="hidden-check" onchange="toggleRow(this, 'qty-7', 'row-7')">
+                <div class="custom-check"><i data-lucide="check" size="16"></i></div>
+                <span class="item-name">Language Programs</span>
+            </label>
+            <div class="qty-wrapper">
+                <input type="number" id="qty-7" class="qty-input" placeholder="0" disabled>
+            </div>
+        </div>
+
+        <div class="item-row" id="row-8">
+            <label class="item-info">
+                <input type="checkbox" class="hidden-check" onchange="toggleRow(this, 'qty-8', 'row-8')">
+                <div class="custom-check"><i data-lucide="check" size="16"></i></div>
+                <span class="item-name">Leadership Development</span>
+            </label>
+            <div class="qty-wrapper">
+                <input type="number" id="qty-8" class="qty-input" placeholder="0" disabled>
+            </div>
+        </div>
+    </div>
+</div>
+    
+<div class="selection-card">
+    <h2><i data-lucide="check-square" size="20"></i> Select Available Facilities.</h2>
+    
+    <div class="checkbox-grid">
+        <label class="checkbox-item">
+            <input type="checkbox" class="hidden-check" name="skill" value="html">
+            <div class="custom-box"><i data-lucide="check" size="14"></i></div>
+            <span class="label-text">Modern Classrooms</span>
+        </label>
+
+        <label class="checkbox-item">
+            <input type="checkbox" class="hidden-check" name="skill" value="css">
+            <div class="custom-box"><i data-lucide="check" size="14"></i></div>
+            <span class="label-text">High-Speed Internet</span>
+        </label>
+
+        <label class="checkbox-item">
+            <input type="checkbox" class="hidden-check" name="skill" value="js">
+            <div class="custom-box"><i data-lucide="check" size="14"></i></div>
+            <span class="label-text">Science Laboratories</span>
+        </label>
+
+        <label class="checkbox-item">
+            <input type="checkbox" class="hidden-check" name="skill" value="react">
+            <div class="custom-box"><i data-lucide="check" size="14"></i></div>
+            <span class="label-text">Computer Labs</span>
+        </label>
+
+        <label class="checkbox-item">
+            <input type="checkbox" class="hidden-check" name="skill" value="node">
+            <div class="custom-box"><i data-lucide="check" size="14"></i></div>
+            <span class="label-text">Library & Media Center</span>
+        </label>
+
+        <label class="checkbox-item">
+            <input type="checkbox" class="hidden-check" name="skill" value="python">
+            <div class="custom-box"><i data-lucide="check" size="14"></i></div>
+            <span class="label-text">Cafteria</span>
+        </label>
+        
+        <label class="checkbox-item">
+            <input type="checkbox" class="hidden-check" name="skill" value="ui">
+            <div class="custom-box"><i data-lucide="check" size="14"></i></div>
+            <span class="label-text">Transportation</span>
+        </label>
+
+        <label class="checkbox-item">
+            <input type="checkbox" class="hidden-check" name="skill" value="git">
+            <div class="custom-box"><i data-lucide="check" size="14"></i></div>
+            <span class="label-text">Security & Safety</span>
+        </label>
+    </div>
+</div>
+</div>
+                        </div>
+                        <div class="step-pane" id="pane-6">
+                            <div style="text-align: center; padding: 40px 0;">
+                                <i class="fas fa-rocket" style="font-size: 4rem; color: var(--primary); margin-bottom: 20px;"></i>
+                                <h3>Initialization Ready</h3>
+                                <p style="color: var(--text-dim); margin-top: 10px;">Review your details. Upon clicking 'Launch', your environment will be provisioned instantly.</p>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="modal-nav">
+                    <button class="btn btn-outline" onclick="handleCloseModal()">Cancel</button>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn btn-outline-map black" id="btnBack" onclick="navigateStep(-1)" style="display: none; background: var(--bg-dark); color: var(--text);">Back</button>
+                        <button class="btn btn-primary" id="btnNext" onclick="navigateStep(1)">Next Step</button>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    
+</body>
+<script src="https://unpkg.com/dexie@latest/dist/dexie.js"></script>
+
+<script src="eschool_maker.js"></script>
+</html>

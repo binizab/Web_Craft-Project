@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>NovaMail | P2P Video Call</title>
+    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #0a0f1c;
+            --card: #1e293b;
+            --card-light: #2d3a4e;
+            --accent: #38bdf8;
+            --accent-dark: #0284c7;
+            --danger: #ef4444;
+            --danger-dark: #dc2626;
+            --success: #22c55e;
+            --success-dark: #16a34a;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --border: #334155;
+            --shadow: 0 25px 40px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        body {
+            font-family: 'Poppins', 'Inter', system-ui, sans-serif;
+            background: linear-gradient(135deg, #0a0f1c 0%, #0f172a 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .app-wrapper {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            animation: fadeInDown 0.6s ease;
+        }
+
+        .header h1 {
+            font-size: clamp(1.8rem, 5vw, 2.8rem);
+            font-weight: 700;
+            background: linear-gradient(135deg, #ffffff, var(--accent));
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header p {
+            color: var(--text-secondary);
+            margin-top: 8px;
+            font-size: 0.9rem;
+        }
+
+        /* Connection Panel */
+        .connection-panel {
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 20px 24px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow);
+        }
+
+        .id-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            background: rgba(15, 23, 42, 0.6);
+            padding: 8px 16px;
+            border-radius: 50px;
+            border: 1px solid var(--border);
+        }
+
+        .id-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .id-badge {
+            background: #0f172a;
+            padding: 6px 16px;
+            border-radius: 40px;
+            border: 1px solid var(--accent);
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-weight: 600;
+            color: var(--accent);
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .input-group input {
+            flex: 1;
+            background: #0f172a;
+            border: 1px solid var(--border);
+            color: white;
+            padding: 12px 16px;
+            border-radius: 50px;
+            outline: none;
+            font-family: 'Poppins', monospace;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .input-group input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
+        }
+
+        /* Video Grid */
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 24px;
+            margin-bottom: 30px;
+        }
+
+        .video-container {
+            background: var(--card);
+            border-radius: 24px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: var(--shadow);
+            aspect-ratio: 16 / 9;
+            border: 2px solid var(--border);
+            transition: transform 0.3s ease, border-color 0.3s;
+        }
+
+        .video-container:hover {
+            border-color: var(--accent);
+            transform: translateY(-4px);
+        }
+
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            background: #000;
+        }
+
+        .video-label {
+            position: absolute;
+            bottom: 16px;
+            left: 16px;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(4px);
+            padding: 6px 14px;
+            border-radius: 40px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-left: 3px solid var(--success);
+        }
+
+        .video-label.remote-label {
+            border-left-color: var(--accent);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--success);
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
+
+        .status-dot.remote-dot {
+            background: var(--accent);
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+        }
+
+        /* Controls */
+        .controls {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .btn {
+            padding: 12px 28px;
+            border-radius: 60px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.9rem;
+            transition: all 0.25s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            backdrop-filter: blur(4px);
+        }
+
+        .btn-start {
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            color: #0f172a;
+            box-shadow: 0 4px 15px rgba(56, 189, 248, 0.3);
+        }
+
+        .btn-connect {
+            background: linear-gradient(135deg, var(--success), var(--success-dark));
+            color: white;
+        }
+
+        .btn-stop {
+            background: linear-gradient(135deg, var(--danger), var(--danger-dark));
+            color: white;
+        }
+
+        .btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            filter: brightness(1.05);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn:active:not(:disabled) {
+            transform: translateY(1px);
+        }
+
+        .btn:disabled {
+            background: #475569;
+            cursor: not-allowed;
+            opacity: 0.6;
+            transform: none;
+        }
+
+        /* Status indicator */
+        .call-status {
+            text-align: center;
+            margin-top: 20px;
+            padding: 10px;
+            background: rgba(30, 41, 59, 0.5);
+            border-radius: 60px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        /* Animations */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .video-container {
+            animation: fadeInUp 0.5s ease backwards;
+        }
+
+        .video-container:first-child {
+            animation-delay: 0.1s;
+        }
+
+        .video-container:last-child {
+            animation-delay: 0.2s;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            body {
+                padding: 16px;
+            }
+            .connection-panel {
+                padding: 16px;
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .id-section {
+                justify-content: center;
+            }
+            .input-group {
+                flex-direction: column;
+            }
+            .btn-connect {
+                justify-content: center;
+            }
+            .controls .btn {
+                flex: 1;
+                justify-content: center;
+            }
+            .video-grid {
+                gap: 16px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .video-label {
+                font-size: 0.65rem;
+                padding: 4px 10px;
+                bottom: 10px;
+                left: 10px;
+            }
+            .btn {
+                padding: 10px 20px;
+                font-size: 0.8rem;
+            }
+        }
+
+        /* Tooltip / helper */
+        .tooltip-icon {
+            cursor: help;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+        .tooltip-icon:hover {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-wrapper">
+        <div class="header">
+            <h1>
+                <i data-lucide="video"></i>
+                NovaCall
+            </h1>
+            <p>Secure peer-to-peer video calls • WebRTC powered</p>
+        </div>
+
+        <div class="connection-panel">
+            <div class="id-section">
+                <span class="id-label">
+                    <i data-lucide="user" style="width: 14px; height: 14px;"></i> Your ID:
+                </span>
+                <span id="my-id" class="id-badge">Initializing...</span>
+                <span class="tooltip-icon" onclick="copyMyId()" style="cursor: pointer;">
+                    <i data-lucide="copy" style="width: 16px; height: 16px;"></i>
+                </span>
+            </div>
+            <div class="input-group">
+                <input type="text" id="remote-id" placeholder="Enter Remote ID to call...">
+                <button class="btn btn-connect" id="connectBtn">
+                    <i data-lucide="phone-call"></i> Connect & Call
+                </button>
+            </div>
+        </div>
+
+        <div class="video-grid">
+            <div class="video-container">
+                <video id="localVideo" autoplay playsinline muted></video>
+                <div class="video-label">
+                    <div class="status-dot"></div>
+                    <i data-lucide="camera" style="width: 14px; height: 14px;"></i>
+                    Local Camera (You)
+                </div>
+            </div>
+
+            <div class="video-container">
+                <video id="remoteVideo" autoplay playsinline></video>
+                <div class="video-label remote-label">
+                    <div class="status-dot remote-dot"></div>
+                    <i data-lucide="users" style="width: 14px; height: 14px;"></i>
+                    Remote Feed
+                </div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-start" id="startCam">
+                <i data-lucide="webcam"></i> Initialize Camera
+            </button>
+            <button class="btn btn-stop" id="endSession">
+                <i data-lucide="phone-off"></i> End Session
+            </button>
+        </div>
+        <div class="call-status" id="callStatus">
+            <i data-lucide="info" style="width: 14px; height: 14px;"></i> Ready — Start camera, then call any peer using their ID
+        </div>
+    </div>
+
+    <script>
+        // DOM elements
+        const localVideo = document.getElementById('localVideo');
+        const remoteVideo = document.getElementById('remoteVideo');
+        const startCamBtn = document.getElementById('startCam');
+        const connectBtn = document.getElementById('connectBtn');
+        const endSessionBtn = document.getElementById('endSession');
+        const myIdDisplay = document.getElementById('my-id');
+        const remoteIdInput = document.getElementById('remote-id');
+        const callStatusDiv = document.getElementById('callStatus');
+
+        let localStream = null;
+        let peer = null;
+        let currentCall = null;      // active call reference
+        let peerInitialized = false;
+
+        // Helper: update status message
+        function setStatus(message, isError = false) {
+            callStatusDiv.innerHTML = `<i data-lucide="${isError ? 'alert-circle' : 'info'}" style="width: 14px; height: 14px;"></i> ${message}`;
+            lucide.createIcons();
+        }
+
+        // Copy ID to clipboard
+        window.copyMyId = function() {
+            const id = myIdDisplay.innerText;
+            if (id && id !== "Initializing...") {
+                navigator.clipboard.writeText(id);
+                setStatus("✅ Your ID copied to clipboard!", false);
+                setTimeout(() => setStatus("Ready — Start camera, then call any peer using their ID"), 2000);
+            } else {
+                setStatus("⚠️ Waiting for Peer ID...", true);
+            }
+        };
+
+        // Initialize PeerJS
+        function initPeer() {
+            peer = new Peer();
+            
+            peer.on('open', (id) => {
+                myIdDisplay.innerText = id;
+                peerInitialized = true;
+                setStatus(`✅ Your ID: ${id} — Share this with others to receive calls`);
+                lucide.createIcons();
+            });
+
+            // Handle incoming calls
+            peer.on('call', (call) => {
+                setStatus(`📞 Incoming call from ${call.peer}...`);
+                if (!localStream) {
+                    setStatus("⚠️ Incoming call! Please start your camera first to answer.", true);
+                    return;
+                }
+                // Answer the call with local stream
+                call.answer(localStream);
+                call.on('stream', (remoteStream) => {
+                    remoteVideo.srcObject = remoteStream;
+                    setStatus(`📹 Connected with ${call.peer} — Live video`);
+                });
+                call.on('close', () => {
+                    if (remoteVideo.srcObject) {
+                        remoteVideo.srcObject = null;
+                        setStatus("🔌 Remote peer ended the call.");
+                    }
+                });
+                currentCall = call;
+            });
+
+            peer.on('error', (err) => {
+                console.error("Peer error:", err);
+                let errorMsg = "Connection error: ";
+                if (err.type === 'peer-unavailable') errorMsg += "Remote ID not found or offline.";
+                else if (err.type === 'network') errorMsg += "Network issue, check connection.";
+                else errorMsg += err.message;
+                setStatus(errorMsg, true);
+                setTimeout(() => {
+                    if (!currentCall) setStatus("Ready — Start camera, then call any peer using their ID");
+                }, 3000);
+            });
+
+            peer.on('disconnected', () => {
+                setStatus("⚠️ Peer disconnected. Reload page to reconnect.", true);
+            });
+        }
+
+        // Start Camera
+        async function startCamera() {
+            try {
+                if (localStream) {
+                    // Already have stream, just re-enable tracks if they were stopped?
+                    setStatus("Camera already active.");
+                    return;
+                }
+                setStatus("🎥 Requesting camera & microphone...");
+                localStream = await navigator.mediaDevices.getUserMedia({ 
+                    video: true, 
+                    audio: true 
+                });
+                localVideo.srcObject = localStream;
+                startCamBtn.disabled = true;
+                startCamBtn.innerHTML = '<i data-lucide="check-circle"></i> Camera Active';
+                lucide.createIcons();
+                setStatus("✅ Camera active! You can now call or receive calls.");
+            } catch (err) {
+                console.error("Camera error:", err);
+                let errorMsg = "Camera access denied or error. Please allow permissions.";
+                if (err.name === 'NotAllowedError') errorMsg = "Permission denied. Please allow camera & mic.";
+                setStatus(errorMsg, true);
+                alert(errorMsg);
+            }
+        }
+
+        // Initiate Call
+        function initiateCall() {
+            const remoteId = remoteIdInput.value.trim();
+            if (!remoteId) {
+                setStatus("⚠️ Please enter a Remote ID to call.", true);
+                alert("Enter the Remote ID of the person you want to call.");
+                return;
+            }
+            if (!localStream) {
+                setStatus("⚠️ Start your camera first before making a call.", true);
+                alert("Please initialize your camera first.");
+                return;
+            }
+            if (!peerInitialized || !peer) {
+                setStatus("⏳ Peer connection still initializing, please wait...", true);
+                return;
+            }
+
+            setStatus(`📞 Calling ${remoteId}...`);
+            
+            const call = peer.call(remoteId, localStream);
+            
+            call.on('stream', (remoteStream) => {
+                remoteVideo.srcObject = remoteStream;
+                setStatus(`📹 Connected with ${remoteId} — Live video call active`);
+            });
+            
+            call.on('error', (err) => {
+                console.error("Call error:", err);
+                setStatus(`❌ Call failed: ${err.message || "Peer unavailable"}`, true);
+                remoteVideo.srcObject = null;
+                currentCall = null;
+            });
+            
+            call.on('close', () => {
+                setStatus("📴 Call ended by remote peer.");
+                if (remoteVideo.srcObject) {
+                    remoteVideo.srcObject = null;
+                }
+                currentCall = null;
+            });
+            
+            currentCall = call;
+        }
+
+        // End current call & close streams
+        function endSession() {
+            // Close active call
+            if (currentCall) {
+                currentCall.close();
+                currentCall = null;
+            }
+            // Stop local tracks
+            if (localStream) {
+                localStream.getTracks().forEach(track => {
+                    track.stop();
+                });
+                localStream = null;
+                localVideo.srcObject = null;
+            }
+            // Clear remote video
+            if (remoteVideo.srcObject) {
+                remoteVideo.srcObject = null;
+            }
+            
+            startCamBtn.disabled = false;
+            startCamBtn.innerHTML = '<i data-lucide="webcam"></i> Initialize Camera';
+            lucide.createIcons();
+            setStatus("🛑 Session ended. Reload page for fresh connection, or re-initialize camera.");
+            
+            // reset peer? better hint to reload
+            setTimeout(() => {
+                setStatus("Ready — Click 'Initialize Camera' to start over.");
+            }, 1500);
+            
+            // optional: reload peer or just disable calling until camera starts
+        }
+
+        // End session & reload page fully to avoid weird peer states
+        endSessionBtn.addEventListener('click', () => {
+            endSession();
+            // Option to reload after cleanup
+            setTimeout(() => {
+                if (confirm("Session ended. Reload page to reset connection completely?")) {
+                    location.reload();
+                }
+            }, 300);
+        });
+
+        // Event listeners
+        startCamBtn.addEventListener('click', startCamera);
+        connectBtn.addEventListener('click', initiateCall);
+        
+        // Also allow Enter key on remote input
+        remoteIdInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                initiateCall();
+            }
+        });
+
+        // Initialize PeerJS
+        initPeer();
+
+        // Cleanup on page unload (close peer)
+        window.addEventListener('beforeunload', () => {
+            if (peer && !peer.destroyed) {
+                peer.destroy();
+            }
+            if (localStream) {
+                localStream.getTracks().forEach(track => track.stop());
+            }
+        });
+
+        // Helper to reinit lucide after dynamic updates
+        function refreshIcons() {
+            lucide.createIcons();
+        }
+        
+        // Set interval to ensure icons render properly
+        setInterval(refreshIcons, 100);
+        setTimeout(refreshIcons, 500);
+        refreshIcons();
+    </script>
+</body>
+</html>

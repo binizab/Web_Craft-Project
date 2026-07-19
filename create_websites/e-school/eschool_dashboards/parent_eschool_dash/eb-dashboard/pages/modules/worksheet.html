@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudyPortal | Dark Mode</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #0f172a; color: #f8fafc; }
+        .paper-view { background-color: #ffffff; color: #1e293b; min-height: 80vh; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body class="font-sans antialiased">
+
+    <nav class="border-b border-slate-800 p-4 bg-slate-900/80 backdrop-blur-md sticky top-0 z-20">
+        <div class="max-w-6xl mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-black text-blue-500 cursor-pointer" onclick="showLevel('subjects')">EDU<span class="text-white">BLUE</span></h1>
+            <button onclick="showLevel('subjects')" class="text-slate-400 hover:text-blue-400 text-sm font-medium transition">Back to Library</button>
+        </div>
+    </nav>
+
+    <main class="max-w-6xl mx-auto p-6">
+        
+        <div id="subjects-grid" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div onclick="showLevel('topics', 'Math')" class="group cursor-pointer bg-slate-800 border border-slate-700 p-8 rounded-2xl hover:border-blue-500 transition-all hover:-translate-y-1 shadow-xl">
+                <div class="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center text-blue-400 mb-4 group-hover:bg-blue-500 group-hover:text-white transition">
+                    <span class="text-2xl">∑</span>
+                </div>
+                <h3 class="text-xl font-bold">Mathematics</h3>
+                <p class="text-slate-400 mt-2 text-sm">Algebra, Geometry, and Calculus resources.</p>
+            </div>
+            <div onclick="showLevel('topics', 'History')" class="group cursor-pointer bg-slate-800 border border-slate-700 p-8 rounded-2xl hover:border-blue-500 transition-all hover:-translate-y-1 shadow-xl">
+                <div class="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center text-blue-400 mb-4 group-hover:bg-blue-500 group-hover:text-white transition">
+                    <span class="text-2xl">🏛</span>
+                </div>
+                <h3 class="text-xl font-bold">History</h3>
+                <p class="text-slate-400 mt-2 text-sm">World events, timelines, and ancient eras.</p>
+            </div>
+            <div onclick="showLevel('topics', 'Biology')" class="group cursor-pointer bg-slate-800 border border-slate-700 p-8 rounded-2xl hover:border-blue-500 transition-all hover:-translate-y-1 shadow-xl">
+                <div class="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center text-blue-400 mb-4 group-hover:bg-blue-500 group-hover:text-white transition">
+                    <span class="text-2xl">🧬</span>
+                </div>
+                <h3 class="text-xl font-bold">Biology</h3>
+                <p class="text-slate-400 mt-2 text-sm">Cell structures, ecosystems, and genetics.</p>
+            </div>
+        </div>
+
+        <div id="topics-grid" class="hidden">
+            <h2 id="selected-subject" class="text-3xl font-bold mb-8 text-blue-400">Subject</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <button onclick="showLevel('worksheet', 'Algebra Fundamentals')" class="p-4 bg-slate-800 border border-slate-700 rounded-xl hover:bg-slate-700 text-left">Unit 1: Algebra Intro</button>
+                <button onclick="showLevel('worksheet', 'Linear Equations')" class="p-4 bg-slate-800 border border-slate-700 rounded-xl hover:bg-slate-700 text-left">Unit 2: Linear Equations</button>
+                <button onclick="showLevel('worksheet', 'Quadratic Functions')" class="p-4 bg-slate-800 border border-slate-700 rounded-xl hover:bg-slate-700 text-left">Unit 3: Quadratics</button>
+                <button onclick="showLevel('worksheet', 'Complex Numbers')" class="p-4 bg-slate-800 border border-slate-700 rounded-xl hover:bg-slate-700 text-left">Unit 4: Complex Numbers</button>
+            </div>
+        </div>
+
+        <div id="worksheet-view" class="hidden">
+            <div class="max-w-[800px] mx-auto paper-view p-12 shadow-2xl rounded-sm mb-10">
+                <div class="border-b-2 border-slate-900 pb-4 mb-8 flex justify-between items-end">
+                    <div>
+                        <h2 id="worksheet-title" class="text-3xl font-serif font-bold uppercase tracking-widest">Worksheet</h2>
+                        <p class="text-sm mt-2">Section: General Education</p>
+                    </div>
+                    <div class="text-right text-sm">
+                        <p>Name: ____________________</p>
+                        <p class="mt-2">Date: ____________________</p>
+                    </div>
+                </div>
+                
+                <div class="space-y-10 font-serif">
+                    <div class="space-y-4">
+                        <p class="font-bold">Q1. Instructions: Solve for the following variable without a calculator.</p>
+                        <div class="pl-4 h-24 border-b border-dotted border-slate-400">Answer:</div>
+                    </div>
+                    <div class="space-y-4">
+                        <p class="font-bold">Q2. List three primary causes of the event discussed in the previous chapter.</p>
+                        <div class="pl-4 space-y-6">
+                            <div class="border-b border-dotted border-slate-400">1.</div>
+                            <div class="border-b border-dotted border-slate-400">2.</div>
+                            <div class="border-b border-dotted border-slate-400">3.</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-20 text-center text-xs text-slate-500 italic">
+                    End of Worksheet - Property of EduBlue Learning Systems
+                </div>
+            </div>
+            <div class="flex justify-center gap-4 mb-20">
+                <button onclick="window.print()" class="bg-blue-600 px-6 py-2 rounded-lg font-bold hover:bg-blue-500">Print to PDF</button>
+                <button onclick="showLevel('topics')" class="bg-slate-700 px-6 py-2 rounded-lg font-bold hover:bg-slate-600">Go Back</button>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        function showLevel(level, title = '') {
+            // Hide all levels
+            document.getElementById('subjects-grid').classList.add('hidden');
+            document.getElementById('topics-grid').classList.add('hidden');
+            document.getElementById('worksheet-view').classList.add('hidden');
+
+            // Show selected level
+            if (level === 'subjects') {
+                document.getElementById('subjects-grid').classList.remove('hidden');
+            } else if (level === 'topics') {
+                if(title) document.getElementById('selected-subject').innerText = title;
+                document.getElementById('topics-grid').classList.remove('hidden');
+            } else if (level === 'worksheet') {
+                if(title) document.getElementById('worksheet-title').innerText = title;
+                document.getElementById('worksheet-view').classList.remove('hidden');
+                window.scrollTo(0, 0);
+            }
+        }
+    </script>
+</body>
+</html>

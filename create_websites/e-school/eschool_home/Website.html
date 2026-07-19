@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Eb academy</title>
+  <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css" />
+        <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons/css/flag-icons.min.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css"
+  />
+
+  <script type="module" src="firebaseauth.js"></script>
+  <link 
+        rel="stylesheet" 
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" 
+        integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" 
+        crossorigin="anonymous" 
+        referrerpolicy="no-referrer" 
+    />
+<link rel="stylesheet" href="websiteStyle.css">
+</head>
+<body>
+    <nav>
+        <h1 id="title">🏫 Eb academy</h1>
+        <ul>
+  <li onclick="scrollToSection('home', 0)" id="home" class="active">Home</li>
+  <li onclick="scrollToSection('about', 800)" id="about">About us</li>
+  <li onclick="scrollToSection('service', 1800)" id="service">Services</li>
+  <li onclick="scrollToSection('test', 2500)" id="test">Testimonials</li>
+  <li onclick="scrollToSection('gallery', 3600)" id="gallery">Gallery</li>
+  <li onclick="scrollToSection('contact', 5050)" id="contact">Contact</li>
+</ul>
+
+<div class="switch-container" id="switchContainer">
+        <div class="slider" id="slider"></div>
+        <div class="slideBox" id="slideBox"><i class="fas fa-sun"></i></div>
+    </div>
+
+    <div class="dropdown">
+
+        <div class="main" id="dropdownBtn"><span class="fi fi-gb"></span> English</div>
+        
+        <div class="selector" id="dropdownMenu">
+            <div onclick="selectLang('Amharic', 'fi-et')">
+                <span class="fi fi-et"></span> Amharic
+            </div>
+            <div onclick="selectLang('English', 'fi-gb')">
+                <span class="fi fi-gb"></span> English
+            </div>
+        </div>
+    </div>
+
+        <button class="logbtn" onclick="logIn()">Login</button>
+        <button class="chatbtn" onclick="openChat()"><i class="fas fa-comment"></i></button>
+        <div class="chatbot" id="chatBot">
+            <div id="chat-history">
+                <div class="chat-message bot-message">
+                    Hello! Ask me a question about WSP or anything else!
+                </div>
+            </div>
+
+            <div class="input-group-custom">
+                <div class="input-group">
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="userInput"
+                        placeholder="Enter your question"
+                        onkeypress="handleKeyPress(event)" />
+                    <div class="input-group-append">
+                        <button
+                            class="btn btn-success"
+                            type="button"
+                            onclick="sendMessage()">
+                            Ask!
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <main>
+        <section class="home"><br><br><br><br><br>
+            <div class="text">
+            <h1>Elbetel-academy</h1>
+            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Animi officia consectetur molestias numquam suscipit sequi, labore quas ab aut reprehenderit aspernatur reiciendis, enim minus. Maxime facere id reprehenderit laudantium provident!</p>
+            </div>
+            <button class="signbtn" onclick="signIn()">Sign up</button>
+            <button class="contact" onclick="scrollToSection('contact', 4000)">Contact</button>
+            <img src="image.png" alt="Eb-Acadamy">
+            <div class="sign-up-wrapper" id="sWrapper">
+                <h2>Sign-up</h2>
+                <div class="fName">
+<i class="fas fa-user"></i>
+<input id="fName" placeholder=" " required>
+<label for="fName">First Name</label>
+</div>
+
+<div class="lName">
+<i class="fas fa-user"></i>
+<input id="lName" placeholder=" " required>
+<label for="lName">Last Name</label>
+</div>
+                <div class="email">
+                <input type="email" name="Email" id="rEmail" placeholder="">
+                <label for="">Email</label>
+                <i class="fas fa-envelope"></i>
+                </div>
+                <div class="password">
+                <input type="password" name="Password" id="rPassword" placeholder="">
+                <label for="">Password</label>
+<span class="toggle-password" data-target="rPassword"><i class="fas fa-eye-slash"></i></span>
+                </div>
+                <button type="submit" id="submitSignIn">Signup</button>
+                <p>Already have an account <a onclick="logIn()">Login</a></p>
+            
+            </div>
+            <div class="log-in-wrapper" id="lWrapper">
+                <h2>log-in</h2>
+                <div class="username">
+                <input type="text" name="username" id="userName" placeholder="">
+                <label for="">Username</label>
+                <i class="fas fa-user"></i>
+                </div>
+                <div class="email">
+                <input type="email" name="Email" id="email" placeholder="">
+                <label for="">Email</label>
+                <i class="fas fa-envelope"></i>
+                </div>
+                <div class="password">
+                <input type="password" name="Password" id="password" placeholder="">
+                <label for="">Password</label>
+<span class="toggle-password" data-target="password"><i class="fas fa-eye-slash"></i></span>
+                </div>
+                <button type="submit" id="submitSignUp">Login</button>
+                <p>Don't have an account <a onclick="signIn()">Signup</a></p>
+            </div>
+
+           <button onclick="show()" class="profileBtn hide" id="profileShow"><i class="fas fa-user"></i></button>
+
+    <div class="container hide" id="profileBox">
+        <i class="fas fa-user large-user"></i>
+        
+        <div class="details">
+            <label>Username</label>
+            <p id="displayUser"></p>
+
+            <label>Email</label>
+            <p id="displayEmail"></p>
+        </div>
+        <button class="logout" id="deleteBtn"><i class="fas fa-logout">Log out</i></button>
+    </div>
+        </section>
+        <section class="about">
+            <h2>About</h2>
+            <img src="Change the uploaded .png" alt="about">
+            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Distinctio ratione eum neque unde ipsa harum dolor natus velit est sequi numquam eligendi et, odio voluptates placeat cupiditate odit cum possimus!</p>
+            <div class="profile">
+            <a href=""><i class="fab fa-telegram"></i></a>
+            <a href=""><i class="fab fa-twitter"></i></a>
+            <a href=""><i class="fab fa-instagram"></i></a>
+        </div>
+        </section>
+        <section class="services">
+            <h2>Services</h2>
+            <div class="wrap">
+            <div class="service" data-lang="Welcome, Student!" data-url="pass.html">
+                <img src="student.png" alt="img1">
+                <h3>Student</h3>
+                <p>Services for students</p>
+            </div>
+            <div class="service" data-lang="Welcome, Parent!" data-url="test.html">
+                <img src="parent.png" alt="img2">
+                <h3>Parent</h3>
+                <p>Parents control their child</p>
+            </div>
+            <div class="service" data-lang="Welcome, Parent!" data-url="test.html">
+                <img src="teacher.png" alt="img3">
+                <h3>Teacher</h3>
+                <p>Teachers perfrom their task</p>
+            </div>
+            <div class="service" data-lang="Welcome, Administrator!" data-url="signIn.html">
+                <img src="Principal.png" alt="img4">
+                <h3>Administration</h3>
+                <p>Manegement of the school</p>
+            </div>
+        </div>
+        <div id="overlay">
+    <div id="loginContainer">
+      <h2 id="displayText"></h2>
+      <div id="errorMessage" style="color: var(--error-color);"></div>
+      
+      <div class="input-group">
+        <input type="text" id="nameInput" placeholder="Name">
+      </div>
+      <div class="input-group">
+        <input type="password" id="passkeyInput" placeholder="Passkey">
+      </div>
+
+      <div class="action-btns">
+        <button id="enterBtn">Enter</button>
+        <button id="guestBtn">Guest</button>
+      </div>
+    </div>
+  </div>
+        </section>
+  <section class="testimonials">
+    <br><br>
+    <h2>Testimonials</h2>
+    <div class="swiper">
+      <div class="swiper-wrapper">
+
+        <div class="swiper-slide">
+          <img src="Screenshot 2025-09-02 175504.png" alt="Jane Doe" />
+          <h3>name</h3>
+          <p>position</p>
+          <br><br>
+        </div>
+        <div class="swiper-slide">
+          <img src="Screenshot 2025-09-02 175504.png" alt="John Smith" />
+          <h3>name</h3>
+          <p>position</p>
+          <br><br>
+        </div>
+        <div class="swiper-slide">
+          <img src="Screenshot 2025-09-02 175504.png" alt="Emily Clark" />
+          <h3>name</h3>
+          <p>position</p>
+          <br><br>
+        </div>
+      </div>
+      <div class="swiper-pagination"></div>
+      <div class="swiper-button-prev"></div>
+      <div class="swiper-button-next"></div>
+    </div>
+  </section>
+        <section class="gallery">
+            <br><br>
+            <h2>Gallery</h2><br>
+            <div class="collection">
+            <div class="imgcontainer"><img src="Screenshot 2025-09-02 175504.png" alt=""></div>
+            <div class="imgcontainer"><img src="Screenshot 2025-09-02 175504.png" alt=""></div>
+            <div class="imgcontainer"><img src="Screenshot 2025-09-02 175504.png" alt=""></div>
+            <div class="imgcontainer"><img src="Screenshot 2025-09-02 175504.png" alt=""></div>
+            <div class="imgcontainer"><img src="Screenshot 2025-09-02 175504.png" alt=""></div>
+            <div class="imgcontainer"><img src="Screenshot 2025-09-02 175504.png" alt=""></div>
+            <div class="imgcontainer"><img src="Screenshot 2025-09-02 175504.png" alt=""></div>
+            <div class="imgcontainer"><img src="Screenshot 2025-09-02 175504.png" alt=""></div>
+            <div class="imgcontainer"><img src="Screenshot 2025-09-02 175504.png" alt=""></div>
+            <div class="imgcontainer"><img src="Screenshot 2025-09-02 175504.png" alt=""></div>
+            <div class="imgcontainer"><img src="Screenshot 2025-09-02 175504.png" alt=""></div>
+            <div class="imgcontainer"><img src="Screenshot 2025-09-02 175504.png" alt=""></div>
+        </div>
+        </section>
+        <section class="contact">
+            <br><br><br><br><br>
+            <h2>Contact</h2>
+            <p><i class="fas fa-location"></i> Ethiopia, Addis Ababa, Arada, St. Yohannes</p>
+            <p><i class="fas fa-phone"></i> 09-11-12-13-14</p>
+            <p><i class="fas fa-globe"></i> www.EbAcademy.com</a></p>
+            <p><a href="#"><i class="fab fa-facebook-f"></i></a> @Eb-Acadamy</p>
+            <p><a href="#"><i class="fab fa-twitter"></i></a> @Eb-Acadamy</p>
+            <p><a href="#"><i class="fab fa-telegram"></i></a></i> @Eb-Acadamy</p>
+            <div class="commentSection">
+                <h3>Your comment here</h3>
+                <input type="email" name="" id="cEmail" placeholder="Email">
+                <textarea name="" id="comment" placeholder="Comment"></textarea>
+                <button type="submit">Submit</button>
+            </div>
+        </section>
+    </main>
+    <button class="upclick" onclick="scrollToSection('home', 0)" id="btn"><i class="fa-solid fa-arrow-up"></i></button>
+
+    <footer>
+        <p>©Copyright 2025 Eb-acadamy. All rights reseved.</p>
+        <div class="socialink">
+            <a href="#"><i class="fab fa-facebook-f"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+            <a href="#"><i class="fab fa-telegram"></i></a>
+        </div>
+        <div class="link">
+        <a href="privacyPolicy.html">Privacy Policy</a>
+        <span class="separator">.</span>
+        <a href="termService.html">Terms of Service</a>
+        </div>
+    </footer>
+
+</body>
+
+  <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
+  <script src="websiteScript.js"></script>
+</html>

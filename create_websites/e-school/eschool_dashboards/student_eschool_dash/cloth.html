@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stellar Uniforms | Pro Selector</title>
+    <style>
+        :root {
+            --bg-deep: #0b0f1a;
+            --card-bg: #161e2d;
+            --electric-blue: #3b82f6;
+            --glow-blue: rgba(59, 130, 246, 0.4);
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+            --input-bg: #1e293b;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .container-cloth {
+            background: var(--card-bg);
+            display: flex;
+            flex-wrap: wrap;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.7);
+            max-width: 950px;
+            width: 95%;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        /* Image Side */
+        .preview-side {
+            flex: 1;
+            min-width: 400px;
+            background: #000;
+            display: flex;
+            overflow: hidden;
+        }
+
+        #uniform-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: opacity 0.4s ease, transform 0.6s ease;
+        }
+
+        /* Content Side */
+        .content-side {
+            flex: 1;
+            padding: 40px;
+            min-width: 320px;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            margin: 0;
+            color: var(--text-main);
+        }
+
+        .price-display {
+            font-size: 1.5rem;
+            color: var(--electric-blue);
+            font-weight: bold;
+            margin: 10px 0 25px 0;
+        }
+
+        .label-title {
+            display: block;
+            text-transform: uppercase;
+            font-size: 0.7rem;
+            letter-spacing: 2px;
+            color: var(--text-dim);
+            margin-bottom: 12px;
+            font-weight: 700;
+        }
+
+        /* Gender Logic */
+        .gender-options {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+
+        .gender-btn { flex: 1; position: relative; }
+        .gender-btn input { position: absolute; opacity: 0; }
+        .gender-label {
+            display: block;
+            text-align: center;
+            padding: 14px;
+            background: var(--input-bg);
+            border: 2px solid transparent;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .gender-btn input:checked + .gender-label {
+            border-color: var(--electric-blue);
+            background: rgba(59, 130, 246, 0.1);
+            box-shadow: 0 0 20px var(--glow-blue);
+        }
+
+        /* Amount Shower (Quantity Selector) */
+        .amount-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: var(--input-bg);
+            width: fit-content;
+            padding: 5px;
+            border-radius: 12px;
+            margin-bottom: 35px;
+        }
+
+        .qty-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            border: none;
+            background: #334155;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .qty-btn:hover { background: var(--electric-blue); }
+
+        #qty-val {
+            font-size: 1.2rem;
+            font-weight: bold;
+            min-width: 30px;
+            text-align: center;
+        }
+
+        /* Size Select */
+        select {
+            width: 100%;
+            padding: 15px;
+            background: var(--input-bg);
+            border: none;
+            color: white;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            outline: none;
+        }
+
+        .buy-btn {
+            width: 100%;
+            padding: 20px;
+            background: var(--electric-blue);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            font-size: 1rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .buy-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px var(--glow-blue);
+        }
+
+        @media (max-width: 768px) {
+            .container-cloth { flex-direction: column; }
+            .preview-side { min-width: 100%; height: 350px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container-cloth">
+        <div class="preview-side">
+            <img id="uniform-img" src="Screenshot 2026-02-11 193846.png" alt="Uniform View">
+        </div>
+
+        <div class="content-side">
+            <h1>Eb-Academy Uniform</h1>
+            <div class="price-display">ETB<span id="total-price">89</span>.00</div>
+
+            <span class="label-title">Select Gender</span>
+            <div class="gender-options">
+                <div class="gender-btn">
+                    <input type="radio" id="m" name="gen" checked onclick="updateUI('male')">
+                    <label for="m" class="gender-label">Male</label>
+                </div>
+                <div class="gender-btn">
+                    <input type="radio" id="f" name="gen" onclick="updateUI('female')">
+                    <label for="f" class="gender-label">Female</label>
+                </div>
+            </div>
+
+            <span class="label-title">Select Size</span>
+<select id="size-select" onchange="updateTotal()">
+    <option value="0">Small</option>
+    <option value="100" selected>Medium</option>
+    <option value="200">Large</option>
+    <option value="300">XL</option>
+</select>
+
+            <span class="label-title">Shirt Amount</span>
+<div class="amount-container">
+    <button class="qty-btn" onclick="changeQty('shirt', -1)">-</button>
+    <span id="qty-shirt">1</span>
+    <button class="qty-btn" onclick="changeQty('shirt', 1)">+</button>
+</div>
+
+<span class="label-title" id="trouser-label">Trouser Amount</span>
+<div class="amount-container">
+    <button class="qty-btn" onclick="changeQty('trouser', -1)">-</button>
+    <span id="qty-trouser">1</span>
+    <button class="qty-btn" onclick="changeQty('trouser', 1)">+</button>
+</div>
+
+<span class="label-title">Sweater Amount</span>
+<div class="amount-container">
+    <button class="qty-btn" onclick="changeQty('sweater', -1)">-</button>
+    <span id="qty-sweater">1</span>
+    <button class="qty-btn" onclick="changeQty('sweater', 1)">+</button>
+</div>
+
+            <button class="buy-btn">Add to Cart</button>
+        </div>
+    </div>
+
+    <script>
+// 1. Base Prices
+const basePrices = {
+    shirt: 89,
+    trouser: 120,
+    sweater: 150
+};
+
+// 2. Current State
+let order = {
+    shirt: 1,
+    trouser: 1,
+    sweater: 1
+};
+
+/**
+ * Handles Gender Change (Image + Label + Base Price for Trouser/Dress)
+ */
+function updateUI(gender) {
+    const img = document.getElementById('uniform-img');
+    const trouserLabel = document.getElementById('trouser-label');
+    
+    img.style.opacity = '0';
+    
+    setTimeout(() => {
+        if (gender === 'male') {
+            img.src = "Screenshot 2026-02-11 193846.png";
+            trouserLabel.innerText = "Trouser Amount";
+            basePrices.trouser = 120; 
+        } else {
+            img.src = "Screenshot 2026-02-11 194013.png";
+            trouserLabel.innerText = "Dress Amount";
+            basePrices.trouser = 145; // Dress is more expensive
+        }
+        img.style.opacity = '1';
+        updateTotal(); 
+    }, 250);
+}
+
+/**
+ * Handles Quantity buttons
+ */
+function changeQty(item, amt) {
+    order[item] += amt;
+    if (order[item] < 0) order[item] = 0;
+    
+    document.getElementById(`qty-${item}`).innerText = order[item];
+    updateTotal();
+}
+
+/**
+ * The Master Calculation Function
+ */
+function updateTotal() {
+    // Get the extra cost from the selected size
+    const sizeSelect = document.getElementById('size-select');
+    const extraPerItem = parseInt(sizeSelect.value);
+
+    // Calculate Total: (Base Price + Size Extra) * Quantity
+    const shirtTotal = (basePrices.shirt + extraPerItem) * order.shirt;
+    const trouserTotal = (basePrices.trouser + extraPerItem) * order.trouser;
+    const sweaterTotal = (basePrices.sweater + extraPerItem) * order.sweater;
+
+    const grandTotal = shirtTotal + trouserTotal + sweaterTotal;
+    
+    document.getElementById('total-price').innerText = grandTotal;
+}
+
+// Run once on load to ensure price is correct
+updateTotal();
+    </script>
+</body>
+</html>

@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Student Schedule | Dark Mode + Custom DateTime Picker</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Dark Mode Color Palette */
+        :root {
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --text-primary: #e0e0e0;
+            --text-secondary: #b0b0b0;
+            --accent: #03dac6;
+            --accent-dark: #018786;
+            --primary: #6366f1;
+            --primary-light: #2d2b5c;
+            --border-color: #333;
+            --item-bg: #252525;
+            --success-green: #1b5e20;
+            --error-red: #cf6679;
+            --radius: 12px;
+        }
+
+        body { 
+            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif; 
+            margin: 20px; 
+            background-color: var(--bg-color); 
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        .container { 
+            max-width: 900px; 
+            margin: auto; 
+            background: var(--card-bg); 
+            padding: 28px 24px; 
+            border-radius: 24px; 
+            box-shadow: 0 20px 35px rgba(0,0,0,0.6);
+            border: 1px solid rgba(3, 218, 198, 0.15);
+        }
+
+        h2 { 
+            color: var(--accent); 
+            border-bottom: 2px solid var(--border-color); 
+            padding-bottom: 12px; 
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.6rem;
+        }
+
+        /* Input section grid */
+        .input-section { 
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            margin-bottom: 32px;
+            align-items: flex-end;
+        }
+
+        .input-group {
+            flex: 1;
+            min-width: 160px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        /* Custom date & time picker wrappers */
+        .custom-picker-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        .picker-input {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background-color: var(--item-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 12px 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: var(--text-primary);
+        }
+
+        .picker-input:hover {
+            border-color: var(--accent);
+            background-color: #2a2a2a;
+        }
+
+        .picker-input i {
+            color: var(--accent);
+            width: 20px;
+            height: 20px;
+        }
+
+        .picker-input span {
+            flex: 1;
+            font-size: 0.9rem;
+        }
+
+        /* Dropdown panels (calendar & time) */
+        .picker-dropdown {
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 0;
+            right: 0;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            box-shadow: 0 20px 30px rgba(0, 0, 0, 0.5);
+            z-index: 100;
+            padding: 16px;
+            display: none;
+            backdrop-filter: blur(2px);
+            background: #1e1e1eef;
+        }
+
+        .picker-dropdown.show {
+            display: block;
+        }
+
+        /* Calendar styles */
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .calendar-header h4 {
+            font-size: 0.95rem;
+            color: var(--accent);
+        }
+
+        .nav-btn {
+            background: none;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 5px 8px;
+            cursor: pointer;
+            color: var(--text-primary);
+            display: inline-flex;
+            align-items: center;
+            transition: 0.2s;
+        }
+
+        .nav-btn:hover {
+            background: var(--primary-light);
+            border-color: var(--accent);
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+            text-align: center;
+        }
+
+        .weekday {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            padding-bottom: 8px;
+        }
+
+        .day {
+            padding: 8px 0;
+            font-size: 0.8rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .day:hover:not(.empty) {
+            background: var(--primary-light);
+            color: var(--accent);
+        }
+
+        .day.selected {
+            background: var(--accent) !important;
+            color: #121212 !important;
+            font-weight: bold;
+        }
+
+        .day.today {
+            border: 1px solid var(--accent);
+            color: var(--accent);
+        }
+
+        .day.empty {
+            cursor: default;
+            opacity: 0.3;
+        }
+
+        /* Time picker styles */
+        .time-picker-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .time-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 8px;
+        }
+
+        .time-header span {
+            font-weight: 600;
+            color: var(--accent);
+        }
+
+        .time-selectors {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .time-col {
+            flex: 1;
+            text-align: center;
+        }
+
+        .time-col label {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+
+        .time-scroll {
+            background: var(--item-bg);
+            border-radius: 12px;
+            padding: 8px;
+            max-height: 180px;
+            overflow-y: auto;
+        }
+
+        .time-option {
+            padding: 8px;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: 0.1s;
+            font-size: 0.85rem;
+        }
+
+        .time-option:hover, .time-option.selected-time {
+            background: var(--accent);
+            color: #121212;
+            font-weight: 500;
+        }
+
+        .time-option.selected-time {
+            background: var(--accent);
+        }
+
+        /* quick actions */
+        .set-time-btn {
+            background: var(--primary-light);
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            border-radius: 30px;
+            padding: 8px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            margin-top: 10px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+
+        .set-time-btn:hover {
+            background: var(--accent);
+            color: #121212;
+        }
+
+        /* task input */
+        .task-input {
+            background-color: var(--item-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 12px 14px;
+            color: white;
+            width: 100%;
+            font-size: 0.9rem;
+        }
+
+        .task-input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .add-btn { 
+            background: var(--accent); 
+            color: #121212; 
+            border: none; 
+            cursor: pointer; 
+            font-weight: bold; 
+            border-radius: var(--radius); 
+            padding: 0 20px;
+            height: 46px;
+            transition: 0.2s;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .add-btn:hover { 
+            background: var(--accent-dark); 
+            transform: translateY(-1px);
+        }
+
+        /* schedule list */
+        .schedule-list { 
+            list-style: none; 
+            padding: 0; 
+            margin-top: 20px;
+        }
+
+        .item { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding: 16px; 
+            background: var(--item-bg); 
+            border: 1px solid var(--border-color); 
+            margin-bottom: 12px; 
+            border-radius: 16px; 
+            transition: 0.2s;
+        }
+
+        .item.done { 
+            background-color: var(--success-green); 
+            opacity: 0.7; 
+        }
+
+        .item.done span, .item.done strong { 
+            text-decoration: line-through; 
+            color: #ddd;
+        }
+        
+        .info { flex-grow: 1; }
+        .info strong { display: block; font-size: 1rem; margin-bottom: 4px; }
+        .info small { color: var(--text-secondary); font-size: 0.75rem; display: flex; align-items: center; gap: 5px; }
+
+        .actions { display: flex; gap: 8px; }
+        .btn-done, .btn-del { 
+            border: none; 
+            padding: 8px 12px; 
+            border-radius: 40px; 
+            cursor: pointer; 
+            font-weight: bold;
+            transition: 0.15s;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .btn-done { background: #2e7d32; color: white; }
+        .btn-del { background: #b00020; color: white; }
+        .btn-done:hover, .btn-del:hover { filter: brightness(0.9); transform: scale(0.96);}
+        
+        .alert-active { 
+            border: 2px solid var(--error-red); 
+            animation: pulse 1.2s infinite; 
+            background: #3a1a1f;
+        }
+
+        @keyframes pulse { 
+            0% { box-shadow: 0 0 0 0 rgba(207, 102, 121, 0.4); } 
+            70% { box-shadow: 0 0 0 8px rgba(207, 102, 121, 0); } 
+            100% { box-shadow: 0 0 0 0 rgba(207, 102, 121, 0); } 
+        }
+
+        @media (max-width: 700px) {
+            .input-section {
+                flex-direction: column;
+            }
+            .input-group {
+                width: 100%;
+            }
+            .add-btn {
+                justify-content: center;
+                margin-top: 4px;
+            }
+            .item {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+            .actions {
+                width: 100%;
+                justify-content: flex-end;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>
+        <i data-lucide="calendar-clock"></i> 
+        Student Schedule Producer
+    </h2>
+    
+    <div class="input-section">
+        <div class="input-group" style="flex: 2;">
+            <label>📖 Class / Task</label>
+            <input type="text" id="taskInput" class="task-input" placeholder="e.g., Mathematics Exam, Project Submission">
+        </div>
+
+        <!-- Custom Date Picker -->
+        <div class="input-group">
+            <label>📅 Date</label>
+            <div class="custom-picker-wrapper" id="datePickerWrapper">
+                <div class="picker-input" id="dateInputBtn">
+                    <i data-lucide="calendar"></i>
+                    <span id="selectedDateDisplay">Select date</span>
+                </div>
+                <div class="picker-dropdown" id="dateDropdown">
+                    <div class="calendar-header">
+                        <button class="nav-btn" id="prevMonth"><i data-lucide="chevron-left"></i></button>
+                        <h4 id="monthDisplay">Month Year</h4>
+                        <button class="nav-btn" id="nextMonth"><i data-lucide="chevron-right"></i></button>
+                    </div>
+                    <div class="calendar-grid" id="calendarGrid"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Custom Time Picker -->
+        <div class="input-group">
+            <label>⏰ Time</label>
+            <div class="custom-picker-wrapper" id="timePickerWrapper">
+                <div class="picker-input" id="timeInputBtn">
+                    <i data-lucide="clock"></i>
+                    <span id="selectedTimeDisplay">Select time</span>
+                </div>
+                <div class="picker-dropdown" id="timeDropdown">
+                    <div class="time-picker-grid">
+                        <div class="time-header">
+                            <span>Select Hour & Minute</span>
+                            <button class="nav-btn" id="closeTimePicker" style="padding: 2px 6px;"><i data-lucide="x"></i></button>
+                        </div>
+                        <div class="time-selectors">
+                            <div class="time-col">
+                                <label>Hour</label>
+                                <div class="time-scroll" id="hourList"></div>
+                            </div>
+                            <div class="time-col">
+                                <label>Minute</label>
+                                <div class="time-scroll" id="minuteList"></div>
+                            </div>
+                        </div>
+                        <button class="set-time-btn" id="confirmTimeBtn">Set Time</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <button class="add-btn" id="addTaskBtn">
+            <i data-lucide="plus"></i> Add Task
+        </button>
+    </div>
+
+    <ul id="scheduleList" class="schedule-list"></ul>
+</div>
+
+<script>
+    lucide.createIcons();
+
+    // ------------------- DATA & STORAGE -------------------
+    let schedules = JSON.parse(localStorage.getItem('studentScheduleCustom')) || [];
+
+    // Selected date & time values (ISO-like)
+    let selectedDateObj = null;      // Date object (for display)
+    let selectedTimeStr = "23:59";    // default fallback time
+    let displayDateStr = "";           // formatted date for UI
+    let displayTimeStr = "";
+
+    // calendar state
+    let currentNavDate = new Date();
+    const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    const weekdays = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
+
+    // DOM elements
+    const dateInputBtn = document.getElementById('dateInputBtn');
+    const dateDropdown = document.getElementById('dateDropdown');
+    const timeInputBtn = document.getElementById('timeInputBtn');
+    const timeDropdown = document.getElementById('timeDropdown');
+    const calendarGrid = document.getElementById('calendarGrid');
+    const monthDisplaySpan = document.getElementById('monthDisplay');
+    const selectedDateSpan = document.getElementById('selectedDateDisplay');
+    const selectedTimeSpan = document.getElementById('selectedTimeDisplay');
+    const taskInput = document.getElementById('taskInput');
+    const addBtn = document.getElementById('addTaskBtn');
+
+    // time picker dynamic lists
+    const hourList = document.getElementById('hourList');
+    const minuteList = document.getElementById('minuteList');
+    let tempHour = "12";
+    let tempMinute = "00";
+
+    // Helper: update global datetime values
+    function updateDateTimeStorage() {
+        if (selectedDateObj && selectedTimeStr) {
+            const combined = new Date(selectedDateObj);
+            const [hours, minutes] = selectedTimeStr.split(':');
+            combined.setHours(parseInt(hours), parseInt(minutes), 0);
+            displayDateStr = selectedDateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            displayTimeStr = selectedTimeStr;
+            selectedDateSpan.innerText = displayDateStr;
+            selectedTimeSpan.innerText = displayTimeStr;
+        } else if (selectedDateObj && !selectedTimeStr) {
+            selectedDateSpan.innerText = selectedDateObj.toLocaleDateString();
+        } else {
+            selectedDateSpan.innerText = "Select date";
+        }
+        if (!selectedTimeStr) selectedTimeSpan.innerText = "Select time";
+        if (selectedTimeStr && !selectedDateObj) selectedTimeSpan.innerText = selectedTimeStr;
+    }
+
+    // Set default today date & default time (current hour rounded)
+    function initDefaults() {
+        const now = new Date();
+        selectedDateObj = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const hours = now.getHours().toString().padStart(2, '0');
+        const minutes = now.getMinutes().toString().padStart(2, '0');
+        selectedTimeStr = `${hours}:${minutes}`;
+        displayTimeStr = selectedTimeStr;
+        updateDateTimeStorage();
+        renderCalendar();
+        buildTimeOptions();
+    }
+
+    // Calendar rendering 
+    function renderCalendar() {
+        if (!calendarGrid) return;
+        calendarGrid.innerHTML = '';
+        const year = currentNavDate.getFullYear();
+        const month = currentNavDate.getMonth();
+        monthDisplaySpan.innerText = `${months[month]} ${year}`;
+
+        weekdays.forEach(day => {
+            const el = document.createElement('div');
+            el.className = 'weekday';
+            el.innerText = day;
+            calendarGrid.appendChild(el);
+        });
+
+        const firstDay = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+        for (let i = 0; i < firstDay; i++) {
+            const empty = document.createElement('div');
+            empty.className = 'day empty';
+            calendarGrid.appendChild(empty);
+        }
+
+        for (let d = 1; d <= daysInMonth; d++) {
+            const dayCell = document.createElement('div');
+            dayCell.className = 'day';
+            dayCell.innerText = d;
+            const cellDate = new Date(year, month, d);
+            const today = new Date();
+            if (cellDate.toDateString() === today.toDateString()) dayCell.classList.add('today');
+            if (selectedDateObj && cellDate.toDateString() === selectedDateObj.toDateString()) dayCell.classList.add('selected');
+            dayCell.onclick = () => {
+                selectedDateObj = new Date(year, month, d);
+                updateDateTimeStorage();
+                renderCalendar();
+                dateDropdown.classList.remove('show');
+            };
+            calendarGrid.appendChild(dayCell);
+        }
+    }
+
+    // build time selectors
+    function buildTimeOptions() {
+        // Hours 00-23
+        hourList.innerHTML = '';
+        for (let h = 0; h < 24; h++) {
+            const hourVal = h.toString().padStart(2, '0');
+            const opt = document.createElement('div');
+            opt.className = 'time-option';
+            opt.innerText = hourVal;
+            if (tempHour === hourVal) opt.classList.add('selected-time');
+            opt.onclick = () => {
+                document.querySelectorAll('#hourList .time-option').forEach(el => el.classList.remove('selected-time'));
+                opt.classList.add('selected-time');
+                tempHour = hourVal;
+            };
+            hourList.appendChild(opt);
+        }
+        // Minutes 00-59
+        minuteList.innerHTML = '';
+        for (let m = 0; m < 60; m++) {
+            const minVal = m.toString().padStart(2, '0');
+            const opt = document.createElement('div');
+            opt.className = 'time-option';
+            opt.innerText = minVal;
+            if (tempMinute === minVal) opt.classList.add('selected-time');
+            opt.onclick = () => {
+                document.querySelectorAll('#minuteList .time-option').forEach(el => el.classList.remove('selected-time'));
+                opt.classList.add('selected-time');
+                tempMinute = minVal;
+            };
+            minuteList.appendChild(opt);
+        }
+        // set preset to current selectedTimeStr
+        if (selectedTimeStr) {
+            const [hDef, mDef] = selectedTimeStr.split(':');
+            tempHour = hDef;
+            tempMinute = mDef;
+            const hourOpts = document.querySelectorAll('#hourList .time-option');
+            const minuteOpts = document.querySelectorAll('#minuteList .time-option');
+            hourOpts.forEach(opt => { if (opt.innerText === tempHour) opt.classList.add('selected-time'); else opt.classList.remove('selected-time'); });
+            minuteOpts.forEach(opt => { if (opt.innerText === tempMinute) opt.classList.add('selected-time'); else opt.classList.remove('selected-time'); });
+        }
+    }
+
+    // confirm time selection
+    function confirmTimeSelection() {
+        selectedTimeStr = `${tempHour}:${tempMinute}`;
+        displayTimeStr = selectedTimeStr;
+        updateDateTimeStorage();
+        timeDropdown.classList.remove('show');
+        buildTimeOptions(); // refresh highlight
+    }
+
+    // ---------- Event Listeners for dropdowns ----------
+    dateInputBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        dateDropdown.classList.toggle('show');
+        timeDropdown.classList.remove('show');
+        renderCalendar();
+    });
+
+    timeInputBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        timeDropdown.classList.toggle('show');
+        dateDropdown.classList.remove('show');
+        buildTimeOptions();
+    });
+
+    document.getElementById('prevMonth')?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        currentNavDate.setMonth(currentNavDate.getMonth() - 1);
+        renderCalendar();
+    });
+    document.getElementById('nextMonth')?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        currentNavDate.setMonth(currentNavDate.getMonth() + 1);
+        renderCalendar();
+    });
+    document.getElementById('confirmTimeBtn')?.addEventListener('click', () => confirmTimeSelection());
+    document.getElementById('closeTimePicker')?.addEventListener('click', () => timeDropdown.classList.remove('show'));
+
+    window.addEventListener('click', () => {
+        dateDropdown.classList.remove('show');
+        timeDropdown.classList.remove('show');
+    });
+    dateDropdown.addEventListener('click', (e) => e.stopPropagation());
+    timeDropdown.addEventListener('click', (e) => e.stopPropagation());
+
+    // ---------- Schedule Functions ----------
+    function addSchedule() {
+        const task = taskInput.value.trim();
+        if (!task) {
+            alert("Please enter a class or task name.");
+            return;
+        }
+        if (!selectedDateObj) {
+            alert("Please select a date.");
+            return;
+        }
+        if (!selectedTimeStr) {
+            alert("Please select a time.");
+            return;
+        }
+        const year = selectedDateObj.getFullYear();
+        const month = (selectedDateObj.getMonth() + 1).toString().padStart(2, '0');
+        const day = selectedDateObj.getDate().toString().padStart(2, '0');
+        const dateTimeISO = `${year}-${month}-${day}T${selectedTimeStr}`;
+        
+        const entry = {
+            id: Date.now(),
+            task: task,
+            dateTime: dateTimeISO,
+            completed: false,
+            alerted: false
+        };
+        schedules.push(entry);
+        saveAndRender();
+        taskInput.value = '';
+        // keep selected date/time but reset not mandatory
+    }
+
+    function toggleComplete(id) {
+        schedules = schedules.map(s => s.id === id ? {...s, completed: !s.completed} : s);
+        saveAndRender();
+    }
+
+    function deleteItem(id) {
+        schedules = schedules.filter(s => s.id !== id);
+        saveAndRender();
+    }
+
+    function saveAndRender() {
+        localStorage.setItem('studentScheduleCustom', JSON.stringify(schedules));
+        const list = document.getElementById('scheduleList');
+        if (!list) return;
+        list.innerHTML = '';
+        const sorted = [...schedules].sort((a,b) => new Date(a.dateTime) - new Date(b.dateTime));
+        sorted.forEach(item => {
+            const itemDate = new Date(item.dateTime);
+            const now = new Date();
+            const isDue = !item.completed && itemDate <= now;
+            const formattedDateTime = item.dateTime.replace('T', ' • ');
+            
+            const li = document.createElement('li');
+            li.className = `item ${item.completed ? 'done' : ''} ${isDue ? 'alert-active' : ''}`;
+            li.innerHTML = `
+                <div class="info">
+                    <strong>${escapeHtml(item.task)}</strong>
+                    <small><i data-lucide="calendar-clock" style="width:14px;height:14px;"></i> ${formattedDateTime}</small>
+                </div>
+                <div class="actions">
+                    <button class="btn-done" data-id="${item.id}" data-action="done">✓ Done</button>
+                    <button class="btn-del" data-id="${item.id}" data-action="del">✕ Delete</button>
+                </div>
+            `;
+            list.appendChild(li);
+        });
+        // reattach events & lucide icons
+        document.querySelectorAll('.btn-done').forEach(btn => {
+            btn.removeEventListener('click', handleDone);
+            btn.addEventListener('click', handleDone);
+        });
+        document.querySelectorAll('.btn-del').forEach(btn => {
+            btn.removeEventListener('click', handleDel);
+            btn.addEventListener('click', handleDel);
+        });
+        lucide.createIcons();
+    }
+
+    function handleDone(e) {
+        const id = parseInt(e.currentTarget.getAttribute('data-id'));
+        toggleComplete(id);
+    }
+    function handleDel(e) {
+        const id = parseInt(e.currentTarget.getAttribute('data-id'));
+        deleteItem(id);
+    }
+
+    function escapeHtml(str) {
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+
+    // reminder interval
+    setInterval(() => {
+        const now = new Date();
+        let changed = false;
+        schedules.forEach(item => {
+            const itemTime = new Date(item.dateTime);
+            if (!item.completed && !item.alerted && now >= itemTime) {
+                item.alerted = true;
+                changed = true;
+                alert(`⏰ REMINDER: It's time for "${item.task}"!`);
+            }
+        });
+        if (changed) {
+            saveAndRender();
+        }
+    }, 1000);
+
+    addBtn.addEventListener('click', addSchedule);
+    taskInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') addSchedule(); });
+
+    initDefaults();
+    saveAndRender();
+</script>
+</body>
+</html>

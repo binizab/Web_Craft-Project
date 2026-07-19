@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EB Academy | Secure Portal</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-glow: rgba(79, 70, 229, 0.4);
+            --bg-dark: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.9);
+            --text-main: #f8fafc;
+            --error: #f43f5e;
+            --success: #10b981;
+            --spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+
+        body {
+            background: radial-gradient(circle at top left, #1e293b 0%, #0f172a 100%);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            perspective: 1200px;
+        }
+
+        /* Background Animated Circles */
+        .circle {
+            position: absolute; width: 300px; height: 300px;
+            background: var(--primary); filter: blur(120px);
+            border-radius: 50%; opacity: 0.2; z-index: -1;
+            animation: move 20s infinite alternate;
+        }
+        @keyframes move { from { transform: translate(-50%, -50%); } to { transform: translate(50%, 50%); } }
+
+        /* --- MODAL SYSTEM --- */
+        #modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(15px);
+            visibility: hidden;
+            opacity: 0;
+            transition: 0.5s var(--spring);
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #modal-overlay.active { visibility: visible; opacity: 1; }
+
+        .signContainer {
+            background: var(--card-bg);
+            width: 95%;
+            max-width: 440px;
+            padding: 3rem 2.5rem;
+            border-radius: 32px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: none;
+            position: relative;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            transform-style: preserve-3d;
+            transition: transform 0.1s ease-out;
+        }
+
+        .signContainer.active { display: block; animation: entrance 0.6s var(--spring); }
+
+        @keyframes entrance {
+            from { opacity: 0; transform: scale(0.8) translateY(50px) rotateX(-20deg); }
+            to { opacity: 1; transform: scale(1) translateY(0) rotateX(0); }
+        }
+
+        /* --- UI ELEMENTS --- */
+        .form-title { text-align: center; margin-bottom: 2rem; font-size: 2rem; letter-spacing: -1px; }
+        .form-subtitle { text-align: center; color: #94a3b8; margin-top: -1.5rem; margin-bottom: 2rem; font-size: 0.9rem; }
+
+        .sign-group { position: relative; margin-bottom: 1.5rem; transform: translateZ(20px); }
+        .sign-group i.left-icon { position: absolute; left: 18px; top: 16px; color: var(--primary); font-size: 1.1rem; }
+        
+        .sign-group input {
+            width: 100%; padding: 16px 50px;
+            background: rgba(15, 23, 42, 0.7); border: 2px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px; color: white; outline: none; transition: 0.3s;
+            font-size: 1rem;
+        }
+        .sign-group input:focus { border-color: var(--primary); background: rgba(15, 23, 42, 1); box-shadow: 0 0 20px var(--primary-glow); }
+
+        /* --- OTP BOXES --- */
+        .otp-wrapper { display: flex; justify-content: space-between; gap: 10px; margin: 20px 0; transform: translateZ(30px); }
+        .otp-box {
+            width: 50px; height: 65px; text-align: center; font-size: 1.8rem;
+            font-weight: 600; background: #0f172a; border: 2px solid #334155;
+            border-radius: 12px; color: var(--primary); outline: none; transition: 0.3s;
+        }
+        .otp-box:focus { border-color: var(--primary); box-shadow: 0 0 15px var(--primary-glow); }
+
+        .submit-btn {
+            width: 100%; padding: 16px; border: none; border-radius: 16px;
+            cursor: pointer; font-weight: 600; background: var(--primary); color: white;
+            transition: 0.4s; font-size: 1rem; transform: translateZ(40px);
+            box-shadow: 0 10px 20px rgba(79, 70, 229, 0.3);
+        }
+        .submit-btn:hover { transform: translateZ(50px) translateY(-3px); box-shadow: 0 15px 25px rgba(79, 70, 229, 0.5); }
+        .submit-btn:disabled { background: #475569; cursor: not-allowed; }
+
+        .google-btn {
+            width: 100%; padding: 14px; margin-top: 15px; border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.1); background: white; color: #1f2937;
+            font-weight: 600; display: flex; align-items: center; justify-content: center;
+            gap: 12px; cursor: pointer; transition: 0.3s;
+        }
+
+        .links { text-align: center; margin-top: 2rem; color: #94a3b8; font-size: 0.9rem; }
+        .links span { color: var(--primary); cursor: pointer; font-weight: 600; text-decoration: none; }
+        .links span:hover { text-decoration: underline; }
+
+        /* --- GATEKEEPER --- */
+        #gatekeeper { text-align: center; }
+        .btn-main {
+            background: var(--primary); color: white; padding: 20px 50px;
+            border: none; border-radius: 100px; font-size: 1.2rem; font-weight: 600;
+            cursor: pointer; transition: 0.5s; box-shadow: 0 0 30px var(--primary-glow);
+        }
+
+        .reg-loader {
+            display: none;
+            width: 30px; height: 30px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s ease-in-out infinite;
+            margin: 15px auto;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .msg { font-size: 0.8rem; text-align: center; margin-top: 10px; display: none; }
+        .msg.error { color: var(--error); display: block; }
+
+        /* Custom Alert Styles */
+#custom-alert {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 15px 25px;
+    border-radius: 12px;
+    background: var(--card-bg);
+    border: 1px solid var(--primary);
+    color: white;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    transform: translateX(200%);
+    transition: 0.5s var(--spring);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+#custom-alert.show { transform: translateX(0); }
+#custom-alert.error { border-color: var(--error); }
+#custom-alert i { color: var(--primary); }
+#custom-alert.error i { color: var(--error); }
+
+.toggle-password {
+    position: absolute;
+    right: 18px;
+    top: 18px;
+    color: #94a3b8;
+    cursor: pointer;
+    transition: 0.3s;
+    z-index: 10;
+}
+
+.toggle-password:hover {
+    color: var(--primary);
+}
+    </style>
+</head>
+<body>
+
+    <div class="circle"></div>
+
+    <div id="gatekeeper">
+        <button class="btn-main" onclick="navTo('viewSignIn')">Access EB Academy</button>
+    </div>
+
+    <div id="modal-overlay" onclick="closeAll()">
+        <div id="custom-alert">
+    <i class="fas fa-info-circle"></i>
+    <span id="alert-text">Message here</span>
+</div>
+        <div class="signContainer" id="viewSignIn" onclick="event.stopPropagation()">
+            <h1 class="form-title">Welcome Back</h1>
+            <div class="sign-group">
+                <i class="fas fa-envelope left-icon"></i>
+                <input type="email" id="logEmail" placeholder="Email Address">
+            </div>
+            <div class="sign-group">
+    <i class="fas fa-lock left-icon"></i>
+    <input type="password" id="logPass" placeholder="Password">
+    <i class="fas fa-eye toggle-password" onclick="togglePass('logPass', this)"></i>
+</div>
+            <button class="submit-btn" id="doSignIn">Sign In</button>
+            <button class="google-btn" id="doGoogle">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="18"> Continue with Google
+            </button>
+            <div class="links">New here? <span onclick="navTo('viewSignUp')">Register</span></div>
+        </div>
+
+        <div class="signContainer" id="viewSignUp" onclick="event.stopPropagation()">
+            <h1 class="form-title">Create Account</h1>
+            <div class="sign-group"><i class="fas fa-user left-icon"></i><input type="text" id="regName" placeholder="Full Name"></div>
+            <div class="sign-group"><i class="fas fa-envelope left-icon"></i><input type="email" id="regEmail" placeholder="Email Address"></div>
+<div class="sign-group">
+    <i class="fas fa-lock left-icon"></i>
+    <input type="password" id="regPass" placeholder="Password (min. 6 chars)">
+    <i class="fas fa-eye toggle-password" onclick="togglePass('regPass', this)"></i>
+</div>
+            <button class="submit-btn" id="requestOTP">Log In</button>
+            <div id="regLoader" class="reg-loader"></div>
+            <div class="links">Already registered? <span onclick="navTo('viewSignIn')">Log In</span></div>
+        </div>
+
+        <div class="signContainer" id="viewProfile" onclick="event.stopPropagation()">
+            <div style="text-align: center;">
+                <h1 id="userGreet">Hello!</h1>
+                <p id="userMail" style="color: #94a3b8; margin-bottom: 30px;"></p>
+                <button class="submit-btn" id="doSignOut" style="background: var(--error)">Log Out</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
+    import { 
+        getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, 
+        updateProfile, onAuthStateChanged, signOut, GoogleAuthProvider, signInWithPopup 
+    } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyA6lvXt1RVDbUYF1jL0yWj6OtU4Dd9-1ms",
+        authDomain: "eb-academy-7f198.firebaseapp.com",
+        projectId: "eb-academy-7f198",
+        appId: "1:1056181453023:web:6604a142c9997045fee96a"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
+    
+    // Initialize EmailJS with your Public Key
+    emailjs.init("vUYnQJyEb_HW8suO9");
+
+    // --- GLOBAL UI CONTROLS (Attached to window for HTML access) ---
+    window.navTo = (id) => {
+        document.getElementById('modal-overlay').classList.add('active');
+        document.querySelectorAll('.signContainer').forEach(c => c.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+    };
+
+    window.closeAll = () => {
+        document.getElementById('modal-overlay').classList.remove('active');
+    };
+
+    window.showAlert = (msg, isError = false) => {
+        const alertBox = document.getElementById('custom-alert');
+        const alertText = document.getElementById('alert-text');
+        alertText.innerText = msg;
+        isError ? alertBox.classList.add('error') : alertBox.classList.remove('error');
+        alertBox.classList.add('show');
+        setTimeout(() => alertBox.classList.remove('show'), 4000);
+    };
+
+    document.getElementById('requestOTP').onclick = async function () {
+    const name = document.getElementById('regName').value.trim();
+    const email = document.getElementById('regEmail').value.trim();
+    const pass = document.getElementById('regPass').value.trim();
+
+    if (!name || !email || pass.length < 6) {
+        return window.showAlert("Fill all fields (Password min 6 chars)", true);
+    }
+
+    this.disabled = true;
+    document.getElementById('regLoader').style.display = "block";
+
+    try {
+        const res = await createUserWithEmailAndPassword(auth, email, pass);
+
+        await updateProfile(res.user, {
+            displayName: name
+        });
+
+        window.showAlert("Account created successfully!");
+        window.closeAll();
+
+    } catch (err) {
+        console.error("SIGNUP ERROR:", err);
+
+        let msg = "Signup failed";
+
+        switch (err.code) {
+            case "auth/email-already-in-use":
+                msg = "Email already registered.";
+                break;
+            case "auth/invalid-email":
+                msg = "Invalid email.";
+                break;
+            case "auth/weak-password":
+                msg = "Password too weak.";
+                break;
+            default:
+                msg = err.message;
+        }
+
+        window.showAlert(msg, true);
+    }
+
+    this.disabled = false;
+    document.getElementById('regLoader').style.display = "none";
+};
+
+    document.getElementById('doSignIn').onclick = () => {
+        const e = document.getElementById('logEmail').value;
+        const p = document.getElementById('logPass').value;
+        if(!e || !p) return window.showAlert("Please enter credentials", true);
+        
+        signInWithEmailAndPassword(auth, e, p)
+            .then(() => {
+                window.showAlert("Welcome back!");
+                window.closeAll();
+            })
+            .catch(err => window.showAlert("Login Failed: " + err.message, true));
+    };
+
+    document.getElementById('doGoogle').onclick = () => {
+        signInWithPopup(auth, provider)
+            .then(() => {
+                window.showAlert("Google Sign-in Successful");
+                window.closeAll();
+            })
+            .catch(err => window.showAlert(err.message, true));
+    };
+
+    document.getElementById('doSignOut').onclick = () => {
+        signOut(auth).then(() => {
+            window.showAlert("Logged out");
+            setTimeout(() => location.reload(), 1000);
+        });
+    };
+
+    onAuthStateChanged(auth, (user) => {
+        const gk = document.getElementById('gatekeeper');
+        if(user) {
+            gk.innerHTML = `<button class="btn-main" style="width: 50px; padding: 10px 10px; transform: scale(1.2); height: 50px; border-radius: 50%;" onclick="navTo('viewProfile')"><i class="fas fa-user left-icon"></i></button>`;
+            document.getElementById('userGreet').innerText = `Welcome, ${user.displayName || 'Explorer'}!`;
+            document.getElementById('userMail').innerText = user.email;
+        } else {
+            gk.innerHTML = `<button class="btn-main" onclick="navTo('viewSignIn')">Access EB Academy</button>`;
+        }
+    });
+
+    // 3D Tilt Effect
+    const modalOverlay = document.getElementById('modal-overlay');
+    modalOverlay.addEventListener('mousemove', (e) => {
+        const activeCard = document.querySelector('.signContainer.active');
+        if (!activeCard) return;
+        const rect = activeCard.getBoundingClientRect();
+        const x = (e.clientX - rect.left - rect.width / 2) / 20;
+        const y = (e.clientY - rect.top - rect.height / 2) / -20;
+        activeCard.style.transform = `rotateX(${y}deg) rotateY(${x}deg)`;
+    });
+
+    window.togglePass = (id, el) => {
+    const input = document.getElementById(id);
+    if (input.type === "password") {
+        input.type = "text";
+        el.classList.replace("fa-eye", "fa-eye-slash");
+    } else {
+        input.type = "password";
+        el.classList.replace("fa-eye-slash", "fa-eye");
+    }
+};
+</script>
+</body>
+</html>

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Overview — ShopHub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../../style.css" />
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+</head>
+<body class="module-body">
+<div class="page-head"><div><h2>Finance Overview</h2><p>Cash flow & profitability</p></div></div><div class="kpi-grid"><div class="kpi"><div class="kpi-icon"><i data-lucide="trending-up"></i></div><div class="label">Revenue</div><div class="val">$248,910</div><div class="delta up"><i data-lucide="arrow-up-right"></i>+12%</div></div><div class="kpi"><div class="kpi-icon"><i data-lucide="trending-down"></i></div><div class="label">Expenses</div><div class="val">$162,400</div><div class="delta down"><i data-lucide="arrow-down-right"></i>+4%</div></div><div class="kpi"><div class="kpi-icon"><i data-lucide="dollar-sign"></i></div><div class="label">Profit</div><div class="val">$86,510</div><div class="delta up"><i data-lucide="arrow-up-right"></i>+22%</div></div><div class="kpi"><div class="kpi-icon"><i data-lucide="clock"></i></div><div class="label">Pending</div><div class="val">$14,220</div></div></div><div class="grid-2"><div class="card"><h3>Cash Flow</h3><div class="bars"><div class="bar" style="height:60%"><span>Jan</span></div><div class="bar" style="height:70%"><span>Feb</span></div><div class="bar" style="height:55%"><span>Mar</span></div><div class="bar" style="height:80%"><span>Apr</span></div><div class="bar" style="height:92%"><span>May</span></div></div></div><div class="card"><h3>Expense Split</h3><div class="bar-row"><div class="br"><div class="top"><span>Salaries</span><span>$55k</span></div><div class="progress"><div style="width:55%"></div></div></div><div class="br"><div class="top"><span>Inventory</span><span>$70k</span></div><div class="progress"><div style="width:70%"></div></div></div><div class="br"><div class="top"><span>Marketing</span><span>$30k</span></div><div class="progress"><div style="width:30%"></div></div></div><div class="br"><div class="top"><span>Logistics</span><span>$40k</span></div><div class="progress"><div style="width:40%"></div></div></div><div class="br"><div class="top"><span>Misc</span><span>$18k</span></div><div class="progress"><div style="width:18%"></div></div></div></div></div></div>
+<script>
+(function(){
+  function paint(){ if(window.lucide) window.lucide.createIcons(); }
+  var t = (function(){ try{return localStorage.getItem('shophub-theme');}catch(e){return null;} })() || 'light';
+  document.documentElement.setAttribute('data-theme', t);
+  window.addEventListener('message', function(e){
+    if(e.data && e.data.type==='theme'){ document.documentElement.setAttribute('data-theme', e.data.theme); }
+  });
+  if(document.readyState!=='loading') paint(); else window.addEventListener('DOMContentLoaded', paint);
+  window.addEventListener('load', function(){ paint(); try{ parent.postMessage({type:'frameReady'},'*'); }catch(e){} });
+})();
+</script>
+</body>
+</html>

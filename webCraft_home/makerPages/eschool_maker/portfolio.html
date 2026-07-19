@@ -1,0 +1,1509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Zabloon Biniam | Full-Stack Architect</title>
+    
+    <meta name="description" content="Professional Portfolio of Zabloon Biniam - Senior Frontend Developer & UI Architect">
+    <meta name="keywords" content="Web Development, Portfolio, Zabloon Biniam, Frontend, 3D CSS">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <style>
+        /* ==========================================================================
+           1. DESIGN SYSTEM & ARCHITECTURE
+           ========================================================================== */
+        :root {
+            /* Color Spectrum */
+            --bg-deep: #050e14;
+            --bg-surface: #081b29;
+            --bg-glass: rgba(17, 46, 66, 0.75);
+            --primary: #00abf0;
+            --primary-glow: rgba(0, 171, 240, 0.5);
+            --secondary: #00f2ff;
+            --accent: #00ff88;
+            --text-main: #ededed;
+            --text-muted: #a5b1c2;
+            --error: #ff4d4d;
+            --success: #00ff88;
+
+            /* Motion Constants */
+            --spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            --smooth: cubic-bezier(0.4, 0, 0.2, 1);
+            --fast: 0.2s ease;
+            --medium: 0.5s var(--smooth);
+            
+            /* Sizing Metrics */
+            --header-h: 90px;
+            --border-radius: 12px;
+            --card-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+
+        /* ==========================================================================
+           2. GLOBAL NORMALIZATION
+           ========================================================================== */
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            font-size: 16px; 
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary) var(--bg-deep);
+        }
+
+        * {
+            font-family: 'Poppins', sans-serif;
+            user-select: none;
+        }
+
+        body {
+            background: var(--bg-deep);
+            color: var(--text-main);
+            overflow-x: hidden;
+            line-height: 1.6;
+            background-attachment: fixed;
+        }
+
+        /* Custom Scrollbar Engine */
+        ::-webkit-scrollbar { width: 10px; }
+        ::-webkit-scrollbar-track { background: var(--bg-deep); }
+        ::-webkit-scrollbar-thumb { 
+            background: linear-gradient(var(--bg-deep), var(--primary), var(--bg-deep)); 
+            border-radius: 20px;
+            border: 2px solid var(--bg-deep);
+        }
+
+        /* ==========================================================================
+           3. UTILITY CLASSES & COMPONENTS
+           ========================================================================== */
+        .container { width: 100%; padding: 0 10%; }
+        
+        .heading {
+            font-size: clamp(2.5rem, 8vw, 4.5rem);
+            text-align: center;
+            margin-bottom: 5rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            position: relative;
+        }
+
+        .heading span {
+            color: var(--primary);
+            filter: drop-shadow(0 0 10px var(--primary-glow));
+        }
+
+        .btn-prime {
+            position: relative;
+            padding: 15px 40px;
+            background: var(--primary);
+            border: 2px solid var(--primary);
+            color: var(--bg-deep);
+            font-weight: 800;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            transition: var(--medium);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .btn-prime::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: 0.5s;
+        }
+
+        .btn-prime:hover::before { left: 100%; }
+
+        .btn-prime:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.5), 0 0 20px var(--primary-glow);
+        }
+
+        /* ==========================================================================
+           4. NAVIGATION FRAMEWORK
+           ========================================================================== */
+        .header {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%;
+            height: var(--header-h);
+            padding: 0 10%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 2000;
+            transition: var(--medium);
+        }
+
+        .header.scrolled {
+            background: var(--bg-glass);
+            backdrop-filter: blur(20px);
+            height: 75px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .logo {
+            font-size: 2rem;
+            color: var(--text-main);
+            font-weight: 900;
+            text-decoration: none;
+        }
+
+        .logo span { color: var(--primary); }
+
+        .navbar { display: flex; align-items: center; }
+
+        .navbar a {
+            font-size: 1.05rem;
+            color: var(--text-main);
+            font-weight: 600;
+            margin-left: 2.5rem;
+            position: relative;
+            transition: 0.3s;
+            text-decoration: none;
+        }
+
+        .navbar a::before {
+            content: '';
+            position: absolute;
+            bottom: -5px; right: 0;
+            width: 0; height: 3px;
+            background: var(--primary);
+            transition: 0.4s var(--smooth);
+        }
+
+        .navbar a:hover::before, .navbar a.active::before { width: 100%; left: 0; }
+        .navbar a:hover, .navbar a.active { color: var(--primary); }
+
+        #menu-icon {
+            font-size: 2.2rem;
+            color: var(--primary);
+            cursor: pointer;
+            display: none;
+            transition: 0.3s;
+        }
+
+        /* ==========================================================================
+           5. HERO ENGINE
+           ========================================================================== */
+        .home {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 10%;
+            gap: 4rem;
+            position: relative;
+        }
+
+        .home-content h1 {
+            font-size: clamp(3rem, 7vw, 5rem);
+            margin: 0.5rem 0;
+            font-weight: 900;
+            line-height: 1.1;
+        }
+
+        .typing-box {
+            font-size: 2.2rem;
+            color: var(--primary);
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            min-height: 3.5rem;
+        }
+
+        .home-img {
+            position: relative;
+            width: 450px;
+            height: 450px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .orbit-ring {
+            position: absolute;
+            width: 110%; height: 110%;
+            border: 2px solid var(--primary-glow);
+            border-radius: 50%;
+            animation: rotate 10s linear infinite;
+        }
+
+        .orbit-ring::after {
+            content: '';
+            position: absolute;
+            top: -10px; left: 50%;
+            width: 20px; height: 20px;
+            background: var(--primary);
+            border-radius: 50%;
+            box-shadow: 0 0 15px var(--primary);
+        }
+
+        .home-img img {
+            width: 90%; height: 90%;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 8px solid var(--bg-surface);
+            box-shadow: 0 0 50px rgba(0, 171, 240, 0.3);
+            z-index: 5;
+            transition: 0.5s;
+        }
+
+        .home-img:hover img { transform: scale(1.05); border-color: var(--primary); }
+
+        /* ==========================================================================
+           6. SERVICES & 3D GALLERY
+           ========================================================================== */
+        .services {
+            padding: 100px 10%;
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1rem;
+        }
+
+        .service-card {
+            background: var(--bg-surface);
+            padding: 3rem 2rem;
+            border-radius: 25px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.05);
+            transition: all 0.6s var(--spring);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .service-card::after {
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            background: radial-gradient(circle, var(--primary-glow) 0%, transparent 70%);
+            opacity: 0;
+            transition: 0.5s;
+            pointer-events: none;
+        }
+
+        .service-card:hover {
+            transform: translateY(-20px) scale(1.02);
+            border-color: var(--primary);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.6);
+        }
+
+        .service-card:hover::after { opacity: 0.2; }
+
+        .service-card i {
+            font-size: 4.5rem;
+            color: var(--primary);
+            margin-bottom: 2rem;
+            transition: 0.5s;
+        }
+
+        /* ==========================================================================
+           7. THE ELITE 3D FORM MODAL
+           ========================================================================== */
+        .modal-mask {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.96);
+            backdrop-filter: blur(25px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            visibility: hidden;
+            opacity: 0;
+            transition: all 0.6s var(--smooth);
+            perspective: 2000px;
+        }
+
+        input {
+            outline: none;
+        }
+        .modal-mask.active { visibility: visible; opacity: 1; }
+
+        .super-form-card {
+            width: 550px;
+            max-width: 95%;
+            max-height: 90vh;
+            background: var(--bg-surface);
+            padding: 50px;
+            border-radius: 30px;
+            border: 2px solid var(--primary);
+            overflow-y: auto;
+            position: relative;
+            transform-style: preserve-3d;
+            transform: scale(0.7) translateZ(-500px) rotateX(20deg);
+            transition: transform 1s var(--spring);
+            box-shadow: 0 100px 150px rgba(0,0,0,0.8);
+        }
+
+        .modal-mask.active .super-form-card {
+            transform: scale(1) translateZ(0) rotateX(0);
+        }
+
+        .form-group {
+            position: relative;
+            margin-bottom: 35px;
+            transform: translateZ(30px);
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 15px;
+            background: rgba(255,255,255,0.03);
+            border: none;
+            border-bottom: 2px solid rgba(0, 171, 240, 0.3);
+            color: white;
+            font-size: 1.1rem;
+            transition: 0.4s;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .form-group label {
+            position: absolute;
+            left: 15px; top: 15px;
+            color: var(--text-muted);
+            pointer-events: none;
+            transition: 0.4s;
+        }
+
+        .form-group input:focus ~ label,
+        .form-group input:valid ~ label,
+        .form-group input[type="date"] ~ label {
+            top: -22px;
+            left: 5px;
+            font-size: 0.85rem;
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        .form-group input:focus {
+            background: rgba(0, 171, 240, 0.05);
+            border-bottom-color: var(--primary);
+            box-shadow: 0 5px 15px rgba(0, 171, 240, 0.1);
+        }
+
+        .about .img {
+            width: 500px;
+            height: 350px;
+            border-radius: 12px;
+            cursor: zoom-in;
+            overflow: hidden;
+            transition: .5s;
+            margin-left: 70px;
+            margin-bottom: 20px;
+        }
+
+        .img img {
+            width: 500px;
+            height: 350px;
+            border-radius: 12px;
+            transition: .5s;
+        }
+
+        .about {
+            height: 700px;
+        }
+
+        .img img:hover {
+            transform: scale(1.1);
+        }
+
+        .img:hover {
+            box-shadow: 50px 50px 0px var(--primary-glow);
+        }
+
+        .content {
+            width: 500px;
+            position: absolute;
+            right: 100px;
+            margin-top: -450px;
+        }
+
+
+/* DARK MODE TOGGLE */
+body.dark {
+  background: var(--bg-dark);
+  color: var(--text-dark);
+}
+
+/* MODAL */
+.modal-mask {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+  padding: 20px;
+}
+
+.super-form-card {
+  width: 100%;
+  max-width: 500px;
+  padding: 2rem;
+  border-radius: 20px;
+  backdrop-filter: blur(15px);
+  background: var(--card-light);
+  box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+  transition: 0.3s;
+}
+
+body.dark .super-form-card {
+  background: var(--card-dark);
+}
+
+/* FORM */
+.form-group {
+  position: relative;
+  margin-bottom: 25px;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 14px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  outline: none;
+  background: transparent;
+  color: inherit;
+}
+
+body.dark .form-group input {
+  border: 1px solid #334155;
+}
+
+.form-group label {
+  position: absolute;
+  left: 12px;
+  top: 12px;
+  font-size: 14px;
+  color: #888;
+  pointer-events: none;
+  transition: 0.3s;
+}
+
+/* floating label */
+.form-group input:focus + label,
+.form-group input:valid + label {
+  top: -8px;
+  left: 10px;
+  font-size: 12px;
+  background: inherit;
+  padding: 0 5px;
+  background-color: var(--bg-deep);
+}
+
+/* BUTTON */
+.btn-prime {
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.btn-prime:hover {
+  opacity: 0.9;
+}
+
+/* CONTACT SECTION */
+.contact {
+  padding: 60px 20px;
+}
+
+.container {
+  display: flex;
+  gap: 40px;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+/* LEFT SIDE (INFO PANEL) */
+.container1 {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 25px;
+  background-color: var(--bg-surface);
+  color: white;
+  border-radius: 20px;
+  padding: 30px 30px 30px 30px;
+}
+
+/* HEADING */
+.container1 h2 {
+  font-size: 2rem;
+  color: var(--primary);
+  margin-bottom: 10px;
+}
+
+.container1 p {
+  font-size: 15px;
+  line-height: 1.6;
+  opacity: 0.85;
+}
+
+/* INFO BOX */
+.info-container {
+  margin-top: 20px;
+}
+
+/* EACH INFO ITEM */
+.info-list {
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+  padding: 12px 15px;
+  border-radius: 12px;
+  transition: 0.3s ease;
+}
+
+input[type="checkbox"] {
+    transform: scale(2);
+    margin-right: 10px;
+}
+
+/* HOVER EFFECT */
+.info-list:hover {
+  background: rgba(79, 70, 229, 0.08);
+}
+
+/* ICON */
+.info-list span {
+  font-size: 20px;
+  color: var(--primary);
+}
+
+/* TEXT */
+.info-list p:first-child {
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.info-list p:last-child {
+  font-size: 14px;
+  opacity: 0.8;
+}
+
+/* SOCIAL LINKS */
+.social-link {
+  margin-top: 25px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* SOCIAL BUTTON STYLE */
+.social-link a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: rgba(79, 70, 229, 0.08);
+  color: inherit;
+  font-weight: 500;
+  transition: 0.3s ease;
+}
+
+/* HOVER */
+.social-link a:hover {
+  background: var(--primary);
+  color: #fff;
+  transform: translateX(5px);
+}
+
+/* DARK MODE */
+body.dark .info-list:hover {
+  background: rgba(79, 70, 229, 0.15);
+}
+
+body.dark .social-link a {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+body.dark .social-link a:hover {
+  background: var(--primary);
+}
+
+/* RESPONSIVE */
+@media (max-width: 900px) {
+  .container1 {
+    text-align: center;
+    align-items: center;
+  }
+
+  .info-list {
+    justify-content: center;
+  }
+
+  .social-link {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .social-link a {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+}
+
+.container2 {
+  flex: 1;
+background-color: var(--bg-surface);
+  color: white;  padding: 2rem;
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+}
+
+body.dark .container2 {
+  background: var(--card-dark);
+}
+
+/* INFO */
+.info-list {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+/* SOCIAL */
+.social-link {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.social-link a {
+  text-decoration: none;
+  color: inherit;
+  font-weight: 500;
+}
+
+/* FORM INPUTS */
+.input-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 15px;
+}
+
+.input-group input,
+.input-group textarea {
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  background: transparent;
+  color: inherit;
+}
+
+body.dark .input-group input,
+body.dark .input-group textarea {
+  border: 1px solid #334155;
+}
+
+/* BUTTON */
+button[type="submit"] {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  background: var(--primary);
+  color: white;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+/* FLEX FOR NAME/EMAIL */
+.first-input {
+  display: flex;
+  gap: 15px;
+}
+
+.first-input .input-group {
+  flex: 1;
+}
+
+/* RESPONSIVE */
+@media (max-width: 900px) {
+  .container {
+    flex-direction: column;
+  }
+
+  .first-input {
+    flex-direction: column;
+  }
+}
+
+/* SMALL DEVICES */
+@media (max-width: 500px) {
+  .super-form-card {
+    padding: 1.5rem;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+  }
+}
+
+@media (min-width: 2000px) {
+            html { font-size: 22px; }
+            .container { padding: 0 15%; }
+        }
+
+        /* Laptops / Desktops */
+        @media (max-width: 1200px) {
+            html { font-size: 15px; }
+            .home-img { width: 380px; height: 380px; }
+        }
+
+        /* Tablets (iPad/Surface) */
+        @media (max-width: 991px) {
+            #menu-icon { display: block; }
+            .navbar {
+                position: absolute;
+                top: 100%; left: -100%;
+                width: 100%;
+                padding: 2rem 10%;
+                background: var(--bg-surface);
+                flex-direction: column;
+                transition: 0.6s var(--spring);
+                border-top: 1px solid rgba(255,255,255,0.1);
+                box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+            }
+            .navbar.active { left: 0; }
+            .navbar a { margin: 1.5rem 0; font-size: 1.4rem; width: 100%; }
+            
+            .home { flex-direction: column-reverse; text-align: center; padding-top: 150px; }
+            .home-content { max-width: 100%; }
+            .home-img { margin-bottom: 3rem; }
+            
+            .services-grid { grid-template-columns: 1fr; }
+        }
+
+        /* Mobile Phones */
+        @media (max-width: 480px) {
+            html { font-size: 14px; }
+            .heading { font-size: 2.5rem; }
+            .home-content h1 { font-size: 3rem; }
+            .super-form-card { padding: 30px 20px; }
+            .modal-mask { backdrop-filter: blur(15px); }
+        }
+
+        /* Animations */
+        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes pulse { 0% { opacity: 0.4; } 50% { opacity: 1; } 100% { opacity: 0.4; } }
+
+        /* --- SECTION FADE-IN ANIMATIONS --- */
+.reveal {
+    opacity: 0;
+    transform: translateY(50px);
+    transition: all 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+    visibility: hidden;
+}
+
+.reveal.active {
+    opacity: 1;
+    transform: translateY(0);
+    visibility: visible;
+}
+
+/* Optional: Subtle stagger for section children */
+.reveal.active > * {
+    animation: fadeIn 0.8s var(--smooth) forwards;
+}
+
+#modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(15px);
+            visibility: hidden;
+            opacity: 0;
+            transition: 0.5s var(--spring);
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #modal-overlay.active { visibility: visible; opacity: 1; }
+
+        .signContainer {
+            background: var(--card-bg);
+            width: 95%;
+            max-width: 440px;
+            padding: 3rem 2.5rem;
+            border-radius: 32px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: none;
+            position: relative;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            transform-style: preserve-3d;
+            transition: transform 0.1s ease-out;
+        }
+
+        .signContainer.active { display: block; animation: entrance 0.6s var(--spring); }
+
+        @keyframes entrance {
+            from { opacity: 0; transform: scale(0.8) translateY(50px) rotateX(-20deg); }
+            to { opacity: 1; transform: scale(1) translateY(0) rotateX(0); }
+        }
+
+        /* --- UI ELEMENTS --- */
+        .form-title { text-align: center; margin-bottom: 2rem; font-size: 2rem; letter-spacing: -1px; }
+        .form-subtitle { text-align: center; color: #94a3b8; margin-top: -1.5rem; margin-bottom: 2rem; font-size: 0.9rem; }
+
+        .sign-group { position: relative; margin-bottom: 1.5rem; transform: translateZ(20px); }
+        .sign-group i.left-icon { position: absolute; left: 18px; top: 16px; color: var(--primary); font-size: 1.1rem; }
+        
+        .sign-group input {
+            width: 100%; padding: 16px 50px;
+            background: rgba(15, 23, 42, 0.7); border: 2px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px; color: white; outline: none; transition: 0.3s;
+            font-size: 1rem;
+        }
+        .sign-group input:focus { border-color: var(--primary); background: rgba(15, 23, 42, 1); box-shadow: 0 0 20px var(--primary-glow); }
+
+        /* --- OTP BOXES --- */
+        .otp-wrapper { display: flex; justify-content: space-between; gap: 10px; margin: 20px 0; transform: translateZ(30px); }
+        .otp-box {
+            width: 50px; height: 65px; text-align: center; font-size: 1.8rem;
+            font-weight: 600; background: #0f172a; border: 2px solid #334155;
+            border-radius: 12px; color: var(--primary); outline: none; transition: 0.3s;
+        }
+        .otp-box:focus { border-color: var(--primary); box-shadow: 0 0 15px var(--primary-glow); }
+
+        .submit-btn {
+            width: 100%; padding: 16px; border: none; border-radius: 16px;
+            cursor: pointer; font-weight: 600; background: var(--primary); color: white;
+            transition: 0.4s; font-size: 1rem; transform: translateZ(40px);
+            box-shadow: 0 10px 20px rgba(79, 70, 229, 0.3);
+        }
+        .submit-btn:hover { transform: translateZ(50px) translateY(-3px); box-shadow: 0 15px 25px rgba(79, 70, 229, 0.5); }
+        .submit-btn:disabled { background: #475569; cursor: not-allowed; }
+
+        .google-btn {
+            width: 100%; padding: 14px; margin-top: 15px; border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.1); background: white; color: #1f2937;
+            font-weight: 600; display: flex; align-items: center; justify-content: center;
+            gap: 12px; cursor: pointer; transition: 0.3s;
+        }
+
+        .links { text-align: center; margin-top: 2rem; color: #94a3b8; font-size: 0.9rem; }
+        .links span { color: var(--primary); cursor: pointer; font-weight: 600; text-decoration: none; }
+        .links span:hover { text-decoration: underline; }
+
+        /* --- GATEKEEPER --- */
+        #gatekeeper { text-align: center; }
+        .btn-main {
+            background: var(--primary); color: white; padding: 20px 50px;
+            border: none; border-radius: 100px; font-size: 1.2rem; font-weight: 600;
+            cursor: pointer; transition: 0.5s; box-shadow: 0 0 30px var(--primary-glow);
+        }
+
+        .reg-loader {
+            display: none;
+            width: 30px; height: 30px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s ease-in-out infinite;
+            margin: 15px auto;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .msg { font-size: 0.8rem; text-align: center; margin-top: 10px; display: none; }
+        .msg.error { color: var(--error); display: block; }
+
+        /* Custom Alert Styles */
+#custom-alert {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 15px 25px;
+    border-radius: 12px;
+    background: var(--card-bg);
+    border: 1px solid var(--primary);
+    color: white;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    transform: translateX(200%);
+    transition: 0.5s var(--spring);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 60px;
+}
+#custom-alert.show { transform: translateX(0); }
+#custom-alert.error { border-color: var(--error); }
+#custom-alert i { color: var(--primary); }
+#custom-alert.error i { color: var(--error); }
+
+.toggle-password {
+    position: absolute;
+    right: 18px;
+    top: 18px;
+    color: #94a3b8;
+    cursor: pointer;
+    transition: 0.3s;
+    z-index: 10;
+}
+
+.toggle-password:hover {
+    color: var(--primary);
+}
+
+/* Styling for the Post Comment button */
+.comment-submit-btn {
+    background: var(--primary, #4f46e5);
+    color: white;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 12px;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s var(--spring, ease);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3);
+    margin-top: 10px;
+}
+
+.comment-submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(79, 70, 229, 0.5);
+    background: #6366f1; /* Lighter indigo */
+}
+
+.comment-submit-btn:active {
+    transform: translateY(0);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <a href="#" class="logo">Zabloon<span>.</span></a>
+        
+        <i class="fa-solid fa-bars-staggered" id="menu-icon"></i>
+
+        <nav class="navbar">
+            <a href="#home" class="active">Home</a>
+            <a href="#about">About</a>
+            <a href="#services">Services</a>
+            <a href="#contact">Contact</a>
+                <div id="gatekeeper">
+            <button class="btn-prime" style="padding: 10px 25px; margin-left: 2rem;" onclick="navTo('viewSignIn')">
+                Sign Up <i data-lucide="play"></i>
+            </button>
+            </div>
+        </nav>
+    </header>
+
+    <section class="home reveal" id="home">
+        <div class="home-content animate__animated animate__fadeInLeft">
+            <h3>Hi There, I'm</h3>
+            <h1>Zabloon Biniam</h1>
+            <div class="typing-box">
+                <span class="typing-text"></span>
+            </div>
+            <p>I build responsive, scalable, and high-performance websites. This is my website that can make websites and services for schools.</p>
+            
+            <div class="btn-group" style="margin-top: 3rem; display: flex; gap: 1.5rem;">
+                <button class="btn-prime" onclick="location.href='#contact'">Contact Me</button>
+                <button class="btn-prime" style="background: transparent; color: var(--primary);" onclick="toggleModal(true)">Register</button>
+            </div>
+        </div>
+
+        <div class="home-img animate__animated animate__zoomIn">
+            <div class="orbit-ring"></div>
+            <img src="Screenshot 2026-02-28 000919.png" alt="Zabloon Biniam">
+        </div>
+    </section>
+
+    <section class="about reveal" id="about">
+        <h2 class="heading">About <span>Me</span></h2>
+        <div class="img"><img src="Screenshot 2025-09-02 175504.png" alt=""></div>
+        <div class="content">
+            <div class="heading" style="font-size: 50px;"><span>Hi There,</span></div>
+            <p>My name is Zabloon Biniam. I'm grade 9 student in Eb-Academy. I have completed over 7 little projects. This is the big one. I've the experience of 2 years in the world of coding. I know over 5 programming languages like HTML, CSS, JS, PHP, SQL and a little bit of Python and C++. Thank for visiting this website. EXPLORE MORE!!!</p>
+                <button class="btn-prime" onclick="location.href='#contact'" style="margin-top: 30px;">Contact Me</button>
+         </div>
+    </section>
+    <section class="services reveal" id="services">
+        <h2 class="heading">Expert <span>Services</span></h2>
+        
+        <div class="services-grid">
+            <div class="service-card" onclick="toggleModal(true)">
+                <i data-lucide="code" style="transform: scale(2); margin-bottom: 20px;"></i>
+                <h3>Responsive Web</h3>
+                <p>Complete digital architecture for educational institutions, from administration portals to interactive student dashboards.</p>
+                <span class="btn-prime" style="padding: 8px 20px; font-size: 0.8rem; margin-top: 1rem;" onclick="checkAuthAndAction(() => window.open('makerPage.html', '_blank'))">View Services</span>
+            </div>
+
+            <div class="service-card">
+                <i data-lucide="school" style="transform: scale(2); margin-bottom: 20px;"></i>
+                <h3>School Ecosystems</h3>
+                <p>Search for available schools around you in wanted forms.</p>
+                <span class="btn-prime" style="padding: 8px 20px; font-size: 0.8rem; margin-top: 1rem;" onclick="checkAuthAndAction(() => window.open('shower.html', '_blank'))">Search Schools</span>
+            </div>
+
+            <div class="service-card">
+                <i data-lucide="recycle" style="transform: scale(2); margin-bottom: 20px;"></i>
+                <h3>Editable and Updated Webpage</h3>
+                <p>Editing, Changing, adding content to previous created websites.</p>
+                <span class="btn-prime" style="padding: 8px 20px; font-size: 0.8rem; margin-top: 1rem;" onclick="checkAuthAndAction(() => window.open('makerPage.html', '_blank'))">Update</span>
+            </div>
+        </div>
+    </section>
+
+        <div id="modal-overlay" onclick="closeAll()">
+        <div id="custom-alert">
+    <i data-lucide="info"></i>
+    <span id="alert-text">Message here</span>
+</div>
+        <div class="signContainer" id="viewSignIn" onclick="event.stopPropagation()">
+            <h1 class="form-title">Welcome Back</h1>
+            <div class="sign-group">
+                <i data-lucide="mail" style="margin-top: 20px; position: absolute; margin-left: 10px;"></i>
+                <input type="email" id="logEmail" placeholder="Email Address">
+            </div>
+            <div class="sign-group">
+    <i data-lucide="lock" style="margin-top: 20px; position: absolute; margin-left: 10px;"></i>
+    <input type="password" id="logPass" placeholder="Password">
+    <i data-lucide="eye" class="toggle-password" onclick="togglePass('logPass', this)"></i>
+</div>
+            <button class="submit-btn" id="doSignIn">Sign In</button>
+            <button class="google-btn" id="doGoogle">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="18"> Continue with Google
+            </button>
+            <div class="links">New here? <span onclick="navTo('viewSignUp')">Register</span></div>
+        </div>
+
+        <div class="signContainer" id="viewSignUp" onclick="event.stopPropagation()">
+            <h1 class="form-title">Create Account</h1>
+            <div class="sign-group"><i data-lucide="user" class="left-icon" style="margin-top: 20px; position: absolute; margin-left: 10px;"></i><input type="text" id="regName" placeholder="Full Name"></div>
+            <div class="sign-group"><i data-lucide="mail" class="left-icon" style="margin-top: 20px; position: absolute; margin-left: 10px;"></i><input type="email" id="regEmail" placeholder="Email Address"></div>
+<div class="sign-group">
+    <i data-lucide="lock" style="margin-top: 20px; position: absolute; margin-left: 10px;"></i>
+    <input type="password" id="regPass" placeholder="Password (min. 6 chars)">
+    <i data-lucide="eye" class="toggle-password" style="position: absolute;" onclick="togglePass('regPass', this)"></i>
+</div>
+            <button class="submit-btn" id="requestOTP">Log In</button>
+            <div id="regLoader" class="reg-loader"></div>
+            <div class="links">Already registered? <span onclick="navTo('viewSignIn')">Log In</span></div>
+        </div>
+
+        <div class="signContainer" id="viewProfile" onclick="event.stopPropagation()">
+            <div style="text-align: center;">
+                <h1 id="userGreet">Hello!</h1>
+                <p id="userMail" style="color: #94a3b8; margin-bottom: 30px;"></p>
+                <button class="submit-btn" id="doSignOut" style="background: var(--error)">Log Out</button>
+            </div>
+        </div>
+
+    </div>
+
+
+    <div class="heading" id="contact"><span></span></div>
+
+<section class="contact reveal" style="background-color: var(--bg-deep); color: black; scroll-margin-top: 90px;" id="contact">
+    
+    <div class="container">
+      
+      <div class="container1">
+        <div>
+          <h2>Get in touch</h2>
+          <p>
+            Have a question or just want to say hi? We'd love to hear from you.
+          </p>
+          
+          <div class="info-container">
+            <div class="info-list">
+              <span><i data-lucide="map-pin"></i></span>
+              <div style="margin-left: 20px;">
+                <p>Office</p>
+                <p>Addid Ababa, Ethiopia</p>
+              </div>
+            </div>
+            <div class="info-list">
+              <span><i data-lucide="mail"></i></span>
+              <div style="margin-left: 20px;">
+                <p>Email</p>
+                <p>biniamzabloon@gmail.com</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="social-link">
+          <a href="#" class=""><i data-lucide="video"></i> YouTube</a>
+          <a href="#" class=""><i data-lucide="link"></i> LinkedIn</a>
+          <a href="#" class=""><i data-lucide="music"></i> TikTok</a>
+        </div>
+      </div>
+
+      <div class="">
+        <form action="#" class="container2">
+          <div class="first-input">
+            <div class="input-group">
+              <label><i data-lucide="user"></i> Name</label>
+              <input type="text" placeholder="" id="name">
+            </div>
+            <div class="input-group">
+              <label><i data-lucide="mail"></i> Email</label>
+              <input type="email" placeholder="" id="email">
+            </div>
+          </div>
+          
+          <div class="input-group">
+            <label><i data-lucide="lamp"></i> Subject</label>
+            <input type="text" placeholder="" id="subject">
+          </div>
+          
+          <div class="input-group">
+            <label><i data-lucide="send"></i> Message</label>
+            <textarea rows="4" placeholder="" id="message"></textarea>
+          </div>
+
+          <button type="button" class="comment-submit-btn" onclick="sendComment()">
+          <i data-lucide="send"></i><span style="font-size: 1rem; font-weight: 900;"> Send Message</span>
+          </button>
+        </form>
+      </div>
+      
+    </div>
+<div class="signContainer" id="viewProfile" onclick="event.stopPropagation()">
+            <div style="text-align: center;">
+                <h1 id="userGreet">Hello!</h1>
+                <p id="userMail" style="color: #94a3b8; margin-bottom: 30px;"></p>
+                <button class="submit-btn" id="doSignOut" style="background: var(--error)">Log Out</button>
+            </div>
+        </div>
+</section>
+  <footer style="background-color: var(--bg-surface); padding: 10px 10px;">
+    &copy; Copy right reserved.
+  </footer>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script src="https://unpkg.com/typed.js@2.1.0/dist/typed.umd.js"></script>
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
+    import { 
+        getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, 
+        updateProfile, onAuthStateChanged, signOut, GoogleAuthProvider, signInWithPopup 
+    } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyA6lvXt1RVDbUYF1jL0yWj6OtU4Dd9-1ms",
+        authDomain: "eb-academy-7f198.firebaseapp.com",
+        projectId: "eb-academy-7f198",
+        appId: "1:1056181453023:web:6604a142c9997045fee96a"
+    };
+
+     const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
+    
+    // --- GLOBAL UI CONTROLS (Attached to window for HTML access) ---
+    window.navTo = (id) => {
+        document.getElementById('modal-overlay').classList.add('active');
+        document.querySelectorAll('.signContainer').forEach(c => c.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+    };
+
+    window.closeAll = () => {
+        document.getElementById('modal-overlay').classList.remove('active');
+    };
+
+    window.showAlert = (msg, isError = false) => {
+        const alertBox = document.getElementById('custom-alert');
+        const alertText = document.getElementById('alert-text');
+        alertText.innerText = msg;
+        isError ? alertBox.classList.add('error') : alertBox.classList.remove('error');
+        alertBox.classList.add('show');
+        setTimeout(() => alertBox.classList.remove('show'), 4000);
+    };
+
+    document.getElementById('requestOTP').onclick = async function () {
+    const name = document.getElementById('regName').value.trim();
+    const email = document.getElementById('regEmail').value.trim();
+    const pass = document.getElementById('regPass').value.trim();
+
+    if (!name || !email || pass.length < 6) {
+        return window.showAlert("Fill all fields (Password min 6 chars)", true);
+    }
+
+    this.disabled = true;
+    document.getElementById('regLoader').style.display = "block";
+
+    try {
+        const res = await createUserWithEmailAndPassword(auth, email, pass);
+
+        await updateProfile(res.user, {
+            displayName: name
+        });
+
+        window.showAlert("Account created successfully!");
+        window.closeAll();
+
+    } catch (err) {
+        console.error("SIGNUP ERROR:", err);
+
+        let msg = "Signup failed";
+
+        switch (err.code) {
+            case "auth/email-already-in-use":
+                msg = "Email already registered.";
+                break;
+            case "auth/invalid-email":
+                msg = "Invalid email.";
+                break;
+            case "auth/weak-password":
+                msg = "Password too weak.";
+                break;
+            default:
+                msg = err.message;
+        }
+
+        window.showAlert(msg, true);
+    }
+
+    this.disabled = false;
+    document.getElementById('regLoader').style.display = "none";
+};
+
+    document.getElementById('doSignIn').onclick = () => {
+        const e = document.getElementById('logEmail').value;
+        const p = document.getElementById('logPass').value;
+        if(!e || !p) return window.showAlert("Please enter credentials", true);
+        
+        signInWithEmailAndPassword(auth, e, p)
+            .then(() => {
+                window.showAlert("Welcome back!");
+                window.closeAll();
+            })
+            .catch(err => window.showAlert("Login Failed: " + err.message, true));
+    };
+
+    document.getElementById('doGoogle').onclick = () => {
+        signInWithPopup(auth, provider)
+            .then(() => {
+                window.showAlert("Google Sign-in Successful");
+                window.closeAll();
+            })
+            .catch(err => window.showAlert(err.message, true));
+    };
+
+    document.getElementById('doSignOut').onclick = () => {
+        signOut(auth).then(() => {
+            window.showAlert("Logged out");
+            setTimeout(() => location.reload(), 1000);
+        });
+    };
+
+    onAuthStateChanged(auth, (user) => {
+        const gk = document.getElementById('gatekeeper');
+        if(user) {
+            gk.innerHTML = `<button class="btn-main" style="width: 50px; padding: 10px 10px; transform: scale(1.2); height: 50px; border-radius: 50%; margin-left: 30px;" onclick="navTo('viewProfile')"><i data-lucide="user"></i></button>`;
+            document.getElementById('userGreet').innerText = `Welcome, ${user.displayName || 'Explorer'}!`;
+            document.getElementById('userMail').innerText = user.email;
+        } else {
+            gk.innerHTML = `<button class="btn-prime" onclick="navTo('viewSignIn')" style="margin-left: 30px; transform: scale(1);">Sign up <i data-lucide="play"></i></button>`;
+        }
+        lucide.createIcons();
+    });
+
+    // 3D Tilt Effect
+    const modalOverlay = document.getElementById('modal-overlay');
+    modalOverlay.addEventListener('mousemove', (e) => {
+        const activeCard = document.querySelector('.signContainer.active');
+        if (!activeCard) return;
+        const rect = activeCard.getBoundingClientRect();
+        const x = (e.clientX - rect.left - rect.width / 2) / 20;
+        const y = (e.clientY - rect.top - rect.height / 2) / -20;
+        activeCard.style.transform = `rotateX(${y}deg) rotateY(${x}deg)`;
+    });
+
+    window.togglePass = (id, el) => {
+    const input = document.getElementById(id);
+    if (input.type === "password") {
+        input.type = "text";
+        el.setAttribute('data-lucide', 'eye-off');
+    } else {
+        input.type = "password";
+        el.setAttribute('data-lucide', 'eye');
+    }
+    // You must call this to re-render the SVG icon
+    lucide.createIcons(); 
+};
+        /* --- A. TYPING ENGINE --- */
+        const typed = new Typed('.typing-text', {
+            strings: ['Frontend Architect', 'Full-Stack Developer', 'Youtuber'],
+            typeSpeed: 70,
+            backSpeed: 40,
+            backDelay: 1500,
+            loop: true
+        });
+
+        /* --- B. NAVIGATION & SCROLL ENGINE --- */
+        const header = document.querySelector('.header');
+        const menuIcon = document.querySelector('#menu-icon');
+        const navbar = document.querySelector('.navbar');
+
+        window.addEventListener('scroll', () => {
+    // 1. Header background toggle
+    header.classList.toggle('scrolled', window.scrollY > 100);
+    
+    // 2. Determine which section is currently in view
+    let current = "";
+    const sections = document.querySelectorAll('section');
+    const scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
+
+    sections.forEach(section => {
+        const sectionTop = section.offsetTop;
+        const sectionHeight = section.clientHeight;
+        
+        // Check if we have scrolled into the section (with a 200px buffer for better UX)
+        if (scrollPosition >= (sectionTop - 200)) {
+            current = section.getAttribute('id');
+        }
+    });
+
+    // 3. Force "Contact" to active if user hits the very bottom of the page
+    if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 50) {
+        current = "contact";
+    }
+
+    // 4. Update Nav Links
+    document.querySelectorAll('.navbar a').forEach(a => {
+        a.classList.remove('active');
+        // Check if the link's href matches the current ID
+        if (a.getAttribute('href') === `#${current}`) {
+            a.classList.add('active');
+        }
+    });
+});
+
+        menuIcon.onclick = () => {
+            navbar.classList.toggle('active');
+            menuIcon.classList.toggle('fa-xmark');
+        };
+
+        /* --- E. PARALLAX EFFECT ON MOUSE MOVE --- */
+        document.addEventListener('mousemove', (e) => {
+            const moveX = (e.clientX * -0.02);
+            const moveY = (e.clientY * -0.02);
+            document.querySelector('.home-img').style.transform = `translate(${moveX}px, ${moveY}px)`;
+        });
+
+        /* --- FADE-IN OBSERVER --- */
+const observerOptions = {
+    threshold: 0.15 // Section triggers when 15% is visible
+};
+
+const revealObserver = new IntersectionObserver((entries, observer) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('active');
+            // Stop observing once revealed to keep performance high
+            observer.unobserve(entry.target);
+        }
+    });
+}, observerOptions);
+
+document.querySelectorAll('.reveal').forEach(section => {
+    revealObserver.observe(section);
+});
+
+emailjs.init("vUYnQJyEb_HW8suO9");
+
+    // 2. Attach the function to window so the HTML 'onclick' can see it
+    window.sendComment = async () => {
+        // Get values
+        const name = document.getElementById("name").value;
+        const email = document.getElementById("email").value;
+        const subject = document.getElementById("subject").value;
+        const message = document.getElementById("message").value;
+
+        // Basic validation check
+        if(!name || !email || !message) {
+            window.showAlert("Please fill in all inputs.", true);
+            return;
+        }
+
+        const params = {
+            from_name: name,
+            from_email: email,
+            from_subject: subject,
+            comment: message
+        };
+
+        try {
+            await emailjs.send("service_k6ar6un", "template_jrs527p", params);
+            window.showAlert("Comment sent successfully");
+            
+            // Optional: Clear the form after sending
+            document.getElementById("name").value = "";
+            document.getElementById("email").value = "";
+            document.getElementById("subject").value = "";
+            document.getElementById("message").value = "";
+        } catch (error) {
+            console.error("EmailJS Error:", error);
+            window.showAlert("Failed to send", true);
+        }
+    };
+
+// Add this inside your <script type="module"> block
+window.checkAuthAndAction = (action) => {
+    const user = auth.currentUser;
+    if (user) {
+        // If logged in, perform the intended action
+        action();
+    } else {
+        // If not logged in, show alert and open sign-in modal
+        window.showAlert("Please sign in to access this feature", true);
+        window.navTo('viewSignIn');
+    }
+};
+
+      lucide.createIcons();
+    </script>
+</body>
+</html>

@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EB Academy | ID Management System</title>
+    <style>
+        :root {
+            --bg: #f8fafc;
+            --panel: #ffffff;
+            --primary: #1e293b;
+            --accent: #d4af37;
+            --blue: #02028a;
+            --red: #ff0000;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            margin: 0;
+            display: flex;
+            height: 100vh;
+        }
+
+        /* LEFT SIDE: INPUT PANEL */
+        .input-panel {
+            width: 400px;
+            background: var(--panel);
+            padding: 30px;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.05);
+            overflow-y: auto;
+            border-right: 1px solid #e2e8f0;
+        }
+
+        .input-panel h2 { color: var(--primary); font-size: 1.2rem; margin-bottom: 20px; }
+
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-size: 0.8rem; color: #64748b; margin-bottom: 5px; font-weight: bold; }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+
+        /* RIGHT SIDE: PREVIEW AREA */
+        .preview-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 30px;
+            background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        /* THE ID CARD STYLING */
+        .id-card {
+            width: 500px;
+            height: 300px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid #ddd;
+            text-align: center;
+            background-color: #fff;
+        }
+
+        .header-logo { width: 55px; position: absolute; left: 15px; top: 15px; }
+        
+        .student-photo {
+            width: 130px;
+            height: 160px;
+            border: 3px solid var(--primary);
+            border-radius: 8px;
+            position: absolute;
+            right: 15px;
+            top: 90px;
+            object-fit: cover;
+            background: #f1f5f9;
+        }
+
+        .card-title { color: var(--red); font-size: 22px; margin: 10px 0 0 0; font-weight: 900; }
+        .card-subtitle { color: var(--blue); font-size: 9px; line-height: 11px; margin: 0; }
+        .separator { border-top: 2px solid var(--accent); margin: 5px 10px; }
+
+        .info-section { text-align: left; margin-left: 20px; margin-top: 15px; }
+        .label-row { color: var(--blue); font-size: 11px; font-weight: bold; margin-bottom: 2px; }
+        .value-row { font-size: 13px; font-weight: bold; color: #000; margin-bottom: 10px; border-bottom: 1px solid #eee; width: 280px; height: 18px; }
+
+        .print-btn {
+            background: var(--primary);
+            color: white;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+            transition: 0.3s;
+        }
+
+        .print-btn:hover { background: #334155; transform: translateY(-2px); }
+
+        /* PRINT LOGIC */
+        @media print {
+            .input-panel, .print-btn, .header-text { display: none; }
+            body { background: white; display: block; }
+            .preview-area { background: none; display: block; }
+            .id-card { box-shadow: none; border: 1px solid #000; margin: 0 auto 20px auto; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="input-panel">
+        <h2>ID Data Entry</h2>
+        
+        <div class="form-group">
+            <label>Student Photo</label>
+            <input type="file" accept="image/*" onchange="updatePhoto(event)">
+        </div>
+
+        <div class="form-group">
+            <label>Full Name (English)</label>
+            <input type="text" id="in-name" placeholder="e.g. Abebe Balcha" oninput="syncText('name')">
+        </div>
+
+        <div class="form-group">
+            <label>Class / Grade</label>
+            <input type="text" id="in-class" placeholder="e.g. Grade 10-A" oninput="syncText('class')">
+        </div>
+
+        <div class="form-group">
+            <label>Year</label>
+            <input type="text" id="in-year" placeholder="e.g. 2025/26" oninput="syncText('year')">
+        </div>
+
+        <div class="form-group">
+            <label>ID Number (No.)</label>
+            <input type="text" id="in-no" placeholder="e.g. 0544" oninput="syncText('no')">
+        </div>
+
+        <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
+        
+        <button class="print-btn" style="width: 100%;" onclick="window.print()">Print Official ID</button>
+    </div>
+
+    <div class="preview-area">
+        <h3 class="header-text" style="color: #64748b;">Live Preview</h3>
+        
+        <div class="id-card" id="capture">
+            <img src="Screenshot 2026-01-09 232109.png" class="header-logo">
+            <h1 class="card-title">EB ACADEMY</h1>
+            <p class="card-subtitle">
+                ኤል-ቤቴል ሕፃናት - መሰናዶ ትምህርት ቤት ኅ/የተ/የ/ማ<br>
+                El-Bethel Kindergarten - Preparatory School P.L.C
+            </p>
+            <div class="separator"></div>
+            
+            <img id="out-photo" class="student-photo" src="placeholder-user.jpg">
+
+            <div class="info-section">
+                <h4 style="color:red; margin: 0; font-size: 13px;">የተማሪ መታወቂያ ካርድ</h4>
+                <h4 style="color:red; margin: 0; font-size: 13px; text-decoration: underline;">STUDENT ID CARD</h4>
+
+                <div style="margin-top:15px;">
+                    <div class="label-row">የተማሪው ስም / Name</div>
+                    <div class="value-row" id="out-name"></div>
+                </div>
+
+                <div style="margin-top:5px;">
+                    <div class="label-row">ክፍል / Class</div>
+                    <div class="value-row" id="out-class" style="width: 150px;"></div>
+                </div>
+
+                <div style="display: flex; gap: 20px;">
+                    <div>
+                        <div class="label-row">የት/ዘመን / Year</div>
+                        <div class="value-row" id="out-year" style="width: 100px;"></div>
+                    </div>
+                    <div>
+                        <div class="label-row">ተራ.ቁ. / No.</div>
+                        <div class="value-row" id="out-no" style="width: 80px;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Function to update text live
+        function syncText(field) {
+            const inputVal = document.getElementById('in-' + field).value;
+            document.getElementById('out-' + field).innerText = inputVal;
+        }
+
+        // Function to update photo live
+        function updatePhoto(event) {
+            const output = document.getElementById('out-photo');
+            output.src = URL.createObjectURL(event.target.files[0]);
+            output.onload = function() {
+                URL.revokeObjectURL(output.src) // free memory
+            }
+        }
+    </script>
+</body>
+</html>

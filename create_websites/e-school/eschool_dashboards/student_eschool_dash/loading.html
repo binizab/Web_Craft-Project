@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium Pay</title>
+    <style>
+        :root { --bg: #030712; --accent: #3b82f6; --glass: rgba(255, 255, 255, 0.03); }
+        body { background: var(--bg); color: white; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .card { background: var(--glass); backdrop-filter: blur(10px); padding: 40px; border-radius: 24px; border: 1px solid rgba(255,255,255,0.1); width: 320px; text-align: center; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #333; background: #111; color: white; box-sizing: border-box; }
+        button { width: 100%; padding: 15px; background: var(--accent); border: none; color: white; border-radius: 12px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        button:disabled { opacity: 0.5; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>Checkout</h2>
+        <input type="text" id="userID" placeholder="User ID">
+        <input type="email" name="" id="email" placeholder="Enter Your Email">
+        <input type="number" id="amount" placeholder="Amount (ETB)">
+        <button id="pay-btn">Confirm & Pay</button>
+    </div>
+
+    <script>
+        document.getElementById('pay-btn').onclick = async function() {
+            const amount = document.getElementById('amount').value;
+            const userID = document.getElementById('userID').value;
+            const email = document.getElementById('email').value;
+
+            if(!amount) return alert("Enter amount");
+
+            this.innerText = "Processing...";
+            this.disabled = true;
+
+            try {
+                // Pointing to your Node.js backend port
+                const res = await fetch('http://localhost:4242/create-payment', { 
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ amount, email, userID })
+                });
+                
+                const data = await res.json();
+                if (data.checkout_url) {
+                    window.location.href = data.checkout_url;
+                } else {
+                    alert("Error starting payment");
+                    this.disabled = false;
+                    this.innerText = "Confirm & Pay";
+                }
+            } catch (err) {
+                console.error(err);
+                alert("Server not responding");
+                this.disabled = false;
+            }
+        };
+    </script>
+</body>
+</html>

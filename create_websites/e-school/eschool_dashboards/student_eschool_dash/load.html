@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loading...</title>
+    <style>
+        /* 1. Basic Setup */
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #000033; /* Matches logo background */
+            font-family: sans-serif;
+        }
+
+        .loader-container {
+            text-align: center;
+            position: relative;
+        }
+
+        /* 2. The Logo Animation */
+        .logo-box {
+            position: relative;
+            width: 250px;
+            height: 250px;
+            margin: 0 auto;
+        }
+
+        .logo-part {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('image.jpg'); /* Ensure your file is named image.jpg */
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+
+        /* Splits the image visually using clip-path */
+        .left {
+            clip-path: inset(0 50% 0 0);
+            animation: splitLeft 2s ease-in-out infinite;
+        }
+
+        .right {
+            clip-path: inset(0 0 0 50%);
+            animation: splitRight 2s ease-in-out infinite;
+        }
+
+        /* 3. Movement Keyframes */
+        @keyframes splitLeft {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(-20px); }
+        }
+
+        @keyframes splitRight {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(20px); }
+        }
+
+        /* 4. The Loading Spinner/Text */
+        .loading-bar {
+            margin-top: 20px;
+            width: 150px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 2px;
+            display: inline-block;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .loading-bar::after {
+            content: '';
+            position: absolute;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: #5d53f0; /* Yellow from your logo */
+            animation: slide 1.5s infinite linear;
+        }
+
+        @keyframes slide {
+            100% { left: 100%; }
+        }
+
+        .text {
+            color: white;
+            margin-top: 10px;
+            font-size: 14px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="loader-container">
+        <div class="logo-box">
+            <div class="logo-part left"></div>
+            <div class="logo-part right"></div>
+        </div>
+        
+        <div class="loading-bar"></div>
+        <div class="text">Loading</div>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduAdmin | Office Command</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --primary: #4f46e5; /* Indigo */
+            --primary-light: #eef2ff;
+            --secondary: #0f172a; /* Slate */
+            --bg: #f1f5f9;
+            --white: #ffffff;
+            --text: #334155;
+            --danger: #ef4444;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --border: #e2e8f0;
+            --radius: 12px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+        }
+
+        .wrapper {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            min-height: 100vh;
+        }
+
+        /* --- Sidebar --- */
+        .sidebar {
+            background: var(--secondary);
+            color: white;
+            padding: 2rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 800;
+            font-size: 1.4rem;
+            color: #818cf8;
+            margin-bottom: 3rem;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0.8rem 1rem;
+            text-decoration: none;
+            color: #94a3b8;
+            font-weight: 600;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            transition: 0.3s;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+
+        .nav-item.active { border-left: 4px solid var(--primary); }
+
+        /* --- Main --- */
+        .main { padding: 2.5rem; }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 10px rgba(79, 70, 229, 0.2);
+        }
+
+        /* --- Stats --- */
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .stat-card {
+            background: var(--white);
+            padding: 1.5rem;
+            border-radius: var(--radius);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border-bottom: 3px solid var(--border);
+        }
+
+        .stat-card h4 { font-size: 0.75rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; }
+        .stat-card p { font-size: 1.6rem; font-weight: 800; margin-top: 0.5rem; color: var(--secondary); }
+
+        /* --- Panels --- */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1.6fr 1fr;
+            gap: 2rem;
+        }
+
+        .panel {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+        }
+
+        .panel-title { 
+            font-weight: 800; 
+            margin-bottom: 1.5rem; 
+            font-size: 1.1rem; 
+            display: flex; 
+            align-items: center; 
+            gap: 10px;
+        }
+
+        /* --- Table Styling --- */
+        .admin-table { width: 100%; border-collapse: collapse; }
+        .admin-table th { text-align: left; font-size: 0.75rem; color: #94a3b8; padding-bottom: 1rem; border-bottom: 1px solid var(--border); }
+        .admin-table td { padding: 1rem 0; border-bottom: 1px solid #f1f5f9; font-size: 0.9rem; }
+
+        .status {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        .status.urgent { background: #fee2e2; color: #ef4444; }
+        .status.review { background: #fef3c7; color: #d97706; }
+        .status.done { background: #d1fae5; color: #059669; }
+
+        /* --- Right Sidebar Items --- */
+        .action-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 1rem;
+            border-radius: 10px;
+            background: #f8fafc;
+            margin-bottom: 1rem;
+            border: 1px solid var(--border);
+        }
+
+        .icon-box {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @media (max-width: 1024px) {
+            .wrapper { grid-template-columns: 1fr; }
+            .sidebar { display: none; }
+            .stat-grid { grid-template-columns: repeat(2, 1fr); }
+            .content-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="wrapper">
+        <aside class="sidebar">
+            <div class="logo">
+                <i data-lucide="shield-check"></i>
+                <span>EduAdmin</span>
+            </div>
+            <nav>
+                <a href="#" class="nav-item active"><i data-lucide="layout-dashboard"></i> Overview</a>
+                <a href="#" class="nav-item"><i data-lucide="users"></i> Student Records</a>
+                <a href="#" class="nav-item"><i data-lucide="file-text"></i> Documents</a>
+                <a href="#" class="nav-item"><i data-lucide="wallet"></i> Tuition & Fees</a>
+                <a href="#" class="nav-item"><i data-lucide="message-square"></i> Communication</a>
+                <a href="#" class="nav-item"><i data-lucide="settings"></i> Settings</a>
+            </nav>
+        </aside>
+
+        <main class="main">
+            <header class="header">
+                <div>
+                    <h1 style="font-weight: 800;">Administrative Dashboard</h1>
+                    <p style="color: #64748b;">Welcome back, <strong>Office Secretary</strong></p>
+                </div>
+                <button class="btn-primary"><i data-lucide="user-plus"></i> New Student Entry</button>
+            </header>
+
+            <div class="stat-grid">
+                <div class="stat-card">
+                    <h4>Total Students</h4>
+                    <p>842</p>
+                </div>
+                <div class="stat-card">
+                    <h4>Daily Attendance</h4>
+                    <p>96.4%</p>
+                </div>
+                <div class="stat-card" style="border-bottom-color: var(--warning);">
+                    <h4>Pending Docs</h4>
+                    <p style="color: var(--warning);">12</p>
+                </div>
+                <div class="stat-card">
+                    <h4>Visitors Logged</h4>
+                    <p>08</p>
+                </div>
+            </div>
+
+            <div class="content-grid">
+                <section class="panel">
+                    <div class="panel-title">
+                        <i data-lucide="clock" size="20"></i> Recent Document Requests
+                    </div>
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Student Name</th>
+                                <th>Request Type</th>
+                                <th>Date Submitted</th>
+                                <th>Priority</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>James Wilson</strong></td>
+                                <td>Official Transcript</td>
+                                <td>2 hours ago</td>
+                                <td><span class="status urgent">Urgent</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Emily Chen</strong></td>
+                                <td>Enrollment Letter</td>
+                                <td>Yesterday</td>
+                                <td><span class="status review">In Review</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Marcus Thorne</strong></td>
+                                <td>Transfer Certificate</td>
+                                <td>Apr 4, 2026</td>
+                                <td><span class="status done">Processed</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Sarah Miller</strong></td>
+                                <td>Health Record Copy</td>
+                                <td>Apr 3, 2026</td>
+                                <td><span class="status review">Pending</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </section>
+
+                <aside>
+                    <div class="panel">
+                        <h3 class="panel-title">Office Schedule</h3>
+                        
+                        <div class="action-item">
+                            <div class="icon-box" style="background: #dbeafe; color: #2563eb;">
+                                <i data-lucide="phone-call" size="18"></i>
+                            </div>
+                            <div>
+                                <p style="font-size: 0.85rem; font-weight: 700;">Parent Callback</p>
+                                <p style="font-size: 0.75rem; color: #64748b;">Grade 10 - Mrs. Smith</p>
+                            </div>
+                        </div>
+
+                        <div class="action-item">
+                            <div class="icon-box" style="background: #fef3c7; color: #d97706;">
+                                <i data-lucide="calendar" size="18"></i>
+                            </div>
+                            <div>
+                                <p style="font-size: 0.85rem; font-weight: 700;">Admissions Meeting</p>
+                                <p style="font-size: 0.75rem; color: #64748b;">Principal's Office @ 2 PM</p>
+                            </div>
+                        </div>
+
+                        <button style="width: 100%; padding: 0.85rem; background: var(--secondary); color: white; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; margin-top: 0.5rem;">Launch Visitor Log</button>
+                    </div>
+
+                    <div class="panel" style="margin-top: 1.5rem; background: var(--primary-light); border: 1px dashed var(--primary);">
+                        <h4 style="font-size: 0.8rem; color: var(--primary); display: flex; align-items: center; gap: 8px;">
+                            <i data-lucide="info" size="16"></i> System Update
+                        </h4>
+                        <p style="font-size: 0.75rem; margin-top: 8px; line-height: 1.4;">
+                            The <strong>Term 2 Report Card</strong> module will be locked for editing this Friday at 4:00 PM.
+                        </p>
+                    </div>
+                </aside>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>

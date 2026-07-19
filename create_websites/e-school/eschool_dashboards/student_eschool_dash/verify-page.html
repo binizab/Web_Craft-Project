@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<body>
+    <h1>Verifying your payment...</h1>
+    <div id="status">Please wait...</div>
+
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const tnx_ref = params.get('tnx_ref');
+
+        async function checkStatus() {
+            const res = await fetch(`/verify-payment/${tnx_ref}`);
+            const result = await res.json();
+            
+            if (result.status === "success") {
+                document.getElementById('status').innerHTML = `
+                    <h2 style="color: green;">Payment Successful!</h2>
+                    <p>Reference: ${result.data.reference}</p>
+                `;
+            } else {
+                document.getElementById('status').innerText = "Payment failed or canceled.";
+            }
+        }
+        checkStatus();
+    </script>
+</body>
+</html>

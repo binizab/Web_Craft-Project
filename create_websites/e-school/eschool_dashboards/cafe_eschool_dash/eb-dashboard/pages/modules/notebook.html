@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>EB Academy | Smart Notebook</title>
+    <!-- Dexie.js for IndexedDB -->
+    <script src="https://unpkg.com/dexie@3.2.4/dist/dexie.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #09090b;
+            --surface: #111113;
+            --card: #18181b;
+            --accent: rgb(73, 73, 212);
+            --accent-glow: rgba(73, 73, 212, 0.3);
+            --text-primary: #fafafa;
+            --text-secondary: #a1a1aa;
+            --border: #27272a;
+            --danger: #ef4444;
+            --success: #10b981;
+            --glass: rgba(255, 255, 255, 0.03);
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+            background: radial-gradient(circle at 20% 30%, #0f0f16, var(--bg));
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Top Navigation Bar */
+        .top-bar {
+            position: sticky;
+            top: 0;
+            background: rgba(9, 9, 11, 0.85);
+            backdrop-filter: blur(14px);
+            border-bottom: 1px solid var(--border);
+            z-index: 20;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo {
+            font-weight: 800;
+            font-size: 1.3rem;
+            background: linear-gradient(135deg, #fff, var(--accent));
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            letter-spacing: -0.3px;
+        }
+
+        .menu-trigger {
+            background: var(--glass);
+            border: 1px solid var(--border);
+            border-radius: 40px;
+            padding: 8px 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            transition: all 0.2s ease;
+        }
+
+        .menu-trigger:hover {
+            background: #27272a;
+            border-color: var(--accent);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .icon-btn {
+            background: var(--glass);
+            border: 1px solid var(--border);
+            border-radius: 40px;
+            padding: 8px 18px;
+            font-weight: 500;
+            cursor: pointer;
+            color: var(--text-primary);
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+        }
+
+        .icon-btn.primary {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: white;
+            box-shadow: 0 2px 10px rgba(73, 73, 212, 0.3);
+        }
+
+        .icon-btn.primary:hover {
+            filter: brightness(1.08);
+            transform: scale(0.97);
+        }
+
+        .icon-btn:hover {
+            background: #27272a;
+        }
+
+        #saveStatus {
+            font-size: 0.7rem;
+            background: rgba(0,0,0,0.6);
+            padding: 5px 12px;
+            border-radius: 40px;
+            color: var(--text-secondary);
+            letter-spacing: 0.3px;
+            backdrop-filter: blur(4px);
+        }
+
+        /* RIGHT SIDEBAR OVERLAY (not on left) */
+        .drawer-overlay {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(6px);
+            z-index: 100;
+            visibility: hidden;
+            opacity: 0;
+            transition: visibility 0.2s, opacity 0.2s;
+        }
+
+        .drawer-overlay.open {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        /* Drawer slides from RIGHT */
+        .drawer {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 86%;
+            max-width: 360px;
+            height: 100%;
+            background: var(--surface);
+            border-left: 1px solid var(--border);
+            box-shadow: -8px 0 30px rgba(0, 0, 0, 0.7);
+            z-index: 101;
+            transform: translateX(100%);
+            transition: transform 0.28s cubic-bezier(0.2, 0.9, 0.3, 1.1);
+            display: flex;
+            flex-direction: column;
+            padding: 20px 0;
+        }
+
+        .drawer-overlay.open .drawer {
+            transform: translateX(0);
+        }
+
+        .drawer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px 20px 24px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 16px;
+        }
+
+        .drawer-header h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .close-drawer {
+            background: var(--glass);
+            border: none;
+            font-size: 24px;
+            width: 36px;
+            height: 36px;
+            border-radius: 30px;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close-drawer:hover {
+            background: #27272a;
+            color: white;
+        }
+
+        .notebook-list-drawer {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding: 8px 16px;
+        }
+
+        .drawer-notebook-item {
+            padding: 14px 16px;
+            border-radius: 14px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid transparent;
+        }
+
+        .drawer-notebook-item.active {
+            background: rgba(73, 73, 212, 0.15);
+            border-left: 3px solid var(--accent);
+            border-color: rgba(73, 73, 212, 0.3);
+        }
+
+        .drawer-notebook-item:hover {
+            background: var(--glass);
+            border-color: var(--border);
+        }
+
+        .drawer-title {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-size: 0.95rem;
+            font-weight: 500;
+            letter-spacing: -0.2px;
+        }
+
+        .drawer-delete {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            cursor: pointer;
+            width: 32px;
+            border-radius: 30px;
+            transition: 0.2s;
+            font-weight: 600;
+        }
+
+        .drawer-delete:hover {
+            color: var(--danger);
+            background: rgba(239, 68, 68, 0.15);
+        }
+
+        /* Editor Area */
+        .editor-wrapper {
+            flex: 1;
+            padding: 24px 20px;
+            max-width: 1100px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .notebook-paper {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 28px;
+            padding: 32px 28px;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.6);
+            transition: 0.2s;
+            display: flex;
+            flex-direction: column;
+            min-height: 65vh;
+        }
+
+        .note-title {
+            background: transparent;
+            border: none;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            width: 100%;
+            outline: none;
+            padding: 8px 0;
+            margin-bottom: 24px;
+            border-bottom: 2px dashed var(--border);
+            font-family: inherit;
+        }
+
+        .note-title:focus {
+            border-bottom-color: var(--accent);
+        }
+
+        .content-area {
+            background: transparent;
+            border: none;
+            color: #e6e6ef;
+            font-size: 1rem;
+            line-height: 1.7;
+            resize: vertical;
+            outline: none;
+            font-family: 'Inter', 'SF Mono', monospace;
+            min-height: 420px;
+            width: 100%;
+        }
+
+        .empty-notebook-msg {
+            text-align: center;
+            color: var(--text-secondary);
+            padding: 40px 20px;
+            font-style: italic;
+        }
+
+        /* Toast notification */
+        .toast-msg {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1e1e2a;
+            backdrop-filter: blur(12px);
+            padding: 10px 22px;
+            border-radius: 60px;
+            font-size: 0.85rem;
+            color: #b9ffb9;
+            border: 1px solid var(--success);
+            pointer-events: none;
+            z-index: 200;
+            transition: opacity 0.2s;
+            opacity: 0;
+            white-space: nowrap;
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        @media (max-width: 640px) {
+            .editor-wrapper {
+                padding: 16px;
+            }
+            .notebook-paper {
+                padding: 20px 16px;
+            }
+            .note-title {
+                font-size: 1.6rem;
+            }
+            .icon-btn span:first-child {
+                display: none;
+            }
+            .icon-btn {
+                padding: 8px 14px;
+            }
+            .menu-trigger span:first-child {
+                display: inline;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="top-bar">
+    <div class="logo-area">
+        <div class="logo">✧ EB NOTEBOOK</div>
+        <button class="menu-trigger" id="menuBtn">
+            ☰ <span>Notebooks</span>
+        </button>
+    </div>
+    <div class="action-buttons">
+        <button class="icon-btn" id="newTopBtn">
+            <span>+</span> <span>New Note</span>
+        </button>
+        <div id="saveStatus">💾 Autosaved</div>
+    </div>
+</div>
+
+<!-- RIGHT DRAWER overlay (mobile menu) -->
+<div class="drawer-overlay" id="drawerOverlay">
+    <div class="drawer">
+        <div class="drawer-header">
+            <h3>📓 My Notebooks</h3>
+            <button class="close-drawer" id="closeDrawerBtn">✕</button>
+        </div>
+        <div class="notebook-list-drawer" id="drawerNotebookList"></div>
+        <div style="padding: 20px 16px; border-top: 1px solid var(--border); margin-top: 8px;">
+            <button class="icon-btn" id="drawerNewBtn" style="width:100%; justify-content: center; gap: 10px;">+ Create Notebook</button>
+        </div>
+    </div>
+</div>
+
+<div class="editor-wrapper">
+    <div class="notebook-paper">
+        <input type="text" class="note-title" id="titleInput" placeholder="Notebook title...">
+        <textarea class="content-area" id="contentInput" placeholder="Write your thoughts, journals, code, ideas... ✨ Autosaves to Dexie (IndexedDB)"></textarea>
+    </div>
+</div>
+<div id="toastMsg" class="toast-msg">✨ Synced</div>
+
+<script>
+    // ---------- DEXIE INIT (IndexedDB) ----------
+    const db = new Dexie('EBNotebooksDB');
+    db.version(1).stores({
+        notebooks: 'id, title, content, updatedAt'
+    });
+
+    // Global state
+    let notebooksArray = [];       // cached array sorted by updatedAt desc
+    let currentNotebookId = null;
+    let autoSaveTimer = null;
+
+    // DOM elements
+    const titleInput = document.getElementById('titleInput');
+    const contentInput = document.getElementById('contentInput');
+    const drawerList = document.getElementById('drawerNotebookList');
+    const saveStatusSpan = document.getElementById('saveStatus');
+    const toastMsg = document.getElementById('toastMsg');
+
+    // Helper: Show floating toast
+    function showToast(message, isError = false) {
+        toastMsg.textContent = message || (isError ? "⚠️ Error" : "✓ Autosaved");
+        toastMsg.style.borderColor = isError ? '#ef4444' : '#10b981';
+        toastMsg.style.color = isError ? '#ffb3b3' : '#c0f0c0';
+        toastMsg.style.opacity = '1';
+        setTimeout(() => {
+            toastMsg.style.opacity = '0';
+        }, 1800);
+    }
+
+    // Load all notebooks from Dexie, sorted newest first
+    async function fetchAndSyncNotebooks() {
+        try {
+            let all = await db.notebooks.orderBy('updatedAt').reverse().toArray();
+            if (all.length === 0) {
+                // Create a welcoming notebook
+                const defaultNote = {
+                    id: Date.now().toString(),
+                    title: "✨ Welcome to EB Academy",
+                    content: "# Your creative space\n\n- Notes are saved to **IndexedDB** via Dexie.\n- No left sidebar — clean right-side menu.\n- Autosave works while you type.\n- Create unlimited notebooks.\n\nEnjoy writing! ✍️",
+                    updatedAt: new Date().getTime()
+                };
+                await db.notebooks.add(defaultNote);
+                all = [defaultNote];
+            }
+            notebooksArray = all;
+            renderDrawer();
+            
+            // set current notebook if needed
+            if (!currentNotebookId || !notebooksArray.find(n => n.id === currentNotebookId)) {
+                currentNotebookId = notebooksArray[0].id;
+            }
+            await loadNotebookIntoEditor(currentNotebookId);
+        } catch (err) {
+            console.error("Dexie load error:", err);
+            showToast("Failed to load notebooks", true);
+        }
+    }
+
+    // Render the right drawer notebook list
+    function renderDrawer() {
+        if (!drawerList) return;
+        drawerList.innerHTML = '';
+        if (notebooksArray.length === 0) {
+            const emptyDiv = document.createElement('div');
+            emptyDiv.className = 'empty-notebook-msg';
+            emptyDiv.innerText = '📭 No notebooks yet. Tap + to create.';
+            drawerList.appendChild(emptyDiv);
+            return;
+        }
+        
+        notebooksArray.forEach(notebook => {
+            const item = document.createElement('div');
+            item.className = `drawer-notebook-item ${notebook.id === currentNotebookId ? 'active' : ''}`;
+            item.setAttribute('data-id', notebook.id);
+            
+            const titleSpan = document.createElement('span');
+            titleSpan.className = 'drawer-title';
+            titleSpan.textContent = notebook.title || "Untitled";
+            
+            const deleteBtn = document.createElement('button');
+            deleteBtn.innerHTML = '🗑️';
+            deleteBtn.className = 'drawer-delete';
+            deleteBtn.title = "Delete notebook";
+            deleteBtn.addEventListener('click', async (e) => {
+                e.stopPropagation();
+                await confirmDeleteNotebook(notebook.id);
+            });
+            
+            item.appendChild(titleSpan);
+            item.appendChild(deleteBtn);
+            item.addEventListener('click', () => {
+                if (currentNotebookId !== notebook.id) {
+                    switchToNotebook(notebook.id);
+                    closeDrawer();
+                } else {
+                    closeDrawer();
+                }
+            });
+            drawerList.appendChild(item);
+        });
+    }
+
+    // Load selected notebook content into editor fields
+    async function loadNotebookIntoEditor(id) {
+        const target = notebooksArray.find(n => n.id === id);
+        if (!target) return false;
+        currentNotebookId = id;
+        titleInput.value = target.title || '';
+        contentInput.value = target.content || '';
+        renderDrawer();  // update active highlight
+        saveStatusSpan.innerText = '📖 Ready';
+        setTimeout(() => {
+            if (saveStatusSpan.innerText === '📖 Ready') saveStatusSpan.innerText = '✨ Autosave';
+        }, 1200);
+        return true;
+    }
+
+    // Save current notebook immediately to Dexie
+    async function persistCurrentNotebook() {
+        if (!currentNotebookId) return false;
+        const newTitle = titleInput.value.trim() === "" ? "Untitled" : titleInput.value;
+        const newContent = contentInput.value;
+        const existingIndex = notebooksArray.findIndex(n => n.id === currentNotebookId);
+        if (existingIndex === -1) return false;
+        
+        const updatedNote = {
+            ...notebooksArray[existingIndex],
+            title: newTitle,
+            content: newContent,
+            updatedAt: Date.now()
+        };
+        notebooksArray[existingIndex] = updatedNote;
+        
+        try {
+            await db.notebooks.put(updatedNote);
+            saveStatusSpan.innerText = '✓ Saved';
+            showToast('Saved to Dexie', false);
+            renderDrawer();  // refresh titles in drawer
+            return true;
+        } catch (err) {
+            console.warn(err);
+            saveStatusSpan.innerText = '⚠️ Error';
+            showToast('Save error', true);
+            return false;
+        }
+    }
+
+    // Auto-debounce save trigger
+    function triggerAutoSave() {
+        if (autoSaveTimer) clearTimeout(autoSaveTimer);
+        saveStatusSpan.innerText = '✍️ typing...';
+        autoSaveTimer = setTimeout(async () => {
+            if (currentNotebookId) {
+                await persistCurrentNotebook();
+            }
+            autoSaveTimer = null;
+        }, 700);
+    }
+
+    // Switch between notebooks and save previous changes first
+    async function switchToNotebook(newId) {
+        if (currentNotebookId && currentNotebookId !== newId) {
+            // Save current before switching
+            await persistCurrentNotebook();
+        }
+        await loadNotebookIntoEditor(newId);
+    }
+
+    // Delete notebook with safety + prevent total loss
+    async function confirmDeleteNotebook(id) {
+        if (notebooksArray.length === 1) {
+            const userConfirm = confirm("This is your only notebook. Delete and create a fresh one?");
+            if (!userConfirm) return;
+            await db.notebooks.delete(id);
+            notebooksArray = [];
+            const freshNotebook = {
+                id: Date.now().toString(),
+                title: "Fresh Start",
+                content: "A new notebook. Everything is saved automatically to IndexedDB.",
+                updatedAt: Date.now()
+            };
+            await db.notebooks.add(freshNotebook);
+            notebooksArray = [freshNotebook];
+            currentNotebookId = freshNotebook.id;
+            await loadNotebookIntoEditor(currentNotebookId);
+            renderDrawer();
+            showToast("New notebook created", false);
+            return;
+        }
+        
+        const confirmDel = confirm(`Delete "${notebooksArray.find(n => n.id === id)?.title || 'Notebook'}" permanently?`);
+        if (!confirmDel) return;
+        
+        await db.notebooks.delete(id);
+        notebooksArray = notebooksArray.filter(n => n.id !== id);
+        if (currentNotebookId === id) {
+            // Move to the most recent remaining
+            const nextNotebook = notebooksArray[0];
+            if (nextNotebook) {
+                currentNotebookId = nextNotebook.id;
+                await loadNotebookIntoEditor(currentNotebookId);
+            } else {
+                // extreme fallback
+                const fallback = { id: Date.now().toString(), title: "Recovered", content: "", updatedAt: Date.now() };
+                await db.notebooks.add(fallback);
+                notebooksArray = [fallback];
+                currentNotebookId = fallback.id;
+                await loadNotebookIntoEditor(currentNotebookId);
+            }
+        }
+        renderDrawer();
+        showToast("Notebook deleted", false);
+    }
+
+    // Create new notebook (with optional title prompt)
+    async function createNewNotebook(askTitle = true) {
+        let baseTitle = "Untitled";
+        if (askTitle) {
+            const inputTitle = prompt("Enter notebook name:", "My Notebook");
+            if (inputTitle === null) return; // cancel
+            baseTitle = inputTitle.trim() || "Untitled";
+        } else {
+            baseTitle = `Note ${new Date().toLocaleTimeString()}`;
+        }
+        
+        const newId = Date.now().toString() + '-' + Math.random().toString(36).substr(2, 5);
+        const newEntry = {
+            id: newId,
+            title: baseTitle,
+            content: "",
+            updatedAt: Date.now()
+        };
+        
+        try {
+            await db.notebooks.add(newEntry);
+            notebooksArray.unshift(newEntry);
+            renderDrawer();
+            await switchToNotebook(newId);
+            closeDrawer();
+            showToast(`✨ "${baseTitle}" created`, false);
+        } catch (err) {
+            console.error(err);
+            showToast("Creation failed", true);
+        }
+    }
+
+    // Event listeners
+    function bindEditorEvents() {
+        titleInput.addEventListener('input', () => triggerAutoSave());
+        contentInput.addEventListener('input', () => triggerAutoSave());
+    }
+
+    // Drawer controls (right side overlay)
+    const drawerOverlay = document.getElementById('drawerOverlay');
+    const menuBtn = document.getElementById('menuBtn');
+    const closeDrawerBtn = document.getElementById('closeDrawerBtn');
+    const newTopBtn = document.getElementById('newTopBtn');
+    const drawerNewBtn = document.getElementById('drawerNewBtn');
+    
+    function openDrawer() {
+        drawerOverlay.classList.add('open');
+        renderDrawer(); // ensure latest titles
+    }
+    function closeDrawer() {
+        drawerOverlay.classList.remove('open');
+    }
+    
+    menuBtn.addEventListener('click', openDrawer);
+    closeDrawerBtn.addEventListener('click', closeDrawer);
+    drawerOverlay.addEventListener('click', (e) => {
+        if (e.target === drawerOverlay) closeDrawer();
+    });
+    
+    newTopBtn.addEventListener('click', async () => {
+        await createNewNotebook(true);
+    });
+    drawerNewBtn.addEventListener('click', async () => {
+        await createNewNotebook(true);
+        closeDrawer();
+    });
+    
+    // Save before page close
+    window.addEventListener('beforeunload', async (e) => {
+        if (currentNotebookId) {
+            await persistCurrentNotebook();
+        }
+    });
+    
+    // additional sync with indexedDB (just to keep consistency across tabs optional)
+    async function backgroundSync() {
+        try {
+            const latestFromDB = await db.notebooks.orderBy('updatedAt').reverse().toArray();
+            if (latestFromDB.length !== notebooksArray.length || 
+                JSON.stringify(latestFromDB.map(n => ({id:n.id, updatedAt:n.updatedAt}))) !== 
+                JSON.stringify(notebooksArray.map(n => ({id:n.id, updatedAt:n.updatedAt})))) {
+                // external change detected, reload
+                notebooksArray = latestFromDB;
+                if (!notebooksArray.find(n => n.id === currentNotebookId) && notebooksArray.length) {
+                    currentNotebookId = notebooksArray[0].id;
+                    await loadNotebookIntoEditor(currentNotebookId);
+                } else if (currentNotebookId) {
+                    // maybe title changed elsewhere? reload current
+                    const curr = notebooksArray.find(n => n.id === currentNotebookId);
+                    if (curr) {
+                        titleInput.value = curr.title;
+                        contentInput.value = curr.content;
+                    }
+                }
+                renderDrawer();
+            }
+        } catch(e) {}
+    }
+    
+    // Init app
+    async function init() {
+        bindEditorEvents();
+        await fetchAndSyncNotebooks();
+        // Periodically check for external changes (optional but safe)
+        setInterval(backgroundSync, 4000);
+    }
+    
+    init();
+</script>
+</body>
+</html>

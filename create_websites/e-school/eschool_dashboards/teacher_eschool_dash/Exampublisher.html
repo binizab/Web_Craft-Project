@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>EduTrack Pro | Ultimate Exam System</title>
+    <!-- Google Fonts: Poppins + Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-deep: #0a0f1a;
+            --surface: #111827;
+            --surface-hover: #1a2538;
+            --border: #2d3748;
+            --text-primary: #f1f5f9;
+            --text-dim: #9ca3af;
+            --accent: #3b82f6;
+            --accent-glow: rgba(59,130,246,0.2);
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --card-radius: 20px;
+        }
+
+        body {
+            font-family: 'Poppins', 'Inter', system-ui, sans-serif;
+            background: radial-gradient(circle at 10% 20%, #0f1420, var(--bg-deep));
+            color: var(--text-primary);
+            margin: 0;
+            padding: 24px 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            width: 100%;
+            transition: 0.3s;
+        }
+
+        /* Cards & UI */
+        .card {
+            background: rgba(17, 24, 39, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 28px;
+            border-radius: var(--card-radius);
+            border: 1px solid var(--border);
+            margin-bottom: 24px;
+            transition: 0.2s;
+        }
+        .card:hover {
+            border-color: var(--accent);
+        }
+
+        h1, h2, h3 {
+            font-weight: 700;
+            letter-spacing: -0.3px;
+        }
+        .accent-text {
+            color: var(--accent);
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 18px;
+        }
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        /* Form inputs */
+        input, textarea, select {
+            background: #0f1219;
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 12px 16px;
+            border-radius: 14px;
+            width: 100%;
+            font-family: 'Poppins', monospace;
+            font-size: 0.9rem;
+            transition: 0.2s;
+            outline: none;
+        }
+        input:focus, textarea:focus, select:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+        label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            margin-bottom: 6px;
+            display: block;
+            letter-spacing: 0.5px;
+        }
+
+        .btn {
+            padding: 14px 24px;
+            border-radius: 40px;
+            border: none;
+            cursor: pointer;
+            font-weight: 700;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            justify-content: center;
+            font-size: 0.9rem;
+        }
+        .btn-blue {
+            background: var(--accent);
+            color: white;
+            box-shadow: 0 4px 12px rgba(59,130,246,0.3);
+        }
+        .btn-blue:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.08);
+        }
+        .btn-green {
+            background: var(--success);
+            color: white;
+            width: 100%;
+            font-size: 1rem;
+        }
+        .btn-green:hover {
+            transform: scale(1.02);
+            filter: brightness(1.05);
+        }
+
+        /* Builder Blocks */
+        .builder-item {
+            border-left: 4px solid var(--accent);
+            padding-left: 20px;
+            margin-top: 28px;
+            background: rgba(59,130,246,0.02);
+            border-radius: 16px;
+            padding: 18px;
+            transition: 0.2s;
+        }
+        .builder-item:hover {
+            background: rgba(59,130,246,0.06);
+        }
+        .instr-head {
+            background: rgba(59, 130, 246, 0.1);
+            padding: 14px 18px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border);
+        }
+        .instr-head input {
+            background: transparent;
+            border: none;
+            font-weight: 600;
+            font-size: 1rem;
+            padding: 0;
+        }
+
+        /* Exam View */
+        #examView {
+            display: none;
+        }
+        .sticky-header {
+            position: sticky;
+            top: 0;
+            background: rgba(10, 15, 26, 0.95);
+            backdrop-filter: blur(16px);
+            z-index: 100;
+            border-bottom: 1px solid var(--border);
+            padding: 16px 0;
+            margin-bottom: 32px;
+            border-radius: 0 0 28px 28px;
+        }
+        .exam-header-grid {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        #timer-box {
+            font-size: 1.6rem;
+            font-weight: 800;
+            font-family: 'Poppins', monospace;
+            color: var(--warning);
+            background: rgba(245,158,11,0.15);
+            padding: 8px 20px;
+            border-radius: 60px;
+            letter-spacing: 1px;
+        }
+
+        .question-wrap {
+            margin-bottom: 32px;
+            padding: 24px;
+            background: rgba(17, 24, 39, 0.7);
+            border-radius: 24px;
+            border: 1px solid var(--border);
+            transition: 0.2s;
+        }
+        .question-wrap h4 {
+            font-size: 1.1rem;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        /* Radio / options */
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #0f1219;
+            padding: 14px 18px;
+            border-radius: 16px;
+            margin-top: 10px;
+            border: 1px solid var(--border);
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .radio-option:hover {
+            border-color: var(--accent);
+            background: var(--surface-hover);
+        }
+        input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--accent);
+        }
+        .fill-blank {
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid var(--accent);
+            color: var(--accent);
+            width: 140px;
+            text-align: center;
+            font-weight: 700;
+            font-family: monospace;
+            font-size: 1rem;
+            outline: none;
+            display: inline-block;
+            margin: 0 8px;
+        }
+        .drag-box {
+            background: #1e293b;
+            padding: 14px;
+            border-radius: 14px;
+            border: 1px solid var(--accent);
+            cursor: grab;
+            text-align: center;
+            font-weight: 500;
+        }
+        .drag-box:active {
+            cursor: grabbing;
+        }
+        .drop-zone {
+            background: #0f1219;
+            padding: 14px;
+            border: 2px dashed var(--accent);
+            border-radius: 16px;
+            min-height: 70px;
+            text-align: center;
+            transition: 0.2s;
+        }
+        .drop-zone.dropped {
+            background: rgba(16,185,129,0.1);
+            border-color: var(--success);
+        }
+
+        /* Responsive */
+        @media (max-width: 780px) {
+            body { padding: 16px; }
+            .card { padding: 20px; }
+            .exam-header-grid {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            #timer-box {
+                text-align: center;
+            }
+            .builder-item {
+                padding: 14px;
+            }
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-dim);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container" id="adminPanel">
+    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; justify-content: space-between;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <i data-lucide="graduation-cap" style="width: 32px; height: 32px; color: var(--accent);"></i>
+            <h1 style="color: var(--accent);">EduTrack Pro · Exam Engine</h1>
+        </div>
+        <button class="btn btn-blue" onclick="loadSampleExam()" style="background: #475569;">
+            <i data-lucide="file-text"></i> Load Sample Exam
+        </button>
+    </div>
+    
+    <div class="card">
+        <h3><i data-lucide="settings"></i> Exam Configuration</h3>
+        <div class="grid-3" style="margin-top: 20px;">
+            <div><label>Subject</label><input type="text" id="subj" value="Mathematics"></div>
+            <div><label>Duration (minutes)</label><input type="number" id="duration" value="60"></div>
+            <div><label>Mark Per Question</label><input type="number" id="mark" value="2"></div>
+        </div>
+        <h4 style="margin: 20px 0 12px 0;">Section Counts</h4>
+        <div class="grid-3">
+            <input type="number" id="cntTF" placeholder="True/False Count">
+            <input type="number" id="cntMCQ" placeholder="Multiple Choice">
+            <input type="number" id="cntMatch" placeholder="Matching Items">
+            <input type="number" id="cntFill" placeholder="Fill in Blanks">
+            <input type="number" id="cntShort" placeholder="Short Answer">
+        </div>
+        <button class="btn btn-blue" onclick="initBuilder()" style="margin-top: 24px;">
+            <i data-lucide="hammer"></i> Initialize Question Builder
+        </button>
+    </div>
+
+    <div id="builderSpace"></div>
+    <button id="launchBtn" class="btn btn-green" style="display:none; margin-top: 8px;" onclick="launchExam()">
+        <i data-lucide="rocket"></i> Go Live (Student Portal)
+    </button>
+</div>
+
+<div class="container" id="examView">
+    <div class="sticky-header">
+        <div class="exam-header-grid">
+            <h2 id="viewSubj" style="display: flex; align-items: center; gap: 10px;"><i data-lucide="clipboard"></i> Exam</h2>
+            <input type="text" id="stuName" placeholder="Full Name" style="max-width: 280px;">
+            <div id="timer-box">00:00</div>
+        </div>
+    </div>
+    
+    <div id="examRender"></div>
+    <button class="btn btn-green" onclick="submitExam()" style="margin: 30px 0;">
+        <i data-lucide="send"></i> Final Submit
+    </button>
+</div>
+
+<script>
+    let timerInterval = null;
+    let timeLeft = 60;
+
+    // Sample exam data - pre-built questions
+    function loadSampleExam() {
+        // Set sample counts
+        document.getElementById('cntTF').value = 2;
+        document.getElementById('cntMCQ').value = 2;
+        document.getElementById('cntMatch').value = 1;
+        document.getElementById('cntFill').value = 1;
+        document.getElementById('cntShort').value = 1;
+        document.getElementById('subj').value = "Mathematics";
+        document.getElementById('duration').value = 45;
+        
+        // Auto initialize builder with sample content
+        setTimeout(() => {
+            initBuilderWithSample();
+        }, 100);
+    }
+    
+    function initBuilderWithSample() {
+        const builderHtml = `
+            <div class="card">
+                <h3><i data-lucide="edit-3"></i> Define Assessment Items</h3>
+                
+                <div class="instr-head">
+                    <i data-lucide="message-circle" style="width: 18px;"></i>
+                    <input type="text" class="instr" data-type="tf" value="True or False Section" style="font-weight:600;">
+                </div>
+                <div class="builder-item" data-type="tf" data-qidx="1">
+                    <div style="display:flex; gap:8px; align-items:center;"><i data-lucide="help-circle"></i> <strong>TRUE/FALSE Question 1</strong></div>
+                    <textarea class="q-text" rows="2" style="margin-top:12px">The number π (pi) is equal to 3.14 exactly.</textarea>
+                </div>
+                <div class="builder-item" data-type="tf" data-qidx="2">
+                    <div style="display:flex; gap:8px; align-items:center;"><i data-lucide="help-circle"></i> <strong>TRUE/FALSE Question 2</strong></div>
+                    <textarea class="q-text" rows="2" style="margin-top:12px">A triangle has 4 sides.</textarea>
+                </div>
+                
+                <div class="instr-head">
+                    <i data-lucide="message-circle" style="width: 18px;"></i>
+                    <input type="text" class="instr" data-type="mcq" value="Multiple Choice Section" style="font-weight:600;">
+                </div>
+                <div class="builder-item" data-type="mcq" data-qidx="1">
+                    <div style="display:flex; gap:8px; align-items:center;"><i data-lucide="help-circle"></i> <strong>MULTIPLE CHOICE Question 1</strong></div>
+                    <textarea class="q-text" rows="2" style="margin-top:12px">What is the value of 5²?</textarea>
+                    <div class="grid-3" style="margin-top:12px">
+                        <input type="text" class="opt" placeholder="Option A" value="10">
+                        <input type="text" class="opt" placeholder="Option B" value="20">
+                        <input type="text" class="opt" placeholder="Option C" value="25">
+                        <input type="text" class="opt" placeholder="Option D" value="30">
+                    </div>
+                </div>
+                <div class="builder-item" data-type="mcq" data-qidx="2">
+                    <div style="display:flex; gap:8px; align-items:center;"><i data-lucide="help-circle"></i> <strong>MULTIPLE CHOICE Question 2</strong></div>
+                    <textarea class="q-text" rows="2" style="margin-top:12px">Solve for x: 2x + 5 = 15</textarea>
+                    <div class="grid-3" style="margin-top:12px">
+                        <input type="text" class="opt" placeholder="Option A" value="3">
+                        <input type="text" class="opt" placeholder="Option B" value="5">
+                        <input type="text" class="opt" placeholder="Option C" value="7">
+                        <input type="text" class="opt" placeholder="Option D" value="10">
+                    </div>
+                </div>
+                
+                <div class="instr-head">
+                    <i data-lucide="message-circle" style="width: 18px;"></i>
+                    <input type="text" class="instr" data-type="match" value="Matching Section" style="font-weight:600;">
+                </div>
+                <div class="builder-item" data-type="match" data-qidx="1">
+                    <div style="display:flex; gap:8px; align-items:center;"><i data-lucide="help-circle"></i> <strong>MATCHING Question 1</strong></div>
+                    <div class="grid-2" style="margin-top:12px">
+                        <input type="text" class="colA" placeholder="Column A (Term)" value="A triangle with equal sides">
+                        <input type="text" class="colB" placeholder="Column B (Match)" value="Equilateral">
+                    </div>
+                </div>
+                
+                <div class="instr-head">
+                    <i data-lucide="message-circle" style="width: 18px;"></i>
+                    <input type="text" class="instr" data-type="fill" value="Fill in the Blanks" style="font-weight:600;">
+                </div>
+                <div class="builder-item" data-type="fill" data-qidx="1">
+                    <div style="display:flex; gap:8px; align-items:center;"><i data-lucide="help-circle"></i> <strong>FILL IN BLANK Question 1</strong></div>
+                    <textarea class="q-text" rows="2" style="margin-top:12px">The square root of 100 is ____.</textarea>
+                    <small style="color:var(--text-dim)">Use '____' as blank placeholder</small>
+                </div>
+                
+                <div class="instr-head">
+                    <i data-lucide="message-circle" style="width: 18px;"></i>
+                    <input type="text" class="instr" data-type="short" value="Short Answer Section" style="font-weight:600;">
+                </div>
+                <div class="builder-item" data-type="short" data-qidx="1">
+                    <div style="display:flex; gap:8px; align-items:center;"><i data-lucide="help-circle"></i> <strong>SHORT ANSWER Question 1</strong></div>
+                    <textarea class="q-text" rows="2" style="margin-top:12px">Explain the Pythagorean theorem in your own words.</textarea>
+                </div>
+            </div>
+        `;
+        
+        document.getElementById('builderSpace').innerHTML = builderHtml;
+        document.getElementById('launchBtn').style.display = 'flex';
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+    }
+    
+    function initBuilder() {
+        const counts = {
+            tf: parseInt(document.getElementById('cntTF').value) || 0,
+            mcq: parseInt(document.getElementById('cntMCQ').value) || 0,
+            match: parseInt(document.getElementById('cntMatch').value) || 0,
+            fill: parseInt(document.getElementById('cntFill').value) || 0,
+            short: parseInt(document.getElementById('cntShort').value) || 0
+        };
+        
+        // Check if any sections are selected
+        const total = counts.tf + counts.mcq + counts.match + counts.fill + counts.short;
+        if (total === 0) {
+            alert("Please enter at least one question count for any section!");
+            return;
+        }
+        
+        let builderHtml = `<div class="card"><h3><i data-lucide="edit-3"></i> Define Assessment Items</h3>`;
+        const typeLabels = { tf: "True / False", mcq: "Multiple Choice", match: "Matching", fill: "Fill Blank", short: "Short Answer" };
+        
+        for (let [type, num] of Object.entries(counts)) {
+            if (num > 0) {
+                builderHtml += `<div class="instr-head">
+                    <i data-lucide="message-circle" style="width: 18px;"></i>
+                    <input type="text" class="instr" data-type="${type}" placeholder="Instructions for ${typeLabels[type]} section..." style="font-weight:600;">
+                </div>`;
+                for (let i = 1; i <= num; i++) {
+                    builderHtml += `<div class="builder-item" data-type="${type}" data-qidx="${i}">
+                        <div style="display:flex; gap:8px; align-items:center;"><i data-lucide="help-circle"></i> <strong>${type.toUpperCase()} Question ${i}</strong></div>
+                        <textarea class="q-text" placeholder="Enter question text..." rows="2" style="margin-top:12px"></textarea>`;
+                    
+                    if (type === 'mcq') {
+                        builderHtml += `<div class="grid-3" style="margin-top:12px">
+                            <input type="text" class="opt" placeholder="Option A">
+                            <input type="text" class="opt" placeholder="Option B">
+                            <input type="text" class="opt" placeholder="Option C">
+                            <input type="text" class="opt" placeholder="Option D">
+                        </div>`;
+                    }
+                    if (type === 'match') {
+                        builderHtml += `<div class="grid-2" style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:12px">
+                            <input type="text" class="colA" placeholder="Column A (Term)">
+                            <input type="text" class="colB" placeholder="Column B (Match)">
+                        </div>`;
+                    }
+                    if (type === 'fill') {
+                        builderHtml += `<small style="color:var(--text-dim)">Use '____' as blank placeholder</small>`;
+                    }
+                    builderHtml += `</div>`;
+                }
+            }
+        }
+        builderHtml += `</div>`;
+        document.getElementById('builderSpace').innerHTML = builderHtml;
+        document.getElementById('launchBtn').style.display = 'flex';
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+    }
+    
+    function launchExam() {
+        const subject = document.getElementById('subj').value;
+        const durationMins = parseInt(document.getElementById('duration').value) || 60;
+        
+        document.getElementById('adminPanel').style.display = 'none';
+        document.getElementById('examView').style.display = 'block';
+        document.getElementById('viewSubj').innerHTML = `<i data-lucide="book-open"></i> ${subject} Examination`;
+        
+        const examContainer = document.getElementById('examRender');
+        examContainer.innerHTML = '';
+        
+        const items = document.querySelectorAll('.builder-item');
+        let currentSection = '';
+        let questionCounter = 1;
+        
+        if (items.length === 0) {
+            examContainer.innerHTML = `<div class="loading" style="text-align: center; padding: 50px;">
+                <i data-lucide="alert-circle" style="width: 48px; height: 48px; margin-bottom: 16px;"></i>
+                <h3>No questions found!</h3>
+                <p>Please go back and initialize the question builder first.</p>
+                <button class="btn btn-blue" onclick="goBack()" style="margin-top: 20px;">Go Back</button>
+            </div>`;
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+            return;
+        }
+        
+        items.forEach((item, idx) => {
+            const type = item.dataset.type;
+            const instructionInput = document.querySelector(`.instr[data-type="${type}"]`);
+            const instructionText = instructionInput ? instructionInput.value : `${type.toUpperCase()} Section`;
+            
+            if (currentSection !== type) {
+                examContainer.innerHTML += `<div style="margin: 32px 0 16px 0; border-left: 4px solid var(--accent); padding-left: 16px;">
+                    <h3 style="display:flex; gap:8px;"><i data-lucide="list"></i> ${instructionText}</h3>
+                </div>`;
+                currentSection = type;
+            }
+            
+            const qTextRaw = item.querySelector('.q-text')?.value || "Question text missing";
+            let questionHtml = `<div class="question-wrap" data-qid="${idx}">
+                <h4><i data-lucide="help-circle"></i> Q${questionCounter}. ${qTextRaw}</h4>`;
+            
+            if (type === 'tf') {
+                questionHtml += `
+                    <label class="radio-option"><input type="radio" name="q_${idx}" value="true"> <span>✅ True</span></label>
+                    <label class="radio-option"><input type="radio" name="q_${idx}" value="false"> <span>❌ False</span></label>
+                `;
+            } 
+            else if (type === 'mcq') {
+                const opts = item.querySelectorAll('.opt');
+                let optCount = 0;
+                opts.forEach((opt, oi) => {
+                    if (opt.value.trim()) {
+                        questionHtml += `<label class="radio-option"><input type="radio" name="q_${idx}" value="${opt.value}"> ${String.fromCharCode(65+oi)}. ${opt.value}</label>`;
+                        optCount++;
+                    }
+                });
+                if (optCount === 0) {
+                    questionHtml += `<p style="color: var(--dim);">No options provided.</p>`;
+                }
+            }
+            else if (type === 'fill') {
+                let modifiedText = qTextRaw;
+                const blanksCount = (modifiedText.match(/____/g) || []).length;
+                for (let b = 0; b < blanksCount; b++) {
+                    modifiedText = modifiedText.replace('____', `<input type="text" class="fill-blank" data-blank="${b}" placeholder="Answer">`);
+                }
+                questionHtml += `<div style="margin-top:12px; font-size:1rem;">${modifiedText}</div>`;
+            }
+            else if (type === 'match') {
+                const colA = item.querySelector('.colA')?.value || "Term";
+                const colB = item.querySelector('.colB')?.value || "Definition";
+                questionHtml += `
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:16px;">
+                        <div class="drag-box" draggable="true" ondragstart="dragMatch(event)" data-matchval="${colB}">📦 ${colB}</div>
+                        <div class="drop-zone" ondrop="dropMatch(event)" ondragover="allowDrop(event)" data-expected="${colA}">⬇️ Drop here for: <strong>${colA}</strong></div>
+                    </div>
+                `;
+            }
+            else if (type === 'short') {
+                questionHtml += `<textarea rows="4" placeholder="Write your detailed answer here..." style="width:100%; margin-top:12px; border-radius: 16px;"></textarea>`;
+            }
+            
+            questionHtml += `</div>`;
+            examContainer.innerHTML += questionHtml;
+            questionCounter++;
+        });
+        
+        // Timer setup
+        timeLeft = durationMins * 60;
+        if (timerInterval) clearInterval(timerInterval);
+        timerInterval = setInterval(updateTimerDisplay, 1000);
+        
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+    }
+    
+    function updateTimerDisplay() {
+        if (timeLeft <= 0) {
+            clearInterval(timerInterval);
+            alert("⏰ Time's up! Submitting automatically.");
+            submitExam();
+        } else {
+            let mins = Math.floor(timeLeft / 60);
+            let secs = timeLeft % 60;
+            document.getElementById('timer-box').innerHTML = `${mins.toString().padStart(2,'0')}:${secs.toString().padStart(2,'0')}`;
+            timeLeft--;
+        }
+    }
+    
+    // Drag & Drop Matching
+    window.dragMatch = function(ev) {
+        ev.dataTransfer.setData("text/plain", ev.target.getAttribute('data-matchval') || ev.target.innerText);
+        ev.dataTransfer.effectAllowed = "copy";
+    };
+    
+    window.allowDrop = function(ev) {
+        ev.preventDefault();
+    };
+    
+    window.dropMatch = function(ev) {
+        ev.preventDefault();
+        const draggedValue = ev.dataTransfer.getData("text/plain");
+        const dropZone = ev.target.closest('.drop-zone');
+        if (dropZone && !dropZone.querySelector('.dropped-content')) {
+            dropZone.innerHTML = `<div class="dropped-content" style="color:#22c55e;">✓ Matched: ${draggedValue}</div>`;
+            dropZone.classList.add('dropped');
+            dropZone.setAttribute('data-matched', draggedValue);
+        }
+    };
+    
+    function goBack() {
+        document.getElementById('adminPanel').style.display = 'block';
+        document.getElementById('examView').style.display = 'none';
+        if (timerInterval) clearInterval(timerInterval);
+    }
+    
+    function submitExam() {
+        if (timerInterval) clearInterval(timerInterval);
+        const studentName = document.getElementById('stuName').value.trim() || "Anonymous Student";
+        
+        // Build answer summary
+        let answerCount = 0;
+        const allQuestions = document.querySelectorAll('.question-wrap');
+        allQuestions.forEach((qWrap, i) => {
+            const radios = qWrap.querySelectorAll('input[type="radio"]:checked');
+            const fills = qWrap.querySelectorAll('.fill-blank');
+            const textareas = qWrap.querySelectorAll('textarea');
+            const matchedZones = qWrap.querySelectorAll('.drop-zone[data-matched]');
+            if (radios.length || fills.length || textareas.length || matchedZones.length) {
+                answerCount++;
+            }
+        });
+        
+        alert(`✅ ${studentName}, your exam has been submitted!\n\n📊 ${answerCount} out of ${allQuestions.length} questions answered.\n\nThank you for completing the exam.`);
+        
+        // Reset to admin panel
+        goBack();
+        
+        // Clear form
+        document.getElementById('stuName').value = '';
+    }
+    
+    // Expose functions globally
+    window.initBuilder = initBuilder;
+    window.launchExam = launchExam;
+    window.submitExam = submitExam;
+    window.goBack = goBack;
+    window.loadSampleExam = loadSampleExam;
+    
+    // Initialize Lucide icons
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+    
+    // Optional: Auto-load sample exam on page load
+    setTimeout(() => {
+        if (document.getElementById('cntTF') && !document.getElementById('cntTF').value) {
+            loadSampleExam();
+        }
+    }, 500);
+</script>
+</body>
+</html>

@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EB Academy | Secure Multi-Portal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.85);
+            --teacher-color: #10b981;
+            --student-color: #38bdf8;
+            --admin-color: #f43f5e;
+            --parent-color: #a855f7;
+            --text-color: #f1f5f9;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .role-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            z-index: 5;
+            transition: 0.5s;
+        }
+
+        .role-btn {
+            padding: 30px;
+            width: 180px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            font-weight: bold;
+            color: white;
+            background: var(--card-bg);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .role-btn i { font-size: 2.5rem; }
+        .role-btn:hover { transform: translateY(-10px); background: rgba(255,255,255,0.15); }
+
+        .btn-teacher:hover { border-color: var(--teacher-color); box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3); }
+        .btn-student:hover { border-color: var(--student-color); box-shadow: 0 10px 30px rgba(56, 189, 248, 0.3); }
+        .btn-admin:hover { border-color: var(--admin-color); box-shadow: 0 10px 30px rgba(244, 63, 94, 0.3); }
+        .btn-parent:hover { border-color: var(--parent-color); box-shadow: 0 10px 30px rgba(168, 85, 247, 0.3); }
+
+        #modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(15px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .login-card {
+            background: var(--card-bg);
+            padding: 2.5rem;
+            border-radius: 28px;
+            width: 380px;
+            border: 1px solid rgba(255,255,255,0.1);
+            position: relative;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            animation: slideUp 0.4s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .pass-group { margin-bottom: 1.2rem; display: flex; flex-direction: column; gap: 5px; }
+        .pass-group label { font-size: 0.8rem; color: #94a3b8; padding-left: 5px; }
+        .pass-wrapper { position: relative; display: flex; align-items: center; }
+
+        .pass-group input {
+            width: 100%;
+            box-sizing: border-box;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid #475569;
+            padding: 14px;
+            border-radius: 12px;
+            color: white;
+            outline: none;
+            transition: 0.3s;
+        }
+        .pass-group input:focus { border-color: #fff; }
+
+        #toggleEye { position: absolute; right: 15px; cursor: pointer; color: #94a3b8; }
+        
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            color: white;
+            margin-top: 10px;
+            transition: transform 0.2s;
+        }
+
+        .guest-link-btn {
+            width: 100%;
+            margin-top: 15px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px dashed rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            color: #fbbf24;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .back-btn {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.8rem;
+            color: #64748b;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        .delete { display: none; }
+        .bg-teacher { background: var(--teacher-color); }
+        .bg-student { background: var(--student-color); }
+        .bg-admin { background: var(--admin-color); }
+        .bg-parent { background: var(--parent-color); }
+    </style>
+</head>
+<body>
+
+    <div class="role-grid" id="mainMenu">
+        <button class="role-btn btn-teacher" onclick="openLogin('Teacher', 'bg-teacher')">
+            <i class="fas fa-apple-alt" style="color: var(--teacher-color);"></i> Teacher
+        </button>
+        <button class="role-btn btn-student" onclick="openLogin('Student', 'bg-student')">
+            <i class="fas fa-book-reader" style="color: var(--student-color);"></i> Student
+        </button>
+        <button class="role-btn btn-parent" onclick="openLogin('Parent', 'bg-parent')">
+            <i class="fas fa-user-friends" style="color: var(--parent-color);"></i> Parent
+        </button>
+        <button class="role-btn btn-admin" onclick="openLogin('Admin', 'bg-admin')">
+            <i class="fas fa-unlock-alt" style="color: var(--admin-color);"></i> Admin
+        </button>
+    </div>
+
+    <div id="modal">
+        <div class="login-card">
+            <h2 id="modalTitle">Portal Login</h2>
+            <p id="roleDesc">Secure access portal.</p>
+            
+            <div class="pass-group">
+                <label>Identify</label>
+                <input type="text" id="username" placeholder="Full Name">
+            </div>
+            
+            <div class="pass-group">
+                <label>Passkey</label>
+                <div class="pass-wrapper">
+                    <input type="password" id="passkey" placeholder="••••••••">
+                    <i class="fas fa-eye" id="toggleEye" onclick="togglePassword()"></i>
+                </div>
+            </div>
+
+            <button class="submit-btn" id="submitBtn" onclick="verifyAccess()">Open Secure Files</button>
+            <button class="guest-link-btn" id="guestBtn" onclick="openGuestFile()"></button>
+
+            <span class="back-btn" onclick="closeLogin()">Cancel and go back</span>
+        </div>
+    </div>
+
+    <script>
+        let selectedRole = "";
+        let isPassVisible = false;
+
+        function openLogin(role, theme) {
+            selectedRole = role;
+            const guestBtn = document.getElementById('guestBtn');
+            document.getElementById('modalTitle').innerText = `${role} Login`;
+            document.getElementById('submitBtn').className = `submit-btn ${theme}`;
+            
+            guestBtn.classList.remove('delete');
+            if(role === 'Student') {
+                guestBtn.innerHTML = '<i class="fas fa-user-plus"></i> New Student Registration';
+            } else if(role === 'Teacher') {
+                guestBtn.innerHTML = '<i class="fas fa-file-signature"></i> Teacher Application';
+            } else {
+                guestBtn.classList.add('delete');
+            }
+
+            document.getElementById('modal').style.display = 'flex';
+            document.getElementById('mainMenu').style.filter = 'blur(10px)';
+        }
+
+        function closeLogin() {
+            document.getElementById('modal').style.display = 'none';
+            document.getElementById('mainMenu').style.filter = 'none';
+        }
+
+        function togglePassword() {
+            const passField = document.getElementById('passkey');
+            isPassVisible = !isPassVisible;
+            passField.type = isPassVisible ? "text" : "password";
+            document.getElementById('toggleEye').classList.toggle('fa-eye-slash');
+        }
+
+        async function verifyAccess() {
+    const user = document.getElementById('username').value;
+    const pass = document.getElementById('passkey').value;
+    const btn = document.getElementById('submitBtn');
+
+    if (!user || !pass) {
+        alert("Please enter both Name and Passkey.");
+        return;
+    }
+
+    btn.innerText = "Verifying...";
+    btn.disabled = true;
+
+    const formData = new FormData();
+    formData.append('username', user);
+    formData.append('passkey', pass);
+    formData.append('role', selectedRole);
+
+    try {
+        const response = await fetch('verify_login.php', {
+            method: 'POST',
+            body: formData
+        });
+
+        const result = await response.text();
+        console.log("Server Response:", result); // Look at this in F12 Console
+
+        if (result.trim() === "success") {
+            // Check your folder path! If pass.html and student/ are in the same root:
+            const redirectMap = {
+                'Admin': 'administration/Atransition.html',
+                'Student': 'student/Stransition.html',
+                'Teacher': 'teacher/Ttransition.html',
+                'Parent': 'parent/Ptransition.html'
+            };
+            window.location.href = "../" + redirectMap[selectedRole];
+        } else {
+            alert("Access Denied: Credentials do not match our records.");
+            btn.innerText = "Open Secure Files";
+            btn.disabled = false;
+        }
+    } catch (error) {
+        alert("Connection Error.");
+        btn.disabled = false;
+    }
+}
+
+        function openGuestFile() {
+            window.location.href = (selectedRole === 'Student') ? '../student/registration.html' : '../teacher/application.html';
+        }
+    </script>
+</body>
+</html>

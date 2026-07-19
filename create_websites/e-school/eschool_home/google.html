@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EB Assistant | Google Auth</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-glow: rgba(79, 70, 229, 0.4);
+            --bg-dark: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.98);
+            --text-main: #f8fafc;
+            --bot-msg: #334155;
+            --error-red: #ef4444;
+        }
+
+        body {
+            background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
+            font-family: 'Poppins', sans-serif;
+            min-height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        /* --- LOADER OVERLAY --- */
+        #loader-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg-dark);
+            z-index: 3000;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .loader-image-container {
+            position: relative;
+            width: 100px; height: 100px;
+            display: flex; justify-content: center; align-items: center;
+        }
+
+        .outer-ring {
+            position: absolute; width: 100%; height: 100%;
+            border: 2px solid rgba(79, 70, 229, 0.1);
+            border-top: 2px solid var(--primary);
+            border-radius: 50%;
+            animation: rotate 2s linear infinite;
+        }
+
+        .loader-progress {
+            width: 200px; height: 4px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px; overflow: hidden;
+        }
+
+        #loader-fill {
+            height: 100%; width: 0%;
+            background: var(--primary);
+            box-shadow: 0 0 10px var(--primary-glow);
+            transition: width 0.4s ease;
+        }
+
+        .loader-status {
+            font-size: 0.7rem; color: #94a3b8;
+            text-transform: uppercase; letter-spacing: 2px;
+        }
+
+        /* --- ERROR NOTIFICATION (TOAST) --- */
+        #error-notification {
+            position: absolute;
+            bottom: -100px; /* Hidden by default */
+            left: 20px;
+            right: 20px;
+            background: #7f1d1d;
+            color: #fecaca;
+            padding: 12px 16px;
+            border-radius: 12px;
+            border-left: 4px solid var(--error-red);
+            font-size: 0.85rem;
+            z-index: 4000;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: bottom 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        #error-notification.show { bottom: 20px; }
+
+        .close-error { cursor: pointer; opacity: 0.7; font-size: 1.1rem; }
+        .close-error:hover { opacity: 1; }
+
+        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        /* --- CHAT UI --- */
+        #chat-launcher { position: fixed; bottom: 30px; right: 30px; width: 65px; height: 65px; border-radius: 50%; background: var(--primary); color: white; border: none; font-size: 26px; cursor: pointer; box-shadow: 0 10px 25px var(--primary-glow); z-index: 2000; }
+        #chatbot-container { position: fixed; top: 0; right: 0; width: 380px; height: 100vh; background: var(--card-bg); backdrop-filter: blur(20px); box-shadow: -15px 0 50px rgba(0, 0, 0, 0.6); z-index: 2001; display: flex; transform: translateX(105%); transition: transform 0.5s ease; }
+        #chatbot-container.open { transform: translateX(0); }
+        .chat-content-wrapper { display: flex; flex-direction: column; height: 100%; padding: 1.5rem; flex-grow: 1; position: relative; overflow: hidden; }
+        #auth-overlay { position: absolute; inset: 0; background: var(--card-bg); z-index: 2005; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 2rem; text-align: center; }
+        .btn-google { background: white; color: #444; border: 1px solid #ddd; padding: 12px 24px; border-radius: 12px; font-weight: 600; display: flex; align-items: center; gap: 12px; cursor: pointer; }
+        .user-info { display: flex; align-items: center; justify-content: space-between; background: rgba(15, 23, 42, 0.4); padding: 8px 12px; border-radius: 15px; margin-bottom: 1rem; }
+        .user-avatar { width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--primary); }
+        .bot-message { align-self: flex-start; background: var(--bot-msg); color: var(--text-main); border-radius: 18px; border-bottom-left-radius: 4px; padding: 12px 16px; margin: 8px 0; max-width: 85%; }
+        .form-control { background: rgba(15, 23, 42, 0.7) !important; color: white !important; border: 1px solid rgba(255,255,255,0.1) !important; border-radius: 12px !important; }
+    </style>
+</head>
+<body>
+
+    <button id="chat-launcher" onclick="toggleChat()">
+        <i class="fas fa-comment-dots"></i>
+    </button>
+
+    <div id="chatbot-container">
+        <div id="resizer" style="width: 6px; cursor: ew-resize; background: rgba(255, 255, 255, 0.05);"></div>
+        
+        <div class="chat-content-wrapper">
+            
+            <div id="error-notification">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span id="error-message">Connection failed.</span>
+                </div>
+                <i class="fas fa-times close-error" onclick="dismissError()"></i>
+            </div>
+
+            <div id="loader-overlay">
+                <div class="loader-image-container">
+                    <div class="outer-ring"></div>
+                    <i class="fab fa-google" style="font-size: 2rem; color: var(--primary); z-index: 2;"></i>
+                </div>
+                <div class="loader-progress">
+                    <div id="loader-fill"></div>
+                </div>
+                <div id="loader-status" class="loader-status">Verifying...</div>
+            </div>
+
+            <div id="auth-overlay">
+                <i class="fas fa-shield-alt mb-3" style="font-size: 3.5rem; color: var(--primary);"></i>
+                <h4 style="color: white;">EB Assistant</h4>
+                <p style="color: #94a3b8; font-size: 0.9rem;">Sign in to start your session</p>
+                <button class="btn-google" onclick="signInWithGoogle()">
+                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="18">
+                    Sign in with Google
+                </button>
+            </div>
+
+            <div class="chat-header">
+                <button onclick="toggleChat()" style="float: right; background:none; border:none; color:#64748b;"><i class="fas fa-times"></i></button>
+                <h5 style="color: white; margin: 0;"><i class="fas fa-robot mr-2"></i>Assistant</h5>
+            </div>
+
+            <div id="user-header" class="user-info" style="display: none;">
+                <div class="user-profile" style="display: flex; align-items: center; gap: 10px;">
+                    <img id="user-pic" class="user-avatar" src="">
+                    <span id="user-name" style="color: white; font-size: 0.85rem;"></span>
+                </div>
+                <span style="color: #ef4444; cursor: pointer; font-size: 0.75rem; font-weight: 600;" onclick="signOutUser()">LOGOUT</span>
+            </div>
+
+            <div id="chat-history" style="flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column;">
+                <div class="chat-message bot-message">Hello! Please sign in to continue.</div>
+            </div>
+
+            <div class="input-group">
+                <input type="text" class="form-control" id="userInput" placeholder="Ask anything..." onkeypress="handleKeyPress(event)" />
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyA6lvXt1RVDbUYF1jL0yWj6OtU4Dd9-1ms",
+            authDomain: "eb-academy-7f198.firebaseapp.com",
+            projectId: "eb-academy-7f198",
+            storageBucket: "eb-academy-7f198.firebasestorage.app",
+            messagingSenderId: "1056181453023",
+            appId: "1:1056181453023:web:6604a142c9997045fee96a"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const provider = new firebase.auth.GoogleAuthProvider();
+
+        const loader = document.getElementById('loader-overlay');
+        const loaderFill = document.getElementById('loader-fill');
+        const loaderStatus = document.getElementById('loader-status');
+        const errorToast = document.getElementById('error-notification');
+        const errorMsg = document.getElementById('error-message');
+
+        function showLoader(percent, status) {
+            loader.style.display = 'flex';
+            loaderFill.style.width = percent + '%';
+            loaderStatus.innerText = status;
+        }
+
+        // ERROR HANDLING LOGIC
+        function triggerError(message) {
+            loader.style.display = 'none'; // Hide loader
+            errorMsg.innerText = message;
+            errorToast.classList.add('show');
+            
+            // Auto-hide after 5 seconds
+            setTimeout(dismissError, 5000);
+        }
+
+        function dismissError() {
+            errorToast.classList.remove('show');
+        }
+
+        function signInWithGoogle() {
+            dismissError(); // Clear old errors
+            showLoader(30, "Waiting for Google...");
+            auth.signInWithPopup(provider).catch(err => {
+                triggerError(err.message);
+            });
+        }
+
+        function signOutUser() { auth.signOut(); }
+
+        auth.onAuthStateChanged(user => {
+            const overlay = document.getElementById('auth-overlay');
+            const userHeader = document.getElementById('user-header');
+            if (user) {
+                showLoader(70, "Syncing Profile...");
+                setTimeout(() => {
+                    overlay.style.display = 'none';
+                    userHeader.style.display = 'flex';
+                    document.getElementById('user-name').innerText = user.displayName;
+                    document.getElementById('user-pic').src = user.photoURL;
+                    loader.style.display = 'none';
+                }, 1000);
+            } else {
+                overlay.style.display = 'flex';
+                userHeader.style.display = 'none';
+                loader.style.display = 'none';
+            }
+        });
+
+        function toggleChat() { document.getElementById('chatbot-container').classList.toggle('open'); }
+        function handleKeyPress(e) { if (e.key === 'Enter') sendMessage(); }
+        // ... rest of chat logic (sendMessage, appendMessage) remains the same
+    </script>
+</body>
+</html>

@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Faculty Sphere – Teacher Profiles with Rating Validation</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: all 0.2s ease;
+        }
+
+        :root {
+            --bg-dark: #030712;
+            --card-surface: #111827;
+            --primary-blue: #3b82f6;
+            --primary-glow: rgba(59, 130, 246, 0.25);
+            --gold-star: #fbbf24;
+            --text-light: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-subtle: #1e293b;
+            --error-red: #f87171;
+            --success-green: #34d399;
+            --transition-default: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body {
+            background: radial-gradient(ellipse at 20% 30%, #0a0f1f, var(--bg-dark));
+            font-family: 'Poppins', sans-serif;
+            padding: 2rem 1.8rem;
+            min-height: 100vh;
+            color: var(--text-light);
+        }
+
+        .dashboard-header {
+            max-width: 1400px;
+            margin: 0 auto 2rem auto;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .title-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .title-section h1 {
+            font-size: 1.9rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #ffffff 20%, var(--primary-blue) 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            letter-spacing: -0.3px;
+        }
+
+        .badge-icon {
+            background: rgba(59,130,246,0.15);
+            padding: 8px;
+            border-radius: 18px;
+            display: inline-flex;
+        }
+
+        .action-save {
+            background: var(--primary-blue);
+            border: none;
+            padding: 0.7rem 1.8rem;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: white;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 8px 20px rgba(59,130,246,0.2);
+            transition: transform 0.15s, background 0.2s;
+        }
+
+        .action-save:hover {
+            transform: translateY(-2px);
+            background: #2563eb;
+        }
+
+        .teacher-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+            gap: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .profile-card {
+            background: var(--card-surface);
+            border-radius: 32px;
+            border: 1px solid var(--border-subtle);
+            overflow: hidden;
+            backdrop-filter: blur(2px);
+            transition: var(--transition-default);
+            box-shadow: 0 20px 30px -12px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .profile-card.invalid-card {
+            border-left: 5px solid var(--error-red);
+            box-shadow: 0 0 0 1px rgba(248,113,113,0.4);
+        }
+
+        .image-zone {
+            position: relative;
+            height: 230px;
+            background: #0f172a;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            transition: background 0.2s;
+        }
+
+        .image-zone:hover {
+            background: #1a2335;
+        }
+
+        .teacher-preview {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: none;
+            z-index: 2;
+        }
+
+        .upload-placeholder {
+            text-align: center;
+            color: var(--text-muted);
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .upload-placeholder svg {
+            width: 2.4rem;
+            height: 2.4rem;
+            margin-bottom: 8px;
+            stroke: var(--text-muted);
+        }
+
+        .experience-badge {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(10px);
+            padding: 5px 12px;
+            border-radius: 40px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            font-family: monospace;
+            border: 1px solid rgba(251,191,36,0.3);
+            z-index: 5;
+            pointer-events: none;
+        }
+
+        .experience-badge svg {
+            width: 0.85rem;
+            height: 0.85rem;
+            stroke: var(--gold-star);
+        }
+
+        .field-error {
+            padding: 0 1.5rem;
+            min-height: 28px;
+        }
+
+        .error-message {
+            color: var(--error-red);
+            font-size: 0.7rem;
+            font-weight: 500;
+            margin-top: 4px;
+            margin-left: 40px;
+            display: none;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .error-message svg {
+            width: 0.75rem;
+            height: 0.75rem;
+            stroke: var(--error-red);
+        }
+
+        /* Error visible state - only shown when validation triggers after save attempt */
+        .field-error.has-field-error .error-message {
+            display: flex;
+        }
+
+        .info-block {
+            padding: 1.5rem 1.5rem 1.8rem;
+            flex: 1;
+        }
+
+        .field-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px;
+            width: 100%;
+        }
+
+        .field-icon {
+            width: 32px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .field-icon svg {
+            width: 1.1rem;
+            height: 1.1rem;
+            stroke: var(--primary-blue);
+        }
+
+        .field-content {
+            flex: 1;
+        }
+
+        .editable-text {
+            border: 2px solid transparent;
+            border-radius: 14px;
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.02);
+            font-size: 0.95rem;
+            outline: none;
+            width: 100%;
+            color: var(--text-light);
+            transition: 0.2s;
+        }
+
+        .editable-text:focus {
+            border-color: var(--primary-blue);
+            background: #0f172a;
+        }
+
+        .teacher-name {
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .teacher-role {
+            color: var(--primary-blue);
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+        }
+
+        .subject-style {
+            font-weight: 500;
+        }
+
+        .years-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(0, 0, 0, 0.25);
+            padding: 6px 12px;
+            border-radius: 60px;
+            width: 100%;
+        }
+
+        .years-editable-chip {
+            background: #1e2a44;
+            border-radius: 32px;
+            padding: 5px 16px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            min-width: 70px;
+            text-align: center;
+            color: var(--gold-star);
+            border: 1px solid var(--border-subtle);
+        }
+
+        .quote-style {
+            font-style: italic;
+            color: #cbd5e1;
+        }
+
+        .rating-area {
+            display: flex;
+            gap: 10px;
+            margin-top: 1.2rem;
+            padding-top: 0.8rem;
+            border-top: 1px dashed var(--border-subtle);
+            justify-content: flex-start;
+        }
+
+        /* Rating invalid state - red border and background */
+        .rating-area.rating-invalid {
+            outline: 2px solid var(--error-red);
+            outline-offset: 2px;
+            border-radius: 40px;
+            background: rgba(248, 113, 113, 0.08);
+            padding: 0.8rem 12px 0rem 12px;
+            margin-top: 1.2rem;
+        }
+
+        /* Shake animation for stars */
+        .shake-stars {
+            animation: gentleShake 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+        }
+
+        .star-icon {
+            font-size: 1.6rem;
+            cursor: pointer;
+            color: var(--text-muted);
+            transition: transform 0.1s, color 0.1s;
+        }
+
+        .star-icon.active-star {
+            color: var(--gold-star);
+            text-shadow: 0 0 6px rgba(251,191,36,0.5);
+        }
+
+        .star-icon:hover {
+            transform: scale(1.15);
+            color: var(--gold-star);
+        }
+
+        @keyframes gentleShake {
+            0% { transform: translateX(0); }
+            20% { transform: translateX(-4px); }
+            40% { transform: translateX(4px); }
+            60% { transform: translateX(-2px); }
+            80% { transform: translateX(2px); }
+            100% { transform: translateX(0); }
+        }
+
+        .shake-card-animation {
+            animation: gentleShake 0.4s ease-in-out;
+        }
+
+        @media (max-width: 780px) {
+            body { padding: 1rem; }
+            .teacher-grid { gap: 1.2rem; }
+            .error-message { margin-left: 34px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="dashboard-header">
+    <div class="title-section">
+        <div class="badge-icon">
+            <i data-lucide="users"></i>
+        </div>
+        <h1>Faculty Sphere</h1>
+    </div>
+    <button class="action-save" id="globalSaveTrigger">
+        <i data-lucide="archive"></i> Publish Directory
+    </button>
+</div>
+
+<div class="teacher-grid" id="teacherGridContainer"></div>
+
+<script>
+    // ======================== CONFIGURATION ========================
+    const FACULTY_COUNT = 6;
+    // Track if save has been attempted to control error visibility
+    let saveAttempted = false;
+    let lucideInitialized = false;
+
+    // Helper to reinitialize Lucide icons after DOM changes
+    function refreshLucideIcons() {
+        if (typeof lucide !== 'undefined' && lucide.createIcons) {
+            lucide.createIcons();
+            lucideInitialized = true;
+        }
+    }
+
+    // Sanitize content for display
+    function sanitizeText(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(match) {
+            if (match === '&') return '&amp;';
+            if (match === '<') return '&lt;';
+            if (match === '>') return '&gt;';
+            return match;
+        });
+    }
+
+    // Build faculty card HTML with unique IDs
+    function buildFacultyCard(dataObj, cardIndex) {
+        const defaultYears = (dataObj.years !== undefined && dataObj.years !== null) ? dataObj.years : "4";
+        return `
+            <div class="profile-card" id="facultyCard_${cardIndex}">
+                <div class="image-zone" onclick="triggerFacultyUpload(${cardIndex})">
+                    <img src="" class="teacher-preview" id="facultyPreview_${cardIndex}">
+                    <div class="experience-badge" id="expBadge_${cardIndex}">
+                        <i data-lucide="clock"></i>
+                        <span id="badgeYears_${cardIndex}">${sanitizeText(defaultYears)} yrs</span>
+                    </div>
+                    <div class="upload-placeholder" id="placeholderZone_${cardIndex}">
+                        <i data-lucide="camera"></i><br>
+                        <span>Portrait</span>
+                    </div>
+                    <input type="file" id="facultyFile_${cardIndex}" hidden accept="image/*" onchange="processFacultyImage(this, ${cardIndex})">
+                </div>
+                <div class="field-error" data-error-group="image" id="imgErrorGroup_${cardIndex}">
+                    <div class="error-message" id="imgError_${cardIndex}">
+                        <i data-lucide="alert-triangle"></i> Profile image required
+                    </div>
+                </div>
+
+                <div class="info-block">
+                    <!-- Full Name -->
+                    <div class="field-row" data-field-group="fullname">
+                        <div class="field-icon"><i data-lucide="user"></i></div>
+                        <div class="field-content">
+                            <div class="editable-text teacher-name" contenteditable="true" id="facultyName_${cardIndex}">${sanitizeText(dataObj.name || "Educator Name")}</div>
+                        </div>
+                    </div>
+                    <div class="field-error" data-error-group="fullname" id="nameErrorGroup_${cardIndex}">
+                        <div class="error-message" id="nameError_${cardIndex}">
+                            <i data-lucide="alert-triangle"></i> Name required
+                        </div>
+                    </div>
+
+                    <!-- Role -->
+                    <div class="field-row" data-field-group="role">
+                        <div class="field-icon"><i data-lucide="briefcase"></i></div>
+                        <div class="field-content">
+                            <div class="editable-text teacher-role" contenteditable="true" id="facultyRole_${cardIndex}">${sanitizeText(dataObj.role || "Lead Instructor")}</div>
+                        </div>
+                    </div>
+                    <div class="field-error" data-error-group="role" id="roleErrorGroup_${cardIndex}">
+                        <div class="error-message" id="roleError_${cardIndex}">
+                            <i data-lucide="alert-triangle"></i> Role required
+                        </div>
+                    </div>
+
+                    <!-- Subject / Expertise -->
+                    <div class="field-row" data-field-group="subject">
+                        <div class="field-icon"><i data-lucide="book-marked"></i></div>
+                        <div class="field-content">
+                            <div class="editable-text subject-style" contenteditable="true" id="facultySubject_${cardIndex}">${sanitizeText(dataObj.subject || "Curriculum Expert")}</div>
+                        </div>
+                    </div>
+                    <div class="field-error" data-error-group="subject" id="subjectErrorGroup_${cardIndex}">
+                        <div class="error-message" id="subjectError_${cardIndex}">
+                            <i data-lucide="alert-triangle"></i> Subject field required
+                        </div>
+                    </div>
+
+                    <!-- Years of Experience -->
+                    <div class="field-row" data-field-group="years">
+                        <div class="field-icon"><i data-lucide="calendar-days"></i></div>
+                        <div class="field-content">
+                            <div class="years-wrapper">
+                                <span class="years-editable-chip editable-text" contenteditable="true" id="yearsChip_${cardIndex}">${sanitizeText(defaultYears)}</span>
+                                <span style="font-size:0.75rem; color:var(--text-muted);">years of experience</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="field-error" data-error-group="years" id="yearsErrorGroup_${cardIndex}">
+                        <div class="error-message" id="yearsError_${cardIndex}">
+                            <i data-lucide="alert-triangle"></i> Years must be 0-60 (numeric)
+                        </div>
+                    </div>
+
+                    <!-- Quote / Motto -->
+                    <div class="field-row" data-field-group="quote">
+                        <div class="field-icon"><i data-lucide="quote"></i></div>
+                        <div class="field-content">
+                            <div class="editable-text quote-style" contenteditable="true" id="facultyQuote_${cardIndex}">${sanitizeText(dataObj.quote || "Inspire minds, transform futures.")}</div>
+                        </div>
+                    </div>
+                    <div class="field-error" data-error-group="quote" id="quoteErrorGroup_${cardIndex}">
+                        <div class="error-message" id="quoteError_${cardIndex}">
+                            <i data-lucide="alert-triangle"></i> Quote required
+                        </div>
+                    </div>
+
+                    <!-- Rating stars container -->
+                    <div class="rating-area" id="starContainer_${cardIndex}" data-current-rating="0">
+                        <span class="star-icon" data-star-val="1">★</span>
+                        <span class="star-icon" data-star-val="2">★</span>
+                        <span class="star-icon" data-star-val="3">★</span>
+                        <span class="star-icon" data-star-val="4">★</span>
+                        <span class="star-icon" data-star-val="5">★</span>
+                    </div>
+                    <!-- Rating error message -->
+                    <div class="field-error" data-error-group="rating" id="ratingErrorGroup_${cardIndex}">
+                        <div class="error-message" id="ratingErrorMsg_${cardIndex}">
+                            <i data-lucide="alert-triangle"></i> Please select a star rating (1-5)
+                        </div>
+                    </div>
+                    <input type="hidden" id="facultyRating_${cardIndex}" value="0">
+                </div>
+            </div>
+        `;
+    }
+
+    // render all cards
+    const gridContainer = document.getElementById('teacherGridContainer');
+    function renderAllCards() {
+        let htmlString = '';
+        for (let i = 0; i < FACULTY_COUNT; i++) {
+            htmlString += buildFacultyCard({}, i);
+        }
+        gridContainer.innerHTML = htmlString;
+        // attach star rating listeners
+        for (let i = 0; i < FACULTY_COUNT; i++) {
+            attachStarRating(i);
+            attachYearsSyncAndValidation(i);
+            attachLiveFieldTracking(i); // track field changes but NOT show errors until save
+        }
+        refreshLucideIcons();
+    }
+
+    // sync badge overlay with years chip
+    function syncBadgeFromYears(cardId) {
+        const yearsChip = document.getElementById(`yearsChip_${cardId}`);
+        const badgeSpan = document.getElementById(`badgeYears_${cardId}`);
+        if (yearsChip && badgeSpan) {
+            let raw = yearsChip.innerText.trim();
+            let numericMatch = raw.match(/\d+/);
+            let displayVal = numericMatch ? numericMatch[0] : "0";
+            badgeSpan.innerText = `${displayVal} yr${displayVal !== "1" ? 's' : ''}`;
+        }
+    }
+
+    function attachYearsSyncAndValidation(cardIndex) {
+        const yearsElement = document.getElementById(`yearsChip_${cardIndex}`);
+        if (!yearsElement) return;
+
+        const updateBadgeAndStore = () => {
+            let raw = yearsElement.innerText.trim();
+            if (raw === "") {
+                yearsElement.innerText = "0";
+                raw = "0";
+            }
+            let digits = raw.match(/\d+/);
+            let cleanNumber = digits ? parseInt(digits[0]) : 0;
+            if (isNaN(cleanNumber)) cleanNumber = 0;
+            if (cleanNumber > 60) cleanNumber = 60;
+            yearsElement.innerText = cleanNumber;
+            syncBadgeFromYears(cardIndex);
+            // If save already attempted, re-validate this field
+            if (saveAttempted) {
+                validateSingleField(cardIndex, 'years');
+                updateCardBorder(cardIndex);
+            }
+        };
+
+        yearsElement.addEventListener('input', () => {
+            let raw = yearsElement.innerText;
+            let numericPart = raw.replace(/[^\d]/g, '');
+            if (numericPart !== raw) {
+                yearsElement.innerText = numericPart;
+            }
+            updateBadgeAndStore();
+        });
+
+        yearsElement.addEventListener('blur', () => {
+            updateBadgeAndStore();
+        });
+        updateBadgeAndStore();
+    }
+
+    // Validate a single field - returns boolean, and conditionally shows error based on saveAttempted flag
+    // UPDATED: Added rating validation with red border, shake, and error message
+    function validateSingleField(cardIndex, fieldType) {
+        const card = document.getElementById(`facultyCard_${cardIndex}`);
+        if (!card) return true;
+        let isValid = true;
+        
+        if (fieldType === 'image') {
+            const previewImg = document.getElementById(`facultyPreview_${cardIndex}`);
+            const hasImage = previewImg && previewImg.src && previewImg.src.startsWith('data:');
+            const errorGroup = document.getElementById(`imgErrorGroup_${cardIndex}`);
+            isValid = hasImage;
+            if (errorGroup) {
+                if (!isValid && saveAttempted) errorGroup.classList.add('has-field-error');
+                else errorGroup.classList.remove('has-field-error');
+            }
+        }
+        else if (fieldType === 'fullname') {
+            const nameElem = document.getElementById(`facultyName_${cardIndex}`);
+            const nameVal = nameElem ? nameElem.innerText.trim() : '';
+            const isValidName = nameVal !== "" && nameVal !== "Educator Name";
+            const errorGroup = document.getElementById(`nameErrorGroup_${cardIndex}`);
+            isValid = isValidName;
+            if (errorGroup) {
+                if (!isValid && saveAttempted) errorGroup.classList.add('has-field-error');
+                else errorGroup.classList.remove('has-field-error');
+            }
+        }
+        else if (fieldType === 'role') {
+            const roleElem = document.getElementById(`facultyRole_${cardIndex}`);
+            const roleVal = roleElem ? roleElem.innerText.trim() : '';
+            const isValidRole = roleVal !== "" && roleVal !== "Lead Instructor";
+            const errorGroup = document.getElementById(`roleErrorGroup_${cardIndex}`);
+            isValid = isValidRole;
+            if (errorGroup) {
+                if (!isValid && saveAttempted) errorGroup.classList.add('has-field-error');
+                else errorGroup.classList.remove('has-field-error');
+            }
+        }
+        else if (fieldType === 'subject') {
+            const subjectElem = document.getElementById(`facultySubject_${cardIndex}`);
+            const subjectVal = subjectElem ? subjectElem.innerText.trim() : '';
+            const isValidSub = subjectVal !== "" && subjectVal !== "Curriculum Expert";
+            const errorGroup = document.getElementById(`subjectErrorGroup_${cardIndex}`);
+            isValid = isValidSub;
+            if (errorGroup) {
+                if (!isValid && saveAttempted) errorGroup.classList.add('has-field-error');
+                else errorGroup.classList.remove('has-field-error');
+            }
+        }
+        else if (fieldType === 'quote') {
+            const quoteElem = document.getElementById(`facultyQuote_${cardIndex}`);
+            const quoteVal = quoteElem ? quoteElem.innerText.trim() : '';
+            const isValidQuote = quoteVal !== "" && quoteVal !== "Inspire minds, transform futures.";
+            const errorGroup = document.getElementById(`quoteErrorGroup_${cardIndex}`);
+            isValid = isValidQuote;
+            if (errorGroup) {
+                if (!isValid && saveAttempted) errorGroup.classList.add('has-field-error');
+                else errorGroup.classList.remove('has-field-error');
+            }
+        }
+        else if (fieldType === 'years') {
+            const yearsChip = document.getElementById(`yearsChip_${cardIndex}`);
+            let yearsRaw = yearsChip ? yearsChip.innerText.trim() : "0";
+            let yearsNum = parseInt(yearsRaw);
+            const isValidYears = (!isNaN(yearsNum) && yearsNum >= 0 && yearsNum <= 60 && yearsRaw !== "");
+            const errorGroup = document.getElementById(`yearsErrorGroup_${cardIndex}`);
+            isValid = isValidYears;
+            if (errorGroup) {
+                if (!isValid && saveAttempted) errorGroup.classList.add('has-field-error');
+                else errorGroup.classList.remove('has-field-error');
+            }
+        }
+        // ========== NEW RATING VALIDATION WITH RED BORDER + SHAKE + ERROR MESSAGE ==========
+        else if (fieldType === 'rating') {
+            const ratingHidden = document.getElementById(`facultyRating_${cardIndex}`);
+            const ratingVal = ratingHidden ? parseInt(ratingHidden.value) : 0;
+            const isValidRating = ratingVal >= 1 && ratingVal <= 5;
+            
+            // Handle error message display
+            const errorGroup = document.getElementById(`ratingErrorGroup_${cardIndex}`);
+            if (errorGroup) {
+                if (!isValidRating && saveAttempted) {
+                    errorGroup.classList.add('has-field-error');
+                } else {
+                    errorGroup.classList.remove('has-field-error');
+                }
+            }
+            
+            // Handle visual feedback for stars container: red border + shake
+            const starContainer = document.getElementById(`starContainer_${cardIndex}`);
+            if (starContainer) {
+                if (!isValidRating && saveAttempted) {
+                    // Add red border class
+                    starContainer.classList.add('rating-invalid');
+                    // Trigger shake animation
+                    starContainer.classList.add('shake-stars');
+                    setTimeout(() => {
+                        if (starContainer) starContainer.classList.remove('shake-stars');
+                    }, 500);
+                } else {
+                    // Remove error styling when valid or save not attempted
+                    starContainer.classList.remove('rating-invalid');
+                    starContainer.classList.remove('shake-stars');
+                }
+            }
+            
+            isValid = isValidRating;
+        }
+        return isValid;
+    }
+
+    // Update card red border based on overall validity (INCLUDING RATING)
+    function updateCardBorder(cardIndex) {
+        const card = document.getElementById(`facultyCard_${cardIndex}`);
+        if (!card) return;
+        const fields = ['image', 'fullname', 'role', 'subject', 'quote', 'years', 'rating'];
+        let allValid = true;
+        fields.forEach(f => {
+            if (!validateSingleField(cardIndex, f)) allValid = false;
+        });
+        if (saveAttempted && !allValid) {
+            card.classList.add('invalid-card');
+        } else {
+            card.classList.remove('invalid-card');
+        }
+        return allValid;
+    }
+
+    // Validate entire card without forcing error display (just returns validity) - INCLUDING RATING
+    function isCardFullyValid(cardIndex) {
+        const fields = ['image', 'fullname', 'role', 'subject', 'quote', 'years', 'rating'];
+        for (let f of fields) {
+            let fieldValid = false;
+            if (f === 'image') {
+                const previewImg = document.getElementById(`facultyPreview_${cardIndex}`);
+                fieldValid = previewImg && previewImg.src && previewImg.src.startsWith('data:');
+            } else if (f === 'fullname') {
+                const nameElem = document.getElementById(`facultyName_${cardIndex}`);
+                const nameVal = nameElem ? nameElem.innerText.trim() : '';
+                fieldValid = nameVal !== "" && nameVal !== "Educator Name";
+            } else if (f === 'role') {
+                const roleElem = document.getElementById(`facultyRole_${cardIndex}`);
+                const roleVal = roleElem ? roleElem.innerText.trim() : '';
+                fieldValid = roleVal !== "" && roleVal !== "Lead Instructor";
+            } else if (f === 'subject') {
+                const subjectElem = document.getElementById(`facultySubject_${cardIndex}`);
+                const subjectVal = subjectElem ? subjectElem.innerText.trim() : '';
+                fieldValid = subjectVal !== "" && subjectVal !== "Curriculum Expert";
+            } else if (f === 'quote') {
+                const quoteElem = document.getElementById(`facultyQuote_${cardIndex}`);
+                const quoteVal = quoteElem ? quoteElem.innerText.trim() : '';
+                fieldValid = quoteVal !== "" && quoteVal !== "Inspire minds, transform futures.";
+            } else if (f === 'years') {
+                const yearsChip = document.getElementById(`yearsChip_${cardIndex}`);
+                let yearsRaw = yearsChip ? yearsChip.innerText.trim() : "0";
+                let yearsNum = parseInt(yearsRaw);
+                fieldValid = (!isNaN(yearsNum) && yearsNum >= 0 && yearsNum <= 60 && yearsRaw !== "");
+            } else if (f === 'rating') {
+                const ratingHidden = document.getElementById(`facultyRating_${cardIndex}`);
+                const ratingVal = ratingHidden ? parseInt(ratingHidden.value) : 0;
+                fieldValid = (ratingVal >= 1 && ratingVal <= 5);
+            }
+            if (!fieldValid) return false;
+        }
+        return true;
+    }
+
+    // Attach live tracking: when user edits, we re-validate but error visibility depends on saveAttempted.
+    function attachLiveFieldTracking(cardIndex) {
+        const fields = ['facultyName', 'facultyRole', 'facultySubject', 'facultyQuote'];
+        fields.forEach(fieldId => {
+            const element = document.getElementById(`${fieldId}_${cardIndex}`);
+            if (element) {
+                element.addEventListener('input', () => {
+                    let fieldType = '';
+                    if (fieldId === 'facultyName') fieldType = 'fullname';
+                    else if (fieldId === 'facultyRole') fieldType = 'role';
+                    else if (fieldId === 'facultySubject') fieldType = 'subject';
+                    else if (fieldId === 'facultyQuote') fieldType = 'quote';
+                    if (fieldType) {
+                        validateSingleField(cardIndex, fieldType);
+                        updateCardBorder(cardIndex);
+                    }
+                });
+            }
+        });
+    }
+
+    // Updated star rating to trigger validation on click
+    function attachStarRating(cardIndex) {
+        const starContainer = document.getElementById(`starContainer_${cardIndex}`);
+        if (!starContainer) return;
+        const stars = starContainer.querySelectorAll('.star-icon');
+        const ratingHidden = document.getElementById(`facultyRating_${cardIndex}`);
+        
+        const updateStarsUI = (ratingVal) => {
+            stars.forEach((star, idx) => {
+                if (idx < ratingVal) star.classList.add('active-star');
+                else star.classList.remove('active-star');
+            });
+            if (ratingHidden) ratingHidden.value = ratingVal;
+            starContainer.setAttribute('data-current-rating', ratingVal);
+            
+            // Re-validate rating field and update border
+            if (saveAttempted) {
+                validateSingleField(cardIndex, 'rating');
+                updateCardBorder(cardIndex);
+            } else {
+                // Clear any pre-existing error styling when rating is selected
+                const errorGroup = document.getElementById(`ratingErrorGroup_${cardIndex}`);
+                if (errorGroup) errorGroup.classList.remove('has-field-error');
+                starContainer.classList.remove('rating-invalid');
+                starContainer.classList.remove('shake-stars');
+            }
+        };
+        
+        updateStarsUI(0);
+        
+        stars.forEach(star => {
+            star.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const starValue = parseInt(star.getAttribute('data-star-val'));
+                updateStarsUI(starValue);
+            });
+        });
+    }
+
+    // image handler
+    window.processFacultyImage = function(inputEl, idx) {
+        const file = inputEl.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                const previewImg = document.getElementById(`facultyPreview_${idx}`);
+                const placeholderDiv = document.getElementById(`placeholderZone_${idx}`);
+                if (previewImg) {
+                    previewImg.src = ev.target.result;
+                    previewImg.style.display = 'block';
+                    if (placeholderDiv) placeholderDiv.style.display = 'none';
+                    if (saveAttempted) {
+                        validateSingleField(idx, 'image');
+                        updateCardBorder(idx);
+                    } else {
+                        const errorGroup = document.getElementById(`imgErrorGroup_${idx}`);
+                        if (errorGroup) errorGroup.classList.remove('has-field-error');
+                    }
+                    refreshLucideIcons();
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    window.triggerFacultyUpload = function(idx) {
+        const fileInput = document.getElementById(`facultyFile_${idx}`);
+        if (fileInput) fileInput.click();
+    };
+
+    // collect all data for saving
+    function collectAllTeacherData() {
+        const facultyDataArray = [];
+        let globalValidFlag = true;
+        for (let i = 0; i < FACULTY_COUNT; i++) {
+            const cardValid = isCardFullyValid(i);
+            if (!cardValid) globalValidFlag = false;
+            const previewImg = document.getElementById(`facultyPreview_${i}`);
+            const imageSrc = (previewImg && previewImg.src && previewImg.src.startsWith('data:')) ? previewImg.src : '';
+            const nameRaw = document.getElementById(`facultyName_${i}`)?.innerText.trim() || "";
+            const roleRaw = document.getElementById(`facultyRole_${i}`)?.innerText.trim() || "";
+            const subjectRaw = document.getElementById(`facultySubject_${i}`)?.innerText.trim() || "";
+            const quoteRaw = document.getElementById(`facultyQuote_${i}`)?.innerText.trim() || "";
+            let yearsRaw = document.getElementById(`yearsChip_${i}`)?.innerText.trim() || "0";
+            let yearsNum = parseInt(yearsRaw);
+            if (isNaN(yearsNum)) yearsNum = 0;
+            const ratingVal = parseInt(document.getElementById(`facultyRating_${i}`)?.value) || 0;
+            facultyDataArray.push({
+                id: i,
+                name: nameRaw,
+                role: roleRaw,
+                subject: subjectRaw,
+                quote: quoteRaw,
+                yearsOfWork: yearsNum,
+                rating: ratingVal,
+                imageBase64: imageSrc
+            });
+        }
+        return { data: facultyDataArray, isValid: globalValidFlag };
+    }
+
+    // save handler: trigger error display only after click
+    async function handleGlobalSave() {
+        const saveButton = document.getElementById('globalSaveTrigger');
+        // Set saveAttempted to true so error messages become visible
+        saveAttempted = true;
+        
+        // Re-validate all fields to show errors now (including rating)
+        for (let i = 0; i < FACULTY_COUNT; i++) {
+            validateSingleField(i, 'image');
+            validateSingleField(i, 'fullname');
+            validateSingleField(i, 'role');
+            validateSingleField(i, 'subject');
+            validateSingleField(i, 'quote');
+            validateSingleField(i, 'years');
+            validateSingleField(i, 'rating'); // NEW: validate rating on save
+            updateCardBorder(i);
+        }
+        
+        const collection = collectAllTeacherData();
+        if (!collection.isValid) {
+            saveButton.style.background = 'var(--error-red)';
+            saveButton.innerHTML = '<i data-lucide="alert-triangle"></i> Fix errors first';
+            setTimeout(() => {
+                saveButton.style.background = '';
+                saveButton.innerHTML = '<i data-lucide="archive"></i> Publish Directory';
+                refreshLucideIcons();
+            }, 2000);
+            const firstInvalidCard = document.querySelector('.profile-card.invalid-card');
+            if (firstInvalidCard) {
+                firstInvalidCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                firstInvalidCard.classList.add('shake-card-animation');
+                setTimeout(() => firstInvalidCard.classList.remove('shake-card-animation'), 500);
+            }
+            return;
+        }
+        console.log("✅ Faculty Directory Saved:", collection.data);
+        saveButton.style.background = 'var(--success-green)';
+        saveButton.innerHTML = '<i data-lucide="check-circle"></i> Saved!';
+        setTimeout(() => {
+            saveButton.style.background = '';
+            saveButton.innerHTML = '<i data-lucide="archive"></i> Publish Directory';
+            refreshLucideIcons();
+        }, 2000);
+        alert(`Success! ${FACULTY_COUNT} teacher profiles saved. Check console for details.`);
+    }
+
+    // Initialize everything
+    renderAllCards();
+    const saveBtn = document.getElementById('globalSaveTrigger');
+    if (saveBtn) saveBtn.addEventListener('click', handleGlobalSave);
+
+    setTimeout(() => {
+        refreshLucideIcons();
+        // Ensure no errors are shown initially (save not attempted)
+        saveAttempted = false;
+        for (let i = 0; i < FACULTY_COUNT; i++) {
+            const groups = ['imgErrorGroup', 'nameErrorGroup', 'roleErrorGroup', 'subjectErrorGroup', 'yearsErrorGroup', 'quoteErrorGroup', 'ratingErrorGroup'];
+            groups.forEach(grp => {
+                const el = document.getElementById(`${grp}_${i}`);
+                if (el) el.classList.remove('has-field-error');
+            });
+            const starContainer = document.getElementById(`starContainer_${i}`);
+            if (starContainer) {
+                starContainer.classList.remove('rating-invalid', 'shake-stars');
+            }
+            const card = document.getElementById(`facultyCard_${i}`);
+            if (card) card.classList.remove('invalid-card');
+        }
+    }, 200);
+</script>
+</body>
+</html>

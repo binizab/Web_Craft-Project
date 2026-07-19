@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EB Academy | Interactive Contact</title>
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-dark: #050a18;
+            --accent-blue: #00d2ff;
+            --text-gray: #94a3b8;
+            --card-bg: rgba(16, 25, 47, 0.95);
+        }
+
+        body { margin: 0; font-family: 'Segoe UI', sans-serif; background: var(--bg-dark); color: white; }
+
+        /* --- FOOTER STYLING --- */
+        #footer { background: #030712; padding: 60px 20px 20px; border-top: 2px solid var(--accent-blue); }
+        .footer-container { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
+            gap: 40px; 
+            max-width: 1200px; 
+            margin: 0 auto;
+            text-align: left;
+        }
+        .footer-column h3 { color: var(--accent-blue); border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
+        
+        /* Interactive Branch List */
+        .branch-item {
+            font-size: 13px; 
+            color: var(--text-gray); 
+            line-height: 1.6; 
+            display: flex; 
+            align-items: flex-start; 
+            gap: 12px;
+            margin-bottom: 12px;
+            transition: 0.3s;
+        }
+
+        /* The Clickable Map Marker Icon */
+        .branch-item i.fa-map-marker-alt { 
+            color: var(--accent-blue); 
+            margin-top: 3px; 
+            cursor: pointer;
+            font-size: 18px;
+            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            padding: 5px;
+        }
+
+        .branch-item i.fa-map-marker-alt:hover {
+            transform: scale(1.4) translateY(-5px);
+            color: #fff;
+            filter: drop-shadow(0 0 8px var(--accent-blue));
+        }
+
+        .footer-column p { font-size: 13px; color: var(--text-gray); display: flex; align-items: center; gap: 10px; }
+        .footer-copy { text-align: center; margin-top: 50px; padding: 20px; border-top: 1px solid rgba(255,255,255,0.05); font-size: 12px; color: var(--text-gray); }
+
+        /* --- MAP MODAL --- */
+        #mapOverlay { position: fixed; inset: 0; background: rgba(0,0,0,0.9); backdrop-filter: blur(10px); display: none; justify-content: center; align-items: center; z-index: 9999; }
+        .map-window { position: relative; width: 90%; max-width: 900px; height: 70vh; background: #000; border-radius: 20px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); }
+        #map { height: 100%; width: 100%; }
+        
+        .nav-info { position: absolute; top: 15px; left: 15px; z-index: 10000; background: var(--card-bg); padding: 15px; border-radius: 12px; width: 200px; pointer-events: none; }
+        .dist-val { color: #10b981; font-size: 22px; font-weight: bold; }
+        .user-dot { width: 12px; height: 12px; background: #4285f4; border: 2px solid white; border-radius: 50%; box-shadow: 0 0 10px #4285f4; }
+    </style>
+</head>
+<body>
+
+    <footer id="footer">
+        <h2 style="color: var(--accent-blue); text-align: center; letter-spacing: 5px; margin-bottom: 40px;">EB ACADEMY</h2>
+        <div class="footer-container">
+            
+            <div class="footer-column">
+                <h3>Branches</h3>
+                <div class="branch-item">
+                    <i class="fas fa-map-marker-alt" onclick="openMapPortal('Arada Highschool', [9.0384, 38.7618])"></i>
+                    <span>Near St. Yohannes church, Arada, highschool</span>
+                </div>
+                <div class="branch-item">
+                    <i class="fas fa-map-marker-alt" onclick="openMapPortal('Arada Pre-Primary', [9.0415, 38.7580])"></i>
+                    <span>Near Tibeb Edeget School, Arada, pre-primary</span>
+                </div>
+                <div class="branch-item">
+                    <i class="fas fa-map-marker-alt" onclick="openMapPortal('Gulele Pre-Primary', [9.0552, 38.7321])"></i>
+                    <span>Near Asres Leyeh Pension, Gulele, pre-primary</span>
+                </div>
+                <div class="branch-item">
+                    <i class="fas fa-map-marker-alt" onclick="openMapPortal('Gulele Middle School', [9.0560, 38.7330])"></i>
+                    <span>Near Asres Leyeh Pension, Gulele, elementary and middle</span>
+                </div>
+                <div class="branch-item">
+                    <i class="fas fa-map-marker-alt" onclick="openMapPortal('Lazarest Elementary', [9.0350, 38.7600])"></i>
+                    <span>Near Lazarest School, elementary</span>
+                </div>
+                <div class="branch-item">
+                    <i class="fas fa-map-marker-alt" onclick="openMapPortal('Gulele Elementary', [9.0520, 38.7310])"></i>
+                    <span>Near Hiywot Condominium, Gulele, elementary</span>
+                </div>
+            </div>
+
+            <div class="footer-column">
+                <h3>Contact Us</h3>
+                <p><i class="fas fa-envelope"></i> ebacademy@gmail.com</p>
+                <p><i class="fas fa-phone"></i> 09-12-13-14-15</p>
+                <p><i class="fas fa-phone"></i> 09-12-13-14-15</p>
+                <p><i class="fas fa-globe"></i> www.ebacademy.com</p>
+            </div>
+
+            <div class="footer-column">
+                <h3>Social Media</h3>
+                <p><i class="fab fa-telegram"></i> 1-6 Gulele no.1</p>
+                <p><i class="fab fa-telegram"></i> 1-8 Gulele</p>
+                <p><i class="fab fa-telegram"></i> 1-6 Gulele no.2</p>
+                <p><i class="fab fa-telegram"></i> 9-12 Arada</p>
+                <p><i class="fab fa-telegram"></i> Pre-primary Gulele</p>
+                <p><i class="fab fa-telegram"></i> Pre-primary Arada</p>
+            </div>
+        </div>
+
+        <div class="footer-copy">
+            &copy; 2026 Eb Academy. All Rights Reserved. Education is the passport to the future.
+        </div>
+    </footer>
+
+    <div id="mapOverlay" onclick="closeMap()">
+        <div class="map-window" onclick="event.stopPropagation()">
+            <div id="map"></div>
+            <div class="nav-info">
+                <h3 id="targetName" style="margin:0; font-size:14px; color:var(--accent-blue);">Branch</h3>
+                <div id="distance" class="dist-val">-- km</div>
+                <p id="pathStatus" style="font-size:10px; color:var(--text-gray); margin:0;">Shortest road route</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        let map;
+        let userPos = null;
+
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(p => {
+                userPos = [p.coords.latitude, p.coords.longitude];
+            }, null, {enableHighAccuracy: true});
+        }
+
+        function openMapPortal(name, coords) {
+            document.getElementById('mapOverlay').style.display = 'flex';
+            document.getElementById('targetName').innerText = name;
+
+            if (!map) {
+                map = L.map('map', { zoomControl: false });
+                L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19 }).addTo(map);
+                L.tileLayer('https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png').addTo(map);
+            }
+
+            map.eachLayer(l => { if (l instanceof L.Marker || l instanceof L.Polyline) map.removeLayer(l); });
+
+            map.setView(coords, 16);
+            L.marker(coords).addTo(map).bindPopup(name).openPopup();
+
+            if (userPos) {
+                L.marker(userPos, { icon: L.divIcon({ className: 'user-dot', html: '<div style="width:12px; height:12px; background:#4285f4; border:2px solid white; border-radius:50%;"></div>' }) }).addTo(map);
+                
+                fetch(`https://router.project-osrm.org/route/v1/driving/${userPos[1]},${userPos[0]};${coords[1]},${coords[0]}?overview=full&geometries=geojson`)
+                    .then(res => res.json())
+                    .then(data => {
+                        const route = data.routes[0];
+                        document.getElementById('distance').innerText = (route.distance / 1000).toFixed(2) + " km";
+                        const points = route.geometry.coordinates.map(p => [p[1], p[0]]);
+                        const line = L.polyline(points, { color: '#00f2ff', weight: 5, opacity: 0.8, dashArray: '1, 10' }).addTo(map);
+                        map.fitBounds(line.getBounds(), { padding: [50, 50] });
+                    });
+            }
+            setTimeout(() => map.invalidateSize(), 300);
+        }
+
+        function closeMap() { document.getElementById('mapOverlay').style.display = 'none'; }
+    </script>
+</body>
+</html>

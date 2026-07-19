@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EB Academy | Admissions Control</title>
+    <style>
+        :root {
+            --bg: #09090b;
+            --card: #18181b;
+            --accent: #38bdf8;
+            --text: #ffffff;
+            --dim: #71717a;
+            --border: #27272a;
+            --success: #10b981;
+            --danger: #ef4444;
+        }
+
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+
+        .tab-nav { display: flex; gap: 20px; border-bottom: 1px solid var(--border); margin-bottom: 30px; }
+        .tab { padding: 15px 30px; cursor: pointer; color: var(--dim); border-bottom: 2px solid transparent; transition: 0.3s; }
+        .tab.active { color: var(--accent); border-color: var(--accent); font-weight: bold; }
+
+        .app-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; }
+        .app-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 20px; position: relative; transition: 0.4s; }
+        .app-card:hover { border-color: var(--accent); transform: translateY(-5px); }
+
+        .app-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; }
+        .type-tag { font-size: 0.7rem; padding: 3px 8px; border-radius: 4px; background: #333; color: #ccc; text-transform: uppercase; }
+
+        .btn-group { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 20px; }
+        .btn { padding: 10px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; font-size: 0.8rem; transition: 0.2s; text-align: center; }
+        
+        .btn-view { background: rgba(255,255,255,0.05); color: white; border: 1px solid #444; width: 100%; }
+        .btn-accept { background: var(--success); color: black; }
+        .btn-reject { background: var(--danger); color: white; }
+
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 1000; align-items: center; justify-content: center; padding: 20px; }
+        .modal-content { background: var(--card); width: 100%; max-width: 600px; max-height: 90vh; overflow-y: auto; border-radius: 20px; padding: 40px; border: 1px solid var(--accent); position: relative; }
+        .close-modal { position: absolute; top: 20px; right: 20px; cursor: pointer; font-size: 1.5rem; color: var(--dim); }
+
+        .info-row { display: flex; justify-content: space-between; align-items: flex-start; padding: 15px 0; border-bottom: 1px solid #27272a; }
+        .info-label { color: var(--dim); font-size: 0.9rem; min-width: 100px; }
+
+        .img-preview { width: 100%; border-radius: 8px; margin-top: 15px; border: 1px solid var(--border); display: none; }
+        .preview-trigger { background: var(--accent); color: black; padding: 5px 10px; border-radius: 4px; font-size: 0.7rem; cursor: pointer; border: none; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header style="margin-bottom: 40px;">
+            <h1 style="color:var(--accent); margin:0;">Application Review Board</h1>
+            <p style="color:var(--dim)">Process new registrations for the 2026 Academic Year</p>
+        </header>
+
+        <div class="tab-nav">
+            <div class="tab active" onclick="filterType('all', event)">All Pending</div>
+            <div class="tab" onclick="filterType('teacher', event)">Teacher Recruitment</div>
+            <div class="tab" onclick="filterType('student', event)">Student Admissions</div>
+        </div>
+
+        <div class="app-grid" id="appGrid">
+            </div>
+    </div>
+
+    <div id="infoModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+            <h2 id="modalTitle" style="color:var(--accent); margin-top:0;">Detailed Profile</h2>
+            <div id="modalBody"></div>
+            <button class="btn btn-view" style="width:100%; margin-top:30px;" onclick="closeModal()">Back to Dashboard</button>
+        </div>
+    </div>
+
+    <script>
+        let allApplications = JSON.parse(localStorage.getItem('eb_applications')) || [];
+
+// 1. Render the Grid
+function renderDashboard(filter = 'all') {
+    const appGrid = document.getElementById('appGrid');
+    appGrid.innerHTML = '';
+
+    allApplications.forEach((app, index) => {
+        // Only show apps that haven't been decided yet
+        if (app.status !== 'Pending') return;
+        if (filter !== 'all' && app.type !== filter) return;
+
+        const card = document.createElement('div');
+        card.className = 'app-card';
+        card.setAttribute('data-id', index);
+        card.innerHTML = `
+            <div class="app-header">
+                <div>
+                    <span class="type-tag">${app.type}</span>
+                    <h3 style="margin: 10px 0 5px;">${app.name}</h3>
+                    <span style="color:var(--dim); font-size:0.8rem;">${app.subject}</span>
+                </div>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-view" onclick="showLiveInfo(${index})">Review Profile</button>
+            </div>
+        `;
+        appGrid.appendChild(card);
+    });
+
+    if (appGrid.innerHTML === '') {
+        appGrid.innerHTML = `<p style="color:var(--dim); text-align:center; width:100%;">No pending applications.</p>`;
+    }
+}
+
+// 2. Accept/Reject Logic
+function updateStatus(index, newStatus) {
+    let reason = "";
+    if (newStatus === 'Rejected') {
+        reason = prompt("Rejection Reason:");
+        if (reason === null) return; 
+    }
+
+    if (confirm(`Confirm ${newStatus} for ${allApplications[index].name}?`)) {
+        // 1. Update the main data
+        allApplications[index].status = newStatus;
+        allApplications[index].reason = reason || "Requirements met.";
+        localStorage.setItem('eb_applications', JSON.stringify(allApplications));
+        
+        // 2. SEND THE "SIGNAL" to apply.html
+        // We save a temporary object that apply.html is listening for
+        localStorage.setItem('last_update', JSON.stringify({
+            email: allApplications[index].email,
+            name: allApplications[index].name,
+            status: newStatus,
+            reason: allApplications[index].reason,
+            time: Date.now() // Ensures the "storage" event fires every time
+        }));
+
+        closeModal();
+
+        // 3. Remove card from UI
+        const card = document.querySelector(`[data-id="${index}"]`);
+        if (card) {
+            card.style.opacity = "0";
+            card.style.transform = "scale(0.8)";
+            setTimeout(() => renderDashboard(), 300);
+        } else {
+            renderDashboard();
+        }
+    }
+}
+
+// 3. Modal Controls
+function showLiveInfo(index) {
+    const app = allApplications[index];
+    const body = document.getElementById('modalBody');
+    document.getElementById('modalTitle').innerText = app.name;
+    
+    body.innerHTML = `
+        <div class="info-row"><span class="info-label">EMAIL</span><span>${app.email}</span></div>
+        <div class="info-row"><span class="info-label">DOC</span>
+            <div style="text-align:right;">
+                <button class="preview-trigger" onclick="togglePreview()">VIEW IMAGE</button>
+                <img id="docPreview" src="${app.fileUrl}" class="img-preview">
+            </div>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:20px;">
+            <button class="btn btn-accept" onclick="updateStatus(${index}, 'Accepted')">Accept</button>
+            <button class="btn btn-reject" onclick="updateStatus(${index}, 'Rejected')">Reject</button>
+        </div>
+    `;
+    document.getElementById('infoModal').style.display = 'flex';
+}
+
+function filterType(val, e) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    if (e) e.target.classList.add('active');
+    renderDashboard(val);
+}
+
+function closeModal() { document.getElementById('infoModal').style.display = 'none'; }
+
+function togglePreview() {
+    const img = document.getElementById('docPreview');
+    img.style.display = (img.style.display === 'block') ? 'none' : 'block';
+}
+
+window.onclick = (e) => { if (e.target.id === 'infoModal') closeModal(); }
+
+// Initialize
+renderDashboard();
+    </script>
+</body>
+</html>

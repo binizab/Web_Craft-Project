@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://unpkg.com/dexie/dist/dexie.js"></script>
+    <link rel="stylesheet" href="teacher_eschool_dash.css">
+</head>
+<body>
+    <div class="dashboard">
+        <!-- Desktop Sidebar -->
+        <aside class="sidebar expanded" id="desktopSidebar">
+            <div class="sidebar-content">
+                <div class="logo-area">
+                    <div class="logo-icon"><i class="fas fa-chalkboard-user"></i></div>
+                    <span class="logo-text">EB Teacher</span>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-header">Teacher Hub</div>
+                    <nav id="desktopNav"></nav>
+                </div>
+                <div class="sidebar-footer">
+                    <div class="user-card">
+                        <div class="avatar"><i class="fas fa-user"></i></div>
+                        <div class="user-info">
+                            <h4>John Mekonnen</h4>
+                            <p>Mathematics Teacher</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Mobile Sidebar -->
+        <div class="mobile-sidebar" id="mobileSidebar">
+            <div class="sidebar-content">
+                <div class="logo-area">
+                    <div class="logo-icon"><i class="fas fa-chalkboard-user"></i></div>
+                    <span class="logo-text">EB Teacher</span>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-header">Teacher Hub</div>
+                    <nav id="mobileNav"></nav>
+                </div>
+            </div>
+        </div>
+        <div class="mobile-overlay" id="mobileOverlay"></div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <header class="top-bar">
+                <button class="menu-btn" id="menuBtn"><i class="fas fa-bars"></i></button>
+                <button class="desktop-toggle" id="toggleSidebar"><i class="fas fa-chevron-left"></i></button>
+                <div class="header-title">
+                    <p>Teacher Dashboard</p>
+                    <h1 id="currentViewTitle">Overview</h1>
+                </div>
+                <div class="header-actions">
+                    <button class="icon-btn" id="themeToggle"><i class="fas fa-moon"></i></button>
+                    <button class="icon-btn" id="settingsBtn"><i class="fas fa-cog"></i></button>
+                </div>
+            </header>
+            <main class="dynamic-view" id="dynamicViewContainer"></main>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="modal">
+        <div class="modal-content">
+            <h3 style="margin-bottom: 1rem;">Settings</h3>
+            <div class="form-group">
+                <label>Theme</label>
+                <select id="themeSelect">
+                    <option value="dark">Dark</option>
+                    <option value="light">Light</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Default Class</label>
+                <input type="text" id="defaultClass" placeholder="e.g., Grade 11 Mathematics">
+            </div>
+            <button class="btn-primary" id="saveSettingsBtn" style="width:100%;">Save</button>
+            <button class="btn-primary" style="width:100%; margin-top:0.5rem; background:var(--border-light);" onclick="closeSettingsModal()">Close</button>
+        </div>
+    </div>
+</body>
+<script src="teacher_eschool_dash.js"></script>
+</html>

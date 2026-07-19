@@ -1,0 +1,4323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Engine Pro | Enterprise Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="maker.css">
+</head>
+
+<style>
+            :root {
+            --primary: #00a2ff;
+            --primary-glow: rgba(0, 162, 255, 0.4);
+            --bg-dark: #050801;
+            --glass: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(74, 67, 67, 0.1);
+            --card-blue: #0a0e1a;
+            --card: #0a0e1a;
+            --hover-bg: rgba(255,255,255,0.02);
+            --border: rgba(255,255,255,0.06);
+            --glass-bg: rgba(255,255,255,0.02);
+            --accent-blue: rgba(59,130,246,.6);
+            --accent-glow: rgba(59,130,246,.12);
+            --blue: #3b82f6;
+            --error: #ff4d4d;
+            --success: #00ff88;
+            --text-main: #ffffff;
+            --text-dim: #94a3b8;
+            --accent: #3b82f6;
+            --gold: #fbbf24;
+            --sidebar-width: 260px;
+            --white-border: 1px white;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+            user-select: none;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #050801; }
+        ::-webkit-scrollbar-thumb { 
+            background: var(--primary); 
+            border-radius: 10px; 
+            border: 2px solid #050801;
+        }
+
+        .main-wrapper {
+            width: 95%;
+            max-width: 1400px;
+            margin: 30px auto;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 40px;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 50px 100px rgba(0,0,0,0.5);
+        }
+
+        .hero-banner {
+            height: 400px;
+            position: relative;
+            background: url('computer.jpg') center/cover;
+            display: flex;
+            align-items: center;
+        }
+
+        .hero-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, #050801 20%, rgba(5, 8, 1, 0.5) 100%);
+            z-index: 1;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            padding: 0 80px;
+            max-width: 900px;
+        }
+
+        .hero-content h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            background: linear-gradient(to right, #fff, var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .btn {
+            padding: 14px 28px;
+            border-radius: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            border: none;
+            color: white;
+            text-decoration: none;
+            font-size: 0.95rem;
+        }
+
+        .btn-primary { background: var(--primary); box-shadow: 0 10px 20px var(--primary-glow); }
+        .btn-primary:hover { transform: translateY(-5px); box-shadow: 0 15px 30px var(--primary-glow); }
+        .btn-outline { background: transparent; border: 1px solid var(--glass-border); }
+        .btn-outline:hover { background: var(--glass-border); }
+        .btn-danger { background: rgba(255, 77, 77, 0.1); color: var(--error); border: 1px solid rgba(255, 77, 77, 0.2); }
+        .btn-danger:hover { background: var(--error); color: white; }
+
+        .controls-bar {
+            padding: 40px 80px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .search-box { position: relative; width: 350px; }
+        .search-box input {
+            width: 100%; padding: 12px 20px 12px 45px;
+            background: var(--glass); border: 2px solid var(--text-dim);
+            border-radius: 12px; color: white; outline: none;
+        }
+        .search-box i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-dim); }
+
+        .project-section { padding: 40px 80px 80px; }
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 30px;
+        }
+
+        .site-card {
+            background: var(--card-blue);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            overflow: hidden;
+            transition: var(--transition);
+        }
+        .site-card:hover { transform: translateY(-10px); border-color: var(--primary); }
+        .card-banner { height: 180px; position: relative; background: #1a1f2e; }
+        .card-banner img { width: 100%; height: 100%; object-fit: cover; opacity: 0.7; }
+        .card-badge { position: absolute; top: 15px; right: 15px; background: var(--primary); padding: 5px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; }
+        .card-body { padding: 25px; }
+        .card-body h3 { color: var(--primary); margin-bottom: 15px; }
+        .info-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; font-size: 0.85rem; color: var(--text-dim); }
+        .card-footer { padding: 20px 25px; border-top: 1px solid var(--glass-border); display: flex; justify-content: space-between; }
+
+        .modal-mask {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.95);
+            backdrop-filter: blur(15px); display: none;
+            justify-content: center; align-items: center; z-index: 9999;
+        }
+
+        .modal-box {
+            width: 100%; max-width: 1000px; height: 650px;
+            background: var(--card-blue); border-top-left-radius: 30px; border-bottom-left-radius: 30px; 
+            border: 1px solid var(--glass-border); display: flex; overflow: hidden;
+        }
+
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(40%) sepia(90%) saturate(2000%) hue-rotate(200deg) brightness(90%) contrast(100%);
+            cursor: pointer;
+            transform: scale(1.3);
+        }
+
+
+        .modal-sidebar {
+            width: var(--sidebar-width); background: rgba(255,255,255,0.01);
+            padding: 60px 35px; border-right: 1px solid var(--glass-border);
+            display: flex; flex-direction: column; justify-content: space-between; position: relative;
+        }
+
+        .sidebar-progress-line { position: absolute; left: 49px; top: 75px; bottom: 75px; width: 2px; background: rgba(255,255,255,0.05); }
+        .sidebar-progress-fill { position: absolute; left: 0; top: 0; width: 100%; height: 0%; background: var(--primary); box-shadow: 0 0 15px var(--primary); transition: height 0.6s; }
+
+        .step-indicator { display: flex; align-items: center; gap: 15px; opacity: 0.3; cursor: pointer; transition: 0.3s; z-index: 2; }
+        .step-indicator.active { opacity: 1; }
+        .step-indicator.completed { opacity: 0.8; color: var(--primary); }
+        .step-circle { width: 30px; height: 30px; border-radius: 50%; border: 2px solid currentColor; background: #0d1117; display: flex; align-items: center; justify-content: center; font-weight: 700; }
+
+        .modal-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .step-indicator:hover {
+            opacity: 1;
+        }
+
+        .modal-header-area { padding: 50px 60px 20px; flex-shrink: 0; }
+        
+        .step-scroll-viewport { 
+            flex: 1; 
+            overflow-y: auto; 
+            padding: 0 60px 40px; 
+        }
+
+        .modal-nav {
+            padding: 25px 60px;
+            border-top: 1px solid var(--glass-border);
+            background: #0d1117;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0; 
+        }
+
+        ::file-selector-button {
+            width: 100px;
+            height: 40px;
+            border-radius: 15px;
+            background-color: var(--blue);
+            border: var(--blue);
+            box-shadow: 0 4px 12px var(--accent-glow);
+            cursor: pointer;
+            font-weight: 500;
+            color: white;
+            margin-right: 10px;
+        }
+
+        .step-pane { display: none; }
+        .step-pane.active { display: block; animation: slideUp 0.4s ease; }
+
+        .input-wrap {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    margin-bottom: 1.5rem;
+    font-family: sans-serif;
+}
+
+.input-wrap label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--text-dim);
+}
+
+.input-wrap input {
+    width: 100%;
+    padding: 10px 10px 10px 40px;
+    border: 2px solid var(--text-dim);
+    color: white;
+    border-radius: 12px;
+    font-weight: 500;
+    height: 50px;
+    font-size: 1rem;
+    background-color: var(--card-blue);
+    transition: .5s;
+    outline: none;
+}
+
+.input-wrap input::placeholder {
+    color: var(--text-dim);
+    font-weight: 400;
+    opacity: 0.6;
+}
+
+.input-wrap input:focus {
+    border-color: var(--primary);
+}
+
+.input-wrap i[style*="position: absolute"] {
+    top: 150px !important; 
+    left: 10px;
+    transform: translateY(-50%) scale(0.8) !important;
+    pointer-events: none;
+}
+
+.error-hint {
+    color: var(--error);
+    font-size: 0.8rem;
+    display: none; /* Hidden by default */
+    margin-top: 5px;
+}
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        @media (max-width: 768px) {
+            .modal-box { flex-direction: column; height: 95vh; }
+            .modal-sidebar { width: 100%; height: auto; flex-direction: row; padding: 20px; overflow-x: auto; }
+            .sidebar-progress-line { display: none; }
+            .modal-header-area, .step-scroll-viewport, .modal-nav { padding: 20px; }
+        }
+
+        .btn-outline-map {
+            background: transparent;
+            border: 1px solid var(--glass-border);
+        }
+
+        .btn-outline-map:hover {
+            background: var(--glass-border);
+        }
+
+        option {
+            background-color: var(--bg-dark);
+            cursor: pointer;
+        }
+    /* images */
+    .gallery-container{max-width:1100px;margin:auto}
+    .header{text-align:center;margin-bottom:50px}
+    .header h1{font-size:2.5rem;margin-bottom:10px}
+    .header p{color:#888;font-size:.9rem}
+
+    .image-grid{
+        display:grid;
+        grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+        gap:25px;
+    }
+
+    .upload-card{
+        background:var(--card);
+        border:2px dashed rgba(59,130,246,.3);
+        border-radius:20px;
+        display:flex;
+        flex-direction:column;
+        min-height:340px;
+        transition:var(--transition);
+    }
+
+    .upload-card:hover{
+        border-color:var(--primary);
+        border-style:solid;
+        box-shadow:0 0 25px rgba(0,162,255,.15);
+        transform:translateY(-5px);
+    }
+
+    .upload-card:hover .media-area,
+    .upload-card:hover .info-area{
+        background:var(--hover-bg)!important;
+    }
+
+    .media-area{
+        position:relative;
+        height:200px;
+        border-top-left-radius:20px;
+        border-top-right-radius:20px;
+        background:#1a1a1b;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        cursor:pointer;
+        transition:var(--transition);
+    }
+
+    .preview-img{
+        position:absolute;
+        inset:0;
+        width:100%;
+        height:100%;
+        object-fit:cover;
+        display:none;
+        border-radius:20px;
+    }
+
+    .upload-card.has-image .preview-img{display:block}
+    .upload-card.has-image .placeholder-content{display:none}
+    .upload-card.has-image .card-actions{display:flex}
+
+    .placeholder-content{text-align:center;color:#555}
+    .placeholder-content i{font-size:2rem;margin-bottom:10px;color:#333}
+    .placeholder-content span{font-size:.8rem;font-weight:600;text-transform:uppercase}
+
+    .info-area{
+        padding:20px;
+        background:#1a1a1b;
+        display:flex;
+        flex-direction:column;
+        gap:8px;
+        flex-grow:1;
+        border-bottom-right-radius: 20px;
+        border-bottom-left-radius: 20px;
+    }
+
+    .label-input {
+    width: 100%;
+    padding: 10px 10px 10px 40px;
+    border: 2px solid var(--text-dim);
+    color: white;
+    border-radius: 12px;
+    font-weight: 500;
+    height: 50px;
+    font-size: 1rem;
+    background-color: var(--card-blue);
+    transition: .5s;
+    outline: none;
+}
+
+.label-input::placeholder {
+    color: var(--text-dim);
+    font-weight: 400;
+    opacity: 0.6;
+}
+
+    .label-input{
+        width:100%;
+        background:#0a0a0a;
+        border: 2px solid var(--border);
+        border-radius:8px;
+        padding: 10px 23px;
+        color:#fff;
+        font-size:.85rem;
+        outline:none;
+    }
+
+    .label-input:focus{ 
+        border-color:var(--primary)
+    }
+
+    .label-input.input-error{
+        border-color:var(--error);
+        background:rgba(255,77,77,.05);
+    }
+
+    .err-img-missing .msg-img{display:flex}
+    .err-label-missing .msg-label{display:flex}
+
+    .upload-card.has-error{
+        border-color:var(--error)!important;
+        border-style:solid;
+    }
+
+    .card-actions{
+        display:none;
+        gap:8px;
+        margin-top:auto;
+        padding-top:10px;
+    }
+
+    .action-btn{
+        flex:1;
+        padding:10px;
+        border-radius:8px;
+        border:none;
+        background:rgba(255,255,255,.05);
+        color:#888;
+        cursor:pointer;
+        transition:.2s;
+    }
+
+    .action-btn:hover{
+        background:var(--primary);
+        color:#fff;
+    }
+
+    .btn-del:hover{
+        background:var(--error);
+        color:#fff;
+    }
+
+    /* branches */
+    .master-control {
+                background: var(--glass-bg); padding: 18px; border-radius: 20px;
+                border: 1px solid var(--accent-blue); margin: 0 auto 30px auto;
+                display: flex; align-items: center; justify-content: center;
+                gap: 15px; width: 100%; max-width: 480px;
+            }
+            .master-control input {
+                background: #020617; border: 1px solid var(--accent-blue);
+                padding: 10px; border-radius: 10px; color: white; width: 80px; text-align: center;
+                font-size: 1.2rem; font-weight: bold;
+            }
+
+            .dashboard-grid { display: flex; flex-direction: column; justify-content: center; align-items: center;}
+            @media (min-width: 768px) { .dashboard-grid { grid-template-columns: repeat(2, 1fr); } }
+            @media (min-width: 1100px) { .dashboard-grid { grid-template-columns: repeat(3, 1fr); } }
+
+            .branch-card {
+                background: var(--glass-bg); padding: 25px; border-radius: 28px;
+                border: 1px solid var(--border); display: flex; flex-direction: column; gap: 18px;
+                transition: 0.3s; width: 350px;
+            }
+            .branch-card:hover { border-color: var(--accent-blue); }
+
+            /* --- Inputs & UI Components --- */
+            .input-group { position: relative; width: 100%; margin-top: 15px;}
+            .input-group i { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--accent-blue); }
+            .input-group input {
+                width: 100%; background: rgba(2, 6, 23, 0.6); border: 2px solid var(--text-dim);
+                padding: 15px 15px 15px 42px; border-radius: 14px; color: white; outline: none; transition: 0.3s;
+            }
+            .input-group input:focus { border-color: var(--primary); }
+            .input-group label {
+                position: absolute; left: 42px; top: 15px; color: var(--text-dim);
+                pointer-events: none; transition: 0.3s;
+            }
+            .input-group input:focus ~ label, .input-group input:not(:placeholder-shown) ~ label {
+                top: -24px; left: 5px; font-size: 0.75rem; color: var(--primary); font-weight: 600;
+            }
+
+            .location-display {
+    margin-top: 10px;
+    padding: 12px 16px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.coords-text {
+    display: flex;
+    margin-top: -40px;
+    flex-direction: column;
+}
+
+.coords-text span {
+    color: var(--primary);
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+@keyframes pulse-blue {
+    0% { border-color: var(--border); }
+    50% { border-color: var(--accent-blue); }
+    100% { border-color: var(--border); }
+}
+
+.location-updated {
+    animation: pulse-blue 1s ease-in-out;
+}
+
+            .custom-dropdown { border: 1px solid var(--border); border-radius: 14px; background: rgba(2, 6, 23, 0.4); position: relative; }
+            .dropdown-trigger { padding: 14px 18px; display: flex; justify-content: space-between; cursor: pointer; align-items: center; }
+            .dropdown-content { 
+                display: none; padding: 15px; border-top: 1px solid var(--border); 
+                max-height: 250px; overflow-y: auto; background: #020617; border-radius: 0 0 14px 14px;
+            }
+            .active .dropdown-content { display: block; }
+            .check-item { display: flex; align-items: center; gap: 12px; padding: 8px 0; cursor: pointer; font-size: 0.9rem; }
+            .check-item input { accent-color: var(--accent-blue); width: 17px; height: 17px; }
+
+            /* --- Map Modal --- */
+            .modal-overlay {
+                position: fixed; inset: 0; background: rgba(2, 6, 23, 0.98);
+                display: none; justify-content: center; align-items: center; z-index: 3000; padding: 15px; width: 100%; height: 100%;
+            }
+            .map-modal-content {
+                width: 100%; max-width: 850px; background: #0f172a; border-radius: 30px;
+                padding: 25px; border: 1px solid var(--border); position: relative;
+            }
+            #map { height: 55vh; width: 100%; border-radius: 20px; margin-top: 15px; border: 1px solid var(--border); }
+.input-group.error {
+    border-color: #e53935 !important;
+}
+
+.input-group.error label {
+    color: #e53935 !important;
+}
+
+.input-group.error i {
+    color: #e53935 !important;
+}
+
+/* Optional subtle glow */
+.input-group.error {
+    box-shadow: 0 0 0 2px rgba(229,57,53,0.1);
+}
+            .error-msg { color: var(--error); font-size: 0.8rem; margin-top: 6px; display: flex; align-items: center; gap: 6px; animation: shake 0.3s; }
+            .input-error { border-color: var(--error) !important; }
+            @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+
+        /* --- web --- */
+        .brand-story-container {
+            max-width: 1000px; margin: 0 auto 40px auto;
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            gap: 20px; background: var(--card);
+            backdrop-filter: var(--glass); padding: 30px;
+            border-radius: 24px; border: 1px solid var(--border);
+        }
+
+        .field-group { display: flex; flex-direction: column; gap: 8px; }
+        .field-group.full-width { grid-column: span 3; }
+
+        .field-label { font-size: 0.75rem; font-weight: 600; color: var(--blue); text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 10px; }
+
+        textarea, .input-field {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid var(--border);
+            border-radius: 12px; color: white;
+            padding: 12px; resize: none; outline: none; transition: .5s;
+        }
+        textarea:focus , input:focus { border-color: var(--blue); }
+
+        /* --- Validation & Height Logic --- */
+        .upload-card.has-error { border-color: var(--error) !important; box-shadow: 0 0 20px rgba(244, 63, 94, 0.2); }
+        
+        .error-list { 
+            max-height: 0; overflow: hidden; 
+            margin-top: 0; opacity: 0;
+            display: flex; flex-direction: column; gap: 5px;
+            text-align: left; padding: 0 10px;
+        }
+
+        /* When card has error, expand the error-list height */
+        .upload-card.has-error .error-list { 
+            max-height: 200px; margin-top: 15px; opacity: 1; 
+        }
+
+        .error-text { color: var(--error); font-size: 0.7rem; display: none; align-items: center; gap: 8px; font-weight: 500; }
+        
+        .err-img-miss .msg-img, .err-name-miss .msg-name, 
+        .err-role-miss .msg-role, .err-quote-miss .msg-quote, 
+        .err-quote-short .msg-short { display: flex; }
+
+        /* --- Swiper & Cards --- */
+        .swiper { width: 100%; height: auto; padding: 80px 0 60px 0; margin-top: 50px; justify-items: center; }
+        .swiper-slide { width: 200px; height: 500px; justify-items: center; z-index: 500;}
+
+        .school-card {
+            background: var(--card); backdrop-filter: var(--glass);
+            border-radius: 28px; padding: 35px 20px 20px 20px;
+            text-align: center; border: 1px solid var(--border);
+            height: auto; /* Dynamic Height */
+            display: flex; flex-direction: column; height: 400px; width: 340px; margin-top: 50px;
+        }
+
+        .profile-wrapper {
+            position: relative; width: 100px; height: 100px;
+            margin: -85px auto 20px auto; cursor: pointer;
+        }
+
+        .profile-img {
+            width: 100%; height: 100%; border-radius: 50%;
+            border: 4px solid var(--blue); background: #0f172a;
+            display: flex; align-items: center; justify-content: center; overflow: hidden;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.4); z-index: 900;
+        }
+
+        .input-field { text-align: center; margin-bottom: 10px; width: 100%; font-size: 0.9rem; }
+        .quote-input { min-height: 100px; font-style: italic; color: #cbd5e1; }
+
+        /* --- Responsive Controls --- */
+        .controls {
+            top: 20px; z-index: 1000;
+            background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px);
+            padding: 15px 25px; border-radius: 50px;
+            max-width: 95%; margin: 0 auto 20px auto;
+            border: 1px solid var(--border);
+            display: flex; flex-wrap: wrap; justify-content: center; gap: 15px;
+                }
+
+        .refresh-btn { background: #334155; color: white; padding: 10px 24px; border-radius: 14px; border: none;
+            font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 10px;}
+
+        @media (max-width: 768px) {
+            .brand-story-container { grid-template-columns: 1fr; }
+            .controls { border-radius: 20px; flex-direction: column; width: 100%; }
+            .controls button { width: 100%; justify-content: center; }
+            .swiper-slide { width: 300px; }
+        }
+
+        /* cards */
+
+        .page-switcher {
+            display: flex; gap: 10px; background: var(--card); padding: 6px; width: 180px;
+            border-radius: 14px; border: 1px solid var(--border); margin-bottom: 20px;
+        }
+
+        .switch-btn {
+            padding: 8px 20px; border-radius: 10px; border: none;
+            background: transparent; color: #888; cursor: pointer;
+            font-weight: 600; transition: var(--transition); font-size: 0.9rem;
+        }
+
+        .switch-btn.active { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(0, 162, 255, 0.3); }
+
+        .upload-zone {
+            width: 100%; max-width: 900px; min-height: 400px;
+            background: var(--card); border: 2px dashed var(--border);
+            border-radius: 24px; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; cursor: pointer; transition: .5s;
+        }
+
+        .upload-zone:hover {
+            background-color: var(--blue);
+            border: 2px solid var(--border);
+            transform: translateY(-5px);
+        }
+
+        .canvas-container {
+            position: relative; display: none; border-radius: 16px;
+            overflow: hidden; border: 1px solid var(--border); background: #000;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+        }
+
+        #bg-img { display: block; max-width: 100%; height: auto; max-height: 75vh; transition: .5s; }
+        #canvas { position: absolute; top: 0; left: 0; cursor: crosshair; }
+
+        #floating-menu {
+            position: absolute; display: none; background: rgba(15, 15, 15, 0.98);
+            backdrop-filter: blur(15px); padding: 6px; border-radius: 8px;
+            border: 1px solid var(--primary); z-index: 9999; gap: 6px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8); align-items: center;
+        }
+
+        .selector {
+            background: #000; border: 1px solid #333; color: white;
+            padding: 5px 8px; border-radius: 4px; outline: none;
+            font-size: 0.75rem; min-width: 120px;
+        }
+
+        .btn-add {
+            background: var(--primary); border: none; color: white;
+            padding: 5px 12px; border-radius: 4px; font-weight: 600;
+            cursor: pointer; font-size: 0.7rem;
+        }
+
+        .action-bar { margin-top: 20px; display: flex; flex-direction: column; align-items: center; gap: 12px; width: 100%; }
+        
+        .status-msg {
+            font-size: 0.8rem; padding: 8px 16px; border-radius: 20px;
+            background: rgba(255, 255, 255, 0.05); color: #bbb;
+            border: 1px solid var(--border);
+        }
+        .status-msg.error { color: var(--danger); border-color: rgba(255, 77, 77, 0.3); }
+        .status-msg.success { color: var(--success); border-color: rgba(0, 255, 204, 0.3); font-weight: 600; }
+
+        .btn-group { display: flex; gap: 12px; }
+        .btn-main {
+            padding: 12px 28px; border-radius: 10px; border: none;
+            font-weight: 600; cursor: pointer; display: flex;
+            align-items: center; gap: 8px; font-size: 0.9rem;
+        }
+
+        .btn-save { background: var(--primary); color: white; opacity: 0.3; cursor: not-allowed; }
+        .btn-save.ready { opacity: 1; cursor: pointer; }
+        .btn-remove { background: #1a1a1a; color: var(--danger); border: 1px solid #333; }
+        
+        .mode-pill {
+            position: absolute; top: 15px; right: 15px;
+            background: var(--success); color: #000; font-weight: 800;
+            padding: 4px 10px; border-radius: 4px; font-size: 0.6rem;
+            display: none; z-index: 20; letter-spacing: 1px;
+        }
+        
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+          -webkit-appearance: none;
+          margin: 0;
+        }
+
+.calendar-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.calendar-input {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border: 2px solid var(--text-dim);
+    border-radius: 12px;
+    cursor: pointer;
+    background: var(--card-blue);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.calendar-input:hover { 
+    border-color: var(--primary);
+}
+
+.calendar-input i { 
+    color: var(--text-dim); 
+    width: 18px; 
+    transition: 0.3s;
+}
+
+.calendar-input:hover i {
+    color: var(--primary);
+}
+
+.calendar-dropdown {
+    position: absolute;
+    top: calc(100% + 12px);
+    left: 0;
+    right: 0;
+    background: var(--card-blue);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    z-index: 100;
+    padding: 18px;
+    min-width: 280px;
+    display: block; 
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px) scale(0.95);
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.calendar-dropdown.show { 
+    opacity: 1; 
+    visibility: visible;
+    transform: translateY(0) scale(1);
+}
+
+/* 4. Calendar Header (Fixed Display) */
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 0 4px;
+    gap: 10px;
+}
+
+.calendar-header h4 { 
+    font-size: 1rem; 
+    color: white;
+    font-weight: 600;
+    margin: 0;
+    white-space: nowrap; /* Keeps Month/Year on one line */
+    flex-grow: 1;
+    text-align: center;
+}
+
+.nav-btn {
+    background: var(--glass);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    transition: all 0.2s ease;
+    flex-shrink: 0; /* Prevents button from getting squashed */
+}
+
+.nav-btn:hover { 
+    background: var(--primary);
+    border-color: var(--primary);
+    box-shadow: 0 0 10px var(--primary-glow);
+    transform: translateY(-1px);
+}
+
+/* 5. Calendar Grid & Days */
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+    text-align: center;
+}
+
+.weekday {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding-bottom: 10px;
+}
+
+.day {
+    padding: 10px 0;
+    font-size: 0.875rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: var(--text-dim);
+    border: 1px solid transparent;
+}
+
+/* Hover: Subtle Blue Glow */
+.day:hover:not(.empty) { 
+    background: rgba(0, 162, 255, 0.1); 
+    color: var(--primary); 
+    border-color: var(--primary-glow);
+    transform: translateY(-2px);
+}
+
+/* Selected Day: Primary Color */
+.day.selected { 
+    background: var(--primary) !important; 
+    color: white !important; 
+    font-weight: 600;
+    box-shadow: 0 0 15px var(--primary-glow);
+}
+
+/* Today's Date Outline */
+.day.today { 
+    border: 1px solid var(--primary); 
+    color: var(--primary); 
+}
+
+.day.empty { 
+    cursor: default; 
+    opacity: 0.3;
+}
+
+@keyframes vibrate {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-4px); }
+    50% { transform: translateX(4px); }
+    75% { transform: translateX(-4px); }
+    100% { transform: translateX(0); }
+}
+
+.shake {
+    animation: vibrate 0.3s linear;
+}
+        /* 1. Wrapper and Trigger Box */
+.custom-select-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.select-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    background: var(--card-blue);
+    border: 2px solid var(--text-dim);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.select-trigger:hover {
+    border-color: var(--primary);
+    box-shadow: 0 0 15px var(--primary-glow);
+}
+
+/* 2. Text Logic (Dim to Bright) */
+.select-text {
+    font-size: 0.95rem;
+    transition: color 0.3s ease, opacity 0.3s ease;
+}
+
+.select-text.is-placeholder {
+    color: var(--text-dim);
+}
+
+.select-text.is-active {
+    color: white;
+    opacity: 1;
+    font-weight: 500;
+    font-style: normal;
+}
+
+/* 3. Chevron Flip Animation */
+.chevron-icon {
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    color: var(--text-dim);
+}
+
+/* When the parent wrapper is 'open', flip the chevron */
+.custom-select-wrapper.open .chevron-icon {
+    transform: rotate(180deg);
+    color: var(--primary);
+}
+
+/* 4. Dropdown Menu (The In & Out Animation) */
+.select-options {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    right: 0;
+    background: var(--card-blue);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 8px;
+    z-index: 100;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+
+    /* Animation State: Hidden by default */
+    visibility: hidden;
+    opacity: 0;
+    transform: translateY(-12px) scale(0.95);
+    
+    /* This transition handles BOTH in and out */
+    transition: 
+        opacity 0.3s ease, 
+        transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+        visibility 0.3s;
+}
+
+/* Open State */
+.custom-select-wrapper.open .select-options {
+    visibility: visible;
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+/* 5. Option Items & Background Change */
+.option-item {
+    padding: 10px 14px;
+    border-radius: 8px;
+    color: var(--text-dim);
+    cursor: pointer;
+    margin-top: 5px;
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
+}
+
+.option-item:hover {
+    background: rgba(0, 162, 255, 0.1);
+    color: var(--primary);
+}
+
+/* Background change of the selected one */
+.option-item.selected {
+    background: var(--primary) !important;
+    color: white !important;
+    font-weight: 600;
+}
+
+/* 6. Vibration/Error (Optional but useful) */
+@keyframes selectVibrate {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-4px); }
+    75% { transform: translateX(4px); }
+}
+
+.custom-select-wrapper.error .select-trigger {
+    border-color: var(--error);
+    animation: selectVibrate 0.3s linear;
+}
+
+        .file-input-hidden { display: none; }
+
+        .dropzone {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 30px 20px;
+            border: 2px dashed var(--primary);
+            border-radius: 12px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s ease;
+            background: #121111;
+        }
+
+        .dropzone.dragover {
+            border-color: var(--primary);
+            background: #1d1e20;
+            transform: scale(1.02);
+        }
+
+        .dropzone:hover, .dropzone.dragover {
+            border-color: var(--primary);
+            background: #1a1246;
+        }
+
+        .icon-box {
+            background: rgba(0, 162, 255, 0.4);
+            color: var(--primary);
+            padding: 13px 13px;
+            border-radius: 50%;
+            align-self: center;
+            justify-self: center;
+            width: 50px;
+            height: 50px;
+            margin-bottom: 16px;
+            transition: transform 0.2s ease;
+        }
+
+        .dropzone:hover .icon-box {
+            transform: translateY(-5px);
+        }
+        .file-info {
+            margin-top: 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--primary);
+            display: none;
+            background: var(---blue);
+            padding: 6px 12px;
+            border-radius: 20px;
+        }
+
+        .browse-text {
+            color: var(--primary);
+            font-weight: 600;
+            text-decoration: underline;
+        }
+
+        .selection-card {
+            background: var(--bg);
+            margin-top: 20px;
+            padding: 32px;
+            border-radius: 20px;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05);
+            width: 100%;
+            border: 1px solid var(--border);
+        }
+
+        h2 {
+            font-size: 1.1rem;
+            color: var(--text);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .checkbox-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 12px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+            margin-top: 5px;
+        }
+
+        .checkbox-item:hover {
+            border-color: var(--primary);
+            background-color: rgb(33, 31, 31);
+        }
+
+        .hidden-check {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .custom-box {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border);
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            color: transparent;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+
+        .hidden-check:checked + .custom-box {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+
+        .label-text {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        /* Focus State for Accessibility */
+        .hidden-check:focus-visible + .custom-box {
+            outline: 2px solid var(--primary);
+            outline-offset: 2px;
+        }
+
+        .inventory-card {
+            background: var(--bg);
+            padding: 24px;
+            border-radius: 20px;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05);
+            width: 100%;
+            max-width: 500px;
+            border: 1px solid var(--border);
+        }
+
+        .header {
+            margin-bottom: 24px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 16px;
+        }
+
+        .header h2 { font-size: 1.2rem; color: var(--text); }
+        .header p { font-size: 0.85rem; color: var(--text-muted); }
+
+        .item-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        /* Each Row */
+        .item-row {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .item-row.active {
+            border-color: var(--primary);
+            background-color: var(--primary-light);
+        }
+
+        .item-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            flex-grow: 1;
+        }
+
+        .hidden-check { display: none; }
+
+        .custom-check {
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--border);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            color: transparent;
+            transition: 0.2s;
+            flex-shrink: 0;
+        }
+
+        .hidden-check:checked + .custom-check {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+
+        .item-name {
+            font-weight: 500;
+            font-size: 0.95rem;
+            color: var(--text);
+        }
+
+        /* Number Input Side */
+        .qty-wrapper {
+            width: 100px;
+            position: relative;
+        }
+
+        .qty-input {
+            width: 100%;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-family: inherit;
+            border: 2px solid var(--text-dim);
+            font-size: 0.9rem;
+            text-align: center;
+            outline: none;
+            transition: 0.2s;
+            background: var(--card);
+            color: white;
+        }
+
+        .qty-input:disabled {
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        .qty-input:not(:disabled) {
+            background: var(--bg-dark);
+            font-weight: 600;
+        }
+
+        /* Hide arrows */
+        .item-list input::-webkit-outer-spin-button,
+        .item-list input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Ensure the text starts as 'Dim' */
+#selectedDateText.is-placeholder {
+    color: var(--text-dim);
+    opacity: 0.6;
+}
+
+/* Base style for the calendar trigger */
+#calInput {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    background: var(--card-blue);
+    border: 2px solid var(--text-dim);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+/* The dropdown container animation */
+#calDropdown {
+    visibility: hidden;
+    opacity: 0;
+    transform: translateY(-10px) scale(0.95);
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: absolute;
+    z-index: 1000;
+}
+
+#calDropdown.show {
+    visibility: visible;
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+/* Placeholder Dimming */
+.select-text.is-placeholder, 
+#selectedDateText.is-placeholder {
+    color: var(--text-dim) !important;
+    opacity: 0.6;
+    transition: all 0.3s ease;
+}
+
+/* Option Hover (Fixes hover after selection) */
+.option-item {
+    padding: 10px;
+    cursor: pointer;
+    transition: 0.2s;
+    color: var(--text-dim);
+}
+
+.option-item:hover {
+    background: rgba(0, 162, 255, 0.1) !important;
+    color: var(--primary) !important;
+}
+
+.option-item.selected {
+    background: var(--primary);
+    color: white;
+}
+
+#calDropdown {
+    /* Instead of display: none, use these three */
+    visibility: hidden;
+    opacity: 0;
+    transform: translateY(-10px) scale(0.95);
+    
+    /* Animation settings */
+    transition: 
+        opacity 0.3s ease, 
+        transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), 
+        visibility 0.3s;
+
+    position: absolute;
+    z-index: 9999;
+    background: var(--card-blue);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    padding: 15px;
+}
+
+/* When the .show class is added via JS */
+#calDropdown.show {
+    visibility: visible;
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+/* Add this to maker.css to handle custom element errors */
+.calendar-input.input-error, 
+.select-trigger.input-error {
+    border-color: var(--error) !important;
+}
+
+.upload-card.err-category-missing .custom-select-wrapper .select-trigger {
+    border-color: var(--error) !important;
+}
+
+.locate-btn {
+    width: 100px;
+    margin-bottom: -25px;
+    margin-left: 190px;
+    height: 30px;
+    border-radius: 10px;
+    background: rgba(57, 162, 248, 0.1);
+    color: var(--primary);
+    transition: .5s;
+    cursor: pointer;
+    outline: none;
+    border: 1px solid #00a2ff;
+    right: 0;
+}
+
+.locate-btn:hover {
+    background-color: var(--primary);
+    color: white;
+    transform: translateY(-5px);
+}
+
+.cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .upload-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.4);
+            transition: transform 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .upload-card:hover {
+            transform: translateY(-5px);
+        }
+
+        /* Media Area */
+        .media-area {
+            position: relative;
+            height: 220px;
+            background: #0d1117;
+            cursor: pointer;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .preview-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: none;
+            z-index: 1;
+        }
+
+        .placeholder-content {
+            position: relative;
+            z-index: 2;
+            color: var(--text-dim);
+            transition: color 0.3s;
+        }
+
+        .media-area:hover .placeholder-content { color: var(--accent); }
+        .placeholder-content i { font-size: 2.5rem; margin-bottom: 10px; }
+
+        .experience-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: var(--accent);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            z-index: 3;
+        }
+
+        /* Content Area */
+        .info-content {
+            padding: 24px;
+            flex-grow: 1;
+            background: linear-gradient(to bottom, rgba(30, 41, 59, 0.5), var(--card-bg));
+        }
+
+        .editable {
+            border: 1px solid transparent;
+            border-radius: 4px;
+            padding: 2px 4px;
+            transition: all 0.2s;
+            outline: none;
+        }
+
+        .editable:hover { background: rgba(255,255,255,0.05); border-color: var(--border); }
+        .editable:focus { background: #0f172a; border-color: var(--accent); }
+
+        .name-title { font-size: 1.3rem; font-weight: 700; margin: 0; display: block; }
+        .role-title { color: var(--accent); font-size: 0.85rem; margin-bottom: 15px; font-weight: 500; display: block;}
+        
+        .subject-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            margin-bottom: 12px;
+        }
+
+        .quote {
+            font-style: italic;
+            color: var(--text-dim);
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin-bottom: 20px;
+            min-height: 45px;
+        }
+
+        .stars-container {
+            display: flex;
+            gap: 5px;
+        }
+
+        .star {
+            font-size: 1.1rem;
+            cursor: pointer;
+            color: transparent;
+            -webkit-text-stroke: 1px var(--text-dim);
+        }
+
+        .star.active {
+            color: var(--gold);
+            -webkit-text-stroke: 1px var(--gold);
+        }
+
+</style>
+<body>
+
+    <div class="main-wrapper">
+        <header class="hero-banner">
+            <div class="hero-overlay"></div>
+            <div class="hero-content">
+                <h1>Web Engine <span style="color:var(--primary)">Pro</span></h1>
+                <p>The next generation of enterprise portal management. Create, validate, and deploy school and business engines in minutes.</p>
+                <div style="display: flex; gap: 15px; margin-top: 20px;">
+                    <button class="btn btn-primary" onclick="handleOpenModal()">
+                        <i class="fas fa-plus-circle"></i> Create New Project
+                    </button>
+                    <button class="btn btn-outline" onclick="window.scrollTo({top: 800, behavior: 'smooth'})">
+                        View Projects
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <div class="controls-bar">
+            <h2>Active Deployments</h2>
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="projectSearch" placeholder="Filter by name ..." onkeyup="filterProjects()">
+            </div>
+        </div>
+
+        <main class="project-section">
+            <div id="gridDisplay" class="grid-container">
+                
+            </div>
+        </main>
+    </div>
+
+    <div class="modal-mask" id="projectModal">
+        <div class="modal-box">
+            <aside class="modal-sidebar">
+                <div class="sidebar-progress-line"><div class="sidebar-progress-fill" id="blueFlow"></div></div>
+                <div class="step-indicator active" id="node-0" onclick="goTo(0)"><div class="step-circle"><i data-lucide="clipboard" style="transform: scale(0.6);"></i></div><div><strong>Basic</strong></div></div>
+                <div class="step-indicator" id="node-1" onclick="goTo(1)"><div class="step-circle"><i data-lucide="image" style="transform: scale(0.6);"></i></div><div><strong>Images</strong></div></div>
+                <div class="step-indicator" id="node-2" onclick="goTo(2)"><div class="step-circle"><i data-lucide="credit-card" style="transform: scale(0.6);"></i></div><div><strong>Cards</strong></div></div>
+                <div class="step-indicator" id="node-3" onclick="goTo(3)"><div class="step-circle"><i data-lucide="file-text" style="transform: scale(0.6);"></i></div><div><strong>Web Content</strong></div></div>
+                <div class="step-indicator" id="node-4" onclick="goTo(4)"><div class="step-circle"><i data-lucide="git-branch" style="transform: scale(0.6);"></i></div><div><strong>Branch</strong></div></div>
+                <div class="step-indicator" id="node-4" onclick="goTo(5)"><div class="step-circle"><i data-lucide="building-2" style="transform: scale(0.6);"></i></div><div><strong>Facilities</strong></div></div>
+                <div class="step-indicator" id="node-5" onclick="goTo(6)"><div class="step-circle"><i data-lucide="rocket" style="transform: scale(0.6);"></i></div><div><strong>Finish</strong></div></div>
+            </aside>
+
+            <main class="modal-content">
+                <div class="modal-header-area">
+                    <h2 id="modalMainHeading">Project Creation</h2>
+                    <p style="color: var(--text-dim);">Follow the steps to provision your new instance.</p>
+                </div>
+
+                <div class="step-scroll-viewport" id="scrollArea">
+                    <form id="multiStepForm">
+                        <div class="step-pane active" id="pane-0">
+                            <div class="input-wrap">
+                                <label><i data-lucide="school"></i>School Name</label>
+                                <i data-lucide="school" style="position: absolute; margin-right: 5px; margin-left: 10px; transform: scale(0.8); color: var(--text-dim); top: 45px;"></i>
+                                <input type="text" id="form-name" placeholder="e.g. Eb-Academy">
+                                <span class="error-hint" id="err-name">Name must be at least 3 characters.</span>
+                            </div>
+                            <div class="input-wrap">
+                                <label><i data-lucide="calendar"></i>Date Of Establishement</label>
+                                <div class="calendar-wrapper">
+        <div class="calendar-input" id="calInput">
+            <i data-lucide="calendar" style="color: var(--text-dim); transform: scale(0.8); margin-left: -10px;"></i>
+        <span id="selectedDateText" class="is-placeholder">Select Date</span>
+        <i data-lucide="calendar" class="calendar-icon" style="color: var(--primary); transform: scale(0.7); right: 10px; position: absolute;"></i>
+        </div>
+
+        <div class="calendar-dropdown" id="calDropdown">
+            <div class="calendar-header">
+                <button class="nav-btn" id="prevMonth" type="button"><i data-lucide="chevron-left"></i></button>
+                <h4 id="monthDisplay">Month Year</h4>
+                <button class="nav-btn" id="nextMonth" type="button"><i data-lucide="chevron-right"></i></button>
+            </div>
+            <div class="calendar-grid" id="calendarGrid">
+                </div>
+        </div>
+    </div>
+                                <span class="error-hint" id="err-date">Please, select date of establishement.</span>
+                            </div>
+                            <div class="input-wrap" style="position: relative;">
+    <label><i data-lucide="graduation-cap"></i> School Type</label>
+    <div class="custom-select-wrapper" id="wrapper1">
+        <div class="select-trigger" id="form-scType" onclick="toggleMenu('menu1')" style="display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: var(--card-blue); border: 2px solid var(--text-dim); border-radius: 12px; cursor: pointer;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <i data-lucide="layers" style="width: 18px; color: var(--text-dim);"></i>
+                <span id="label1" class="select-text is-placeholder">Select School Type</span>
+            </div>
+            <i data-lucide="chevron-down" class="chevron-icon" style="width: 18px;"></i>
+        </div>
+        <div class="select-options" id="menu1">
+            <div class="option-item" onclick="selectValue(this, 'Public', 'label1', 'menu1')">Public</div>
+            <div class="option-item" onclick="selectValue(this, 'Private', 'label1', 'menu1')">Private</div>
+            <div class="option-item" onclick="selectValue(this, 'International', 'label1', 'menu1')">International</div>
+        </div>
+    </div>
+    <span class="error-hint" id="err-scType">Please, Select school type.</span>
+</div>
+                            <div class="input-wrap">
+                                <label><i data-lucide="hash"></i>Number Of School Clubs</label>
+                                <i data-lucide="hash" style="position: absolute; margin-right: 5px; margin-left: 10px; transform: scale(0.8); color: var(--text-dim); top: 45px;"></i>
+                                <input type="number" id="form-clubNo" placeholder="e.g. 25">
+                                <span class="error-hint" id="err-clubNo">Please, Type number of school clubs.</span>
+                            </div>
+                            <div class="input-wrap">
+                                <label><i data-lucide="users"></i>Number Of Students</label>
+                                <i data-lucide="users" style="position: absolute; margin-right: 5px; margin-left: 10px; transform: scale(0.8); color: var(--text-dim); top: 45px;"></i>
+                                <input type="number" id="form-studentNo" placeholder="e.g. 100">
+                                <span class="error-hint" id="err-studentNo">Please, Type number of students.</span>
+                            </div>
+                            
+                            <div class="input-wrap">
+    <label><i data-lucide="unlock"></i> School Legal Permission</label>
+<label class="dropzone">
+            <div class="icon-box"><i data-lucide="upload"></i></div>
+            <span>Upload ID or <span class="browse-text">browse</span></span>
+            <input type="file" class="file-input-hidden" id="form-file">
+            <span style="font-size: 0.75rem; color: var(--text-muted); margin-top: 4px;">
+            Supports JPG, PNG, PDF (Max 10MB)
+        </span>
+            <div class="file-info">
+                <i data-lucide="check" style="display:inline; transform: scale(0.8); margin-bottom: -6px;"></i>
+                <span class="file-name"></span>
+            </div>
+        </label>
+            <p id="file-status-label" style="font-size: 12px; color: #666;"></p>
+    <span class="error-hint" id="err-file">Please, Select file from device.</span>
+</div>
+
+<div class="input-wrap">
+    <label><i data-lucide="database"></i> School DataBase</label>
+<label class="dropzone">
+            <div class="icon-box"><i data-lucide="upload"></i></div>
+            <span>Upload ID or <span class="browse-text">browse</span></span>
+            <input type="file" class="file-input-hidden" id="form-data">
+            <span style="font-size: 0.75rem; color: var(--text-muted); margin-top: 4px;">
+            Supports JPG, PNG, PDF (Max 10MB)
+        </span>
+            <div class="file-info">
+                <i data-lucide="check" style="display:inline; transform: scale(0.8); margin-bottom: -6px;"></i>
+                <span class="file-name"></span>
+            </div>
+        </label>
+        <p id="data-status-label" style="font-size: 12px; color: #666;"></p>
+    <span class="error-hint" id="err-data">Please, Locate your Database.</span>
+</div>
+                            <div class="input-wrap" style="position: relative;">
+    <label><i data-lucide="users"></i> Student Type</label>
+    <div class="custom-select-wrapper" id="wrapper2">
+        <div class="select-trigger" id="form-sType" onclick="toggleMenu('menu2')" style="display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: var(--card-blue); border: 2px solid var(--text-dim); border-radius: 12px; cursor: pointer;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <i data-lucide="users" style="width: 18px; color: var(--text-dim);"></i>
+                <span id="label2" class="select-text is-placeholder">Select Student Type</span>
+            </div>
+            <i data-lucide="chevron-down" class="chevron-icon" style="width: 18px;"></i>
+        </div>
+        <div class="select-options" id="menu2">
+            <div class="option-item" onclick="selectValue(this, 'Mixed', 'label2', 'menu2')">Mixed</div>
+            <div class="option-item" onclick="selectValue(this, 'Boys Only', 'label2', 'menu2')">Boys Only</div>
+            <div class="option-item" onclick="selectValue(this, 'Girls Only', 'label2', 'menu2')">Girls Only</div>
+        </div>
+    </div>
+    <span class="error-hint" id="err-sType">Please, Select student type.</span>
+</div>
+                            <div class="input-wrap" style="position: relative;">
+    <label><i data-lucide="book-open"></i> Program</label>
+    <div class="custom-select-wrapper" id="wrapper3">
+        <div class="select-trigger" id="form-lType" onclick="toggleMenu('menu3')" style="display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: var(--card-blue); border: 2px solid var(--text-dim); border-radius: 12px; cursor: pointer;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <i data-lucide="book-open" style="width: 18px; color: var(--text-dim);"></i>
+                <span id="label3" class="select-text is-placeholder">Select Program</span>
+            </div>
+            <i data-lucide="chevron-down" class="chevron-icon" style="width: 18px;"></i>
+        </div>
+        <div class="select-options" id="menu3">
+            <div class="option-item" onclick="selectValue(this, 'National Curriculum', 'label3', 'menu3')">National Curriculum</div>
+            <div class="option-item" onclick="selectValue(this, 'IGCSE', 'label3', 'menu3')">IGCSE</div>
+            <div class="option-item" onclick="selectValue(this, 'IB Program', 'label3', 'menu3')">IB Program</div>
+        </div>
+    </div>
+    <span class="error-hint" id="err-lType">Please, Select program.</span>
+</div>
+                            <div class="input-wrap">
+                                <label><i data-lucide="mail"></i>Email Address</label>
+                                <i data-lucide="mail" style="position: absolute; margin-right: 5px; margin-left: 10px; transform: scale(0.8); color: var(--text-dim); top: 45px;"></i>
+                                <input type="email" id="form-email" placeholder="admin@domain.com">
+                                <span class="error-hint" id="err-email">Please enter a valid email.</span>
+                            </div>
+                        </div>
+
+                        <div class="step-pane" id="pane-1">
+                           
+<div class="gallery-container">
+<header class="header">
+<h1>Visual Assets</h1>
+<p>Ensure every slot has an image and a unique name before saving.</p>
+</header>
+
+<main class="image-grid" id="assetGrid"></main>
+
+</div>
+
+                        </div>
+
+                        <div class="step-pane" id="pane-2">
+                            <header class="header">
+        <h1>Form Mapper <span style="color: var(--primary)">Pro</span></h1>
+        <p>Map 13 Inputs + 1 Photo (ID size)</p>
+    </header>
+<div style="justify-items: center; align-content: center;">
+    <div class="page-switcher">
+        <button type="button" class="switch-btn active" id="btn-front" onclick="app.switchSide('front')">Front</button>
+<button type="button" class="switch-btn" id="btn-back" onclick="app.switchSide('back')">Back</button>
+</div>
+</div>
+    <div class="upload-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
+        <i class="fas fa-id-card"></i>
+        <p>Click to upload <span id="side-text" style="color:var(--primary)">Front</span></p>
+        <input type="file" id="file-input" hidden accept="image/*" onchange="app.handleFile(this)">
+    </div>
+
+    <div class="canvas-container" id="canvas-wrap">
+        <div id="mode-indicator" class="mode-pill">PHOTO MODE</div>
+        <canvas id="canvas"></canvas>
+        <img id="bg-img">
+        
+        <div id="floating-menu">
+            <select id="form-card" class="selector"></select>
+            <button type="button" id="add-btn" class="btn-add" onclick="app.confirmField()">Map</button>
+        </div>
+    </div>
+
+    <div class="action-bar" id="actions" style="display: none;">
+        <div id="status-label" class="status-msg">Upload images to begin mapping.</div>
+        <div class="btn-group">
+            <button type="button" class="btn-main btn-remove" onclick="app.removeCurrentSide()">Clear Side</button>
+        </div>
+    </div>
+    
+                        </div>
+
+                        <div class="step-pane" id="pane-3">
+                            
+    <div class="brand-story-container">
+        <div class="field-group full-width">
+            <span class="field-label"><i class="fa-solid fa-book-open"></i> Bio</span>
+            <textarea class="textarea" placeholder="Tell your Bio..." id="form-bio"></textarea>
+            <div class="error-hint" id="err-bio">Please, tell us what makes you different.</div>
+        </div>
+        <div class="field-group full-width">
+            <span class="field-label"><i class="fa-solid fa-book-open"></i> Welcoming Text</span>
+            <textarea class="textarea" placeholder="Show your welcoming..." id="form-welcome"></textarea>
+            <div class="error-hint" id="err-welcome">Please, welcome your users.</div>
+        </div>
+        <div class="field-group full-width">
+            <span class="field-label"><i class="fa-solid fa-book-open"></i> Copy right footer</span>
+            <textarea class="textarea" placeholder="Tell your brand's journey..." id="form-footer"></textarea>
+            <div class="error-hint" id="err-footer">Please, say something about your school.</div>
+        </div>
+        <div class="field-group full-width">
+            <span class="field-label"><i class="fa-solid fa-book-open"></i> Brand Narrative</span>
+            <textarea class="textarea" placeholder="Tell your brand's journey..." id="form-about"></textarea>
+            <div class="error-hint" id="err-about">Please, say something about your school.</div>
+        </div>
+        <div class="field-group full-width">
+            <span class="field-label"><i class="fa-solid fa-wand-magic-sparkles"></i> Vision</span>
+            <textarea class="textarea" placeholder="Future goals..." id="form-vision"></textarea>
+            <div class="error-hint" id="err-vision">Please, share your vision.</div>
+        </div>
+        <div class="field-group full-width">
+            <span class="field-label"><i class="fa-solid fa-shield-halved"></i> Mission</span>
+            <textarea class="textarea" placeholder="Our purpose..." id="form-mission"></textarea>
+            <div class="error-hint" id="err-mission">Please, state your mission.</div>
+        </div>
+        <div class="field-group full-width">
+            <span class="field-label"><i class="fa-solid fa-star"></i> Values</span>
+            <textarea class="textarea" placeholder="Core principles..." id="form-value"></textarea>
+            <div class="error-hint" id="err-value">Please, share your values.</div>
+        </div>
+        <div class="field-group full-width">
+            <span class="field-label"><i class="fa-solid fa-star"></i> Innovation</span>
+            <textarea class="textarea" placeholder="Core innovation..." id="form-innovation"></textarea>
+            <div class="error-hint" id="err-innovation">Please, share your innovation.</div>
+        </div>
+        <div class="field-group full-width">
+            <span class="field-label"><i class="fa-solid fa-star"></i> Excellecnce</span>
+            <textarea class="textarea" placeholder="Core excellence..." id="form-excellence"></textarea>
+            <div class="error-hint" id="err-excellence">Please, share your excellence.</div>
+        </div>
+        <div class="field-group full-width">
+            <span class="field-label"><i class="fa-solid fa-star"></i> Community</span>
+            <textarea class="textarea" placeholder="Core community..." id="form-community"></textarea>
+            <div class="error-hint" id="err-community">Please, share your community.</div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <div style="font-weight: 600; color: var(--blue); display: flex; align-items: center; gap: 10px;">
+            <i class="fa-solid fa-grip"></i> CARDS: 
+            <input type="number" id="cardCount" value="4" min="4" max="20" style="background:rgba(255,255,255,0.1); border:none; color:white; width:50px; text-align:center; border-radius: 8px; padding: 5px;">
+        </div>
+        <button type="button" class="refresh-btn" onclick="updateSwiper()"><i class="fa-solid fa-arrows-rotate"></i> Reset Grid</button>
+    </div>
+
+    <div class="swiper mySwiper">
+        <div class="swiper-wrapper" id="swiper-wrapper"></div>
+        <div class="swiper-pagination"></div>
+        <div class="swiper-button-next"></div>
+        <div class="swiper-button-prev"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+    <div class="header">
+        <p>Fill full information about your top 6 rated teachers.</p>
+    </div>
+
+    <div class="cards-grid" id="cardContainer">
+        </div>    
+                        </div>
+
+                        <div class="step-pane" id="pane-4">
+                            <div class="master-control">
+            <i class="fas fa-layer-group" style="color: var(--accent-blue); font-size: 1.5rem;"></i>
+            <label>Branches to Add:</label>
+            <input type="number" id="branchCount" value="1" min="1" max="50" onchange="handleCountChange()">
+        </div>
+        <div class="dashboard-grid" id="branchGrid"></div>
+
+        <div class="modal-overlay" id="mapModal" style="display:none;">
+        
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+                        </div>
+
+                        <div class="step-pane" id="pane-5">
+                            <header class="header">
+        <h1><i class="factory"></i> <span style="color: var(--primary)">Facilities</span></h1>
+        <p>Select available facilities in your school.</p>
+    </header>
+
+            
+    <div style="justify-content: center; align-items: center; display: flex; flex-direction: column;">
+        
+
+    <div class="inventory-card">
+    <div class="header">
+        <h2>Order Items</h2>
+        <p>Select an item and enter the quantity.</p>
+    </div>
+
+    <div class="item-list">
+        <div class="item-row" id="row-1">
+            <label class="item-info">
+                <input type="checkbox" class="hidden-check" onchange="toggleRow(this, 'qty-1', 'row-1')">
+                <div class="custom-check"><i data-lucide="check" size="16"></i></div>
+                <span class="item-name">Wireless Mouse</span>
+            </label>
+            <div class="qty-wrapper">
+                <input type="number" id="qty-1" class="qty-input" placeholder="0" disabled>
+            </div>
+        </div>
+
+        <div class="item-row" id="row-2">
+            <label class="item-info">
+                <input type="checkbox" class="hidden-check" onchange="toggleRow(this, 'qty-2', 'row-2')">
+                <div class="custom-check"><i data-lucide="check" size="16"></i></div>
+                <span class="item-name">Mechanical Keyboard</span>
+            </label>
+            <div class="qty-wrapper">
+                <input type="number" id="qty-2" class="qty-input" placeholder="0" disabled>
+            </div>
+        </div>
+
+        <div class="item-row" id="row-3">
+            <label class="item-info">
+                <input type="checkbox" class="hidden-check" onchange="toggleRow(this, 'qty-3', 'row-3')">
+                <div class="custom-check"><i data-lucide="check" size="16"></i></div>
+                <span class="item-name">USB-C Hub</span>
+            </label>
+            <div class="qty-wrapper">
+                <input type="number" id="qty-3" class="qty-input" placeholder="0" disabled>
+            </div>
+        </div>
+
+        <div class="item-row" id="row-4">
+            <label class="item-info">
+                <input type="checkbox" class="hidden-check" onchange="toggleRow(this, 'qty-4', 'row-4')">
+                <div class="custom-check"><i data-lucide="check" size="16"></i></div>
+                <span class="item-name">Monitor Stand</span>
+            </label>
+            <div class="qty-wrapper">
+                <input type="number" id="qty-4" class="qty-input" placeholder="0" disabled>
+            </div>
+        </div>
+    </div>
+</div>
+    
+<div class="selection-card">
+    <h2><i data-lucide="check-square" size="20"></i> Select Skills</h2>
+    
+    <div class="checkbox-grid">
+        <label class="checkbox-item">
+            <input type="checkbox" class="hidden-check" name="skill" value="html">
+            <div class="custom-box"><i data-lucide="check" size="14"></i></div>
+            <span class="label-text">HTML5</span>
+        </label>
+
+        <label class="checkbox-item">
+            <input type="checkbox" class="hidden-check" name="skill" value="css">
+            <div class="custom-box"><i data-lucide="check" size="14"></i></div>
+            <span class="label-text">CSS3</span>
+        </label>
+
+        <label class="checkbox-item">
+            <input type="checkbox" class="hidden-check" name="skill" value="js">
+            <div class="custom-box"><i data-lucide="check" size="14"></i></div>
+            <span class="label-text">JavaScript</span>
+        </label>
+
+        <label class="checkbox-item">
+            <input type="checkbox" class="hidden-check" name="skill" value="react">
+            <div class="custom-box"><i data-lucide="check" size="14"></i></div>
+            <span class="label-text">React</span>
+        </label>
+
+        <label class="checkbox-item">
+            <input type="checkbox" class="hidden-check" name="skill" value="node">
+            <div class="custom-box"><i data-lucide="check" size="14"></i></div>
+            <span class="label-text">Node.js</span>
+        </label>
+
+        <label class="checkbox-item">
+            <input type="checkbox" class="hidden-check" name="skill" value="python">
+            <div class="custom-box"><i data-lucide="check" size="14"></i></div>
+            <span class="label-text">Python</span>
+        </label>
+        
+        <label class="checkbox-item">
+            <input type="checkbox" class="hidden-check" name="skill" value="ui">
+            <div class="custom-box"><i data-lucide="check" size="14"></i></div>
+            <span class="label-text">UI Design</span>
+        </label>
+
+        <label class="checkbox-item">
+            <input type="checkbox" class="hidden-check" name="skill" value="git">
+            <div class="custom-box"><i data-lucide="check" size="14"></i></div>
+            <span class="label-text">Git</span>
+        </label>
+    </div>
+</div>
+</div>
+<div id="facilityErrors" class="error-msg" style="display: none; margin-bottom: 20px;"></div>
+                        </div>
+                        <div class="step-pane" id="pane-6">
+                            <div style="text-align: center; padding: 40px 0;">
+                                <i class="fas fa-rocket" style="font-size: 4rem; color: var(--primary); margin-bottom: 20px;"></i>
+                                <h3>Initialization Ready</h3>
+                                <p style="color: var(--text-dim); margin-top: 10px;">Review your details. Upon clicking 'Launch', your environment will be provisioned instantly.</p>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="modal-nav">
+                    <button class="btn btn-outline" onclick="handleCloseModal()">Cancel</button>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn btn-outline-map" id="btnBack" onclick="navigateStep(-1)" style="display: none;">Back</button>
+                        <button class="btn btn-primary" id="btnNext" onclick="navigateStep(1)">Next Step</button>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    
+</body>
+<script src="https://unpkg.com/dexie@latest/dist/dexie.js"></script>
+
+<script src="maker.js">lucide.createIcons();
+
+const db = new Dexie("ProjectEngineDB");
+db.version(2).stores({
+    projects: '++id, name, category, date', // id is primary key, others are indexed
+    gallery: 'slotId', // To store image slots
+    shared: 'key'      // To store temporary state like 'sharedData'
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+    const assetGrid = document.getElementById("assetGrid");
+    if (!assetGrid) return;
+
+    const slots = [
+    "Home Hero", "Brand Logo", "Gallery 1", "Gallery 2",
+    "Gallery 3", "Gallery 4", "Gallery 5", "Gallery 6", "Male Uniform", "Female Uniform"
+];
+
+const noLabelSlots = ["Home Hero", "Brand Logo", "Male Uniform", "Female Uniform"];
+// For those slots, we keep hidden label + existing category select (unchanged)
+// For others, we add both text input AND custom category select
+
+assetGrid.innerHTML = "";
+slots.forEach((name, i) => {
+    const idx = i + 1;
+    const hideLabel = noLabelSlots.includes(name);
+
+    if (hideLabel) {
+        // Keep original: hidden label + plain select
+        assetGrid.innerHTML += `
+            <div class="upload-card" id="gallery-card-${idx}">
+                <div class="media-area" id="form-imageInput-${idx}" onclick="triggerInput(${idx})">
+                    <img src="" class="preview-img" id="prev-${idx}">
+                    <div class="placeholder-content">
+                        <i class="fas fa-cloud-arrow-up"></i><br>
+                        <span>${name}</span>
+                    </div>
+                    <input type="file" id="input-${idx}" hidden accept="image/*" onchange="handleFile(this,${idx})">
+                </div>
+                <div class="info-area">
+                    <input type="hidden" id="form-labelInput-${idx}" value="${name}">
+                    <p class="error-hint msg-img" id="err-image-${idx}">
+                        <i class="fas fa-circle-exclamation"></i> Image required
+                    </p>
+                </div>
+            </div>`;
+    } else {
+        // For Gallery slots: keep text input + add custom category select
+        assetGrid.innerHTML += `
+            <div class="upload-card" id="gallery-card-${idx}">
+                <div class="media-area" id="form-imageInput-${idx}" onclick="triggerInput(${idx})">
+                    <img src="" class="preview-img" id="prev-${idx}">
+                    <div class="placeholder-content">
+                        <i class="fas fa-cloud-arrow-up"></i><br>
+                        <span>${name}</span>
+                    </div>
+                    <input type="file" id="input-${idx}" hidden accept="image/*" onchange="handleFile(this,${idx})">
+                </div>
+                <div class="info-area" style="position: relative;">
+    <!-- Wrap label input in a relative container like Step 0 -->
+    <div class="input-wrap" style="position: relative; margin-bottom: 12px;">
+        <i data-lucide="tag" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-dim); z-index: 1;"></i>
+        <input type="text" class="label-input" id="form-labelInput-${idx}" 
+               placeholder="Asset Label" oninput="updateLabel(${idx}, this.value)"
+               style="padding-left: 36px;">
+    </div>
+
+    <!-- Custom select for category -->
+    <div class="custom-select-wrapper" id="cat-wrapper-${idx}" style="margin-top: 8px;">
+        <div class="select-trigger" onclick="toggleCategorySelect(${idx})">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <i data-lucide="folder" style="width: 14px;"></i>
+                <span id="cat-text-${idx}" class="select-text is-placeholder">Select Category</span>
+            </div>
+            <i data-lucide="chevron-down" class="chevron-icon"></i>
+        </div>
+        <div class="select-options" id="cat-menu-${idx}" style="z-index: 3000;">
+            <div class="option-item" onclick="selectCategory(${idx}, 'Event')">Event</div>
+            <div class="option-item" onclick="selectCategory(${idx}, 'Sport')">Sport</div>
+            <div class="option-item" onclick="selectCategory(${idx}, 'Academics')">Academics</div>
+            <div class="option-item" onclick="selectCategory(${idx}, 'Art')">Art</div>
+            <div class="option-item" onclick="selectCategory(${idx}, 'Technology')">Technology</div>
+        </div>
+    </div>
+    <input type="hidden" id="form-category-${idx}" value="">
+
+    <p class="error-hint msg-label" id="err-label-${idx}">
+        <i class="fas fa-circle-exclamation"></i> Label required
+    </p>
+    <p class="error-hint msg-category" id="err-category-${idx}">
+        <i class="fas fa-circle-exclamation"></i> Category required
+    </p>
+    <p class="error-hint msg-img" id="err-image-${idx}">
+        <i class="fas fa-circle-exclamation"></i> Image required
+    </p>
+</div>
+            </div>`;
+    }
+});
+});
+
+// Toggle category select menu for gallery items
+function toggleCategorySelect(idx) {
+    const wrapper = document.getElementById(`cat-wrapper-${idx}`);
+    if (!wrapper) return;
+    
+    // Close any other open category selects
+    document.querySelectorAll('.custom-select-wrapper').forEach(w => {
+        if (w.id !== `cat-wrapper-${idx}`) {
+            w.classList.remove('open');
+            const trig = w.querySelector('.select-trigger');
+            if (trig) trig.style.borderColor = 'var(--text-dim)';
+        }
+    });
+    
+    const isOpen = wrapper.classList.toggle('open');
+    const trigger = wrapper.querySelector('.select-trigger');
+    if (trigger) {
+        trigger.style.borderColor = isOpen ? 'var(--primary)' : 'var(--text-dim)';
+    }
+}
+
+// Select a category value and update hidden input & UI
+function selectCategory(idx, value) {
+    const wrapper = document.getElementById(`cat-wrapper-${idx}`);
+    const catSpan = document.getElementById(`cat-text-${idx}`);
+    const hiddenCat = document.getElementById(`form-category-${idx}`);
+    const card = document.getElementById(`gallery-card-${idx}`);
+    
+    // Update UI text
+    if (catSpan) {
+        catSpan.textContent = value;
+        catSpan.classList.remove('is-placeholder');
+        catSpan.classList.add('is-active');
+        catSpan.style.color = '#ffffff';
+    }
+    
+    // Store in hidden input (for form submission)
+    if (hiddenCat) hiddenCat.value = value;
+    
+    // Update galleryData
+    if (!galleryData[`slot-${idx}`]) galleryData[`slot-${idx}`] = { img: "", label: "", category: "" };
+    galleryData[`slot-${idx}`].category = value;
+    
+    // Remove error class if any
+    if (card && value.trim() !== "") {
+        card.classList.remove("err-category-missing");
+        const errHint = document.getElementById(`err-category-${idx}`);
+        if (errHint) errHint.style.display = 'none';
+        checkCardError(card);
+    }
+    
+    // Close the dropdown
+    if (wrapper) {
+        wrapper.classList.remove('open');
+        const trigger = wrapper.querySelector('.select-trigger');
+        if (trigger) trigger.style.borderColor = 'var(--text-dim)';
+    }
+}
+
+// Reinitialize Lucide icons for new elements
+if (window.lucide) lucide.createIcons();
+function triggerInput(index){
+document.getElementById(`input-${index}`).click();
+}
+
+function updateLabel(index,value){
+const card=document.getElementById(`gallery-card-${index}`);const input=document.getElementById(`form-labelInput-${index}`);
+
+if(!galleryData[`slot-${index}`])
+galleryData[`slot-${index}`]={img:"",label:""};
+
+galleryData[`slot-${index}`].label=value;
+
+if(value.trim()!==""){
+card.classList.remove("err-label-missing");
+input.classList.remove("input-error");
+checkCardError(card);
+}
+}
+
+function removeImage(index){
+const card=document.getElementById(`gallery-card-${index}`);
+const img=document.getElementById(`prev-${index}`);
+
+img.src="";
+card.classList.remove("has-image");
+
+if(galleryData[`slot-${index}`])
+galleryData[`slot-${index}`].img="";
+}
+
+function checkCardError(card) {
+    if (!card.classList.contains("err-img-missing") &&
+        !card.classList.contains("err-label-missing") &&
+        !card.classList.contains("err-category-missing")) {
+        card.classList.remove("has-error");
+    }
+}
+// main
+        let currentStep = 0;
+        let activeEditId = null;
+        const totalSteps = 7;
+
+        window.onload = renderProjects;
+
+        function handleCloseModal() { document.getElementById('projectModal').style.display = 'none'; }
+
+        function navigateStep(direction) {
+            // Validate when moving forward
+            if (direction === 1 && !isStepValid()) return;
+
+            currentStep += direction;
+
+            if (currentStep >= totalSteps) {
+                saveData();
+                return;
+            }
+
+            updateStepView();
+        }
+
+        function goTo(targetStep) {
+    // 1. If moving forward, validate current step first
+    if (targetStep > currentStep) {
+        // Optional: Check if the user is trying to skip multiple steps
+        // If you want them to fill everything, don't let them skip ahead
+        if (targetStep > currentStep + 1) {
+            console.log("Please complete the steps in order.");
+            return; 
+        }
+
+         if (targetStep === 2 && window.app) {
+        setTimeout(() => {
+            window.app.render();
+        }, 300);
+    }
+
+        if (!isStepValid()) return;
+
+    }
+
+    // 2. Set the new step
+    currentStep = targetStep;
+
+    // 3. Refresh the UI (this uses the function from the previous 800-line code)
+    updateStepView();
+}
+
+        function updateStepView() {
+            // Update Form Panes
+            document.querySelectorAll('.step-pane').forEach((pane, idx) => {
+                pane.classList.toggle('active', idx === currentStep);
+            });
+
+            // Update Sidebar Indicators
+            document.querySelectorAll('.step-indicator').forEach((node, idx) => {
+                node.classList.remove('active', 'completed');
+                if (idx === currentStep) node.classList.add('active');
+                if (idx < currentStep) node.classList.add('completed');
+            });
+
+            // Progress Line
+            const fillHeight = (currentStep / (totalSteps - 1)) * 100;
+            document.getElementById('blueFlow').style.height = fillHeight + '%';
+
+            const btnNext = document.getElementById('btnNext');
+    const isLastStep = (currentStep === totalSteps - 1);
+
+    if (isLastStep) {
+        // FINAL STEP: Change text based on Edit vs Create
+        btnNext.innerText = activeEditId ? "Save Changes" : "Launch Project";
+        btnNext.classList.add('btn-success'); // Optional: make it green
+    } else {
+        // MIDDLE STEPS: Change text based on Edit vs Create
+        btnNext.innerText = activeEditId ? "Next (Edit)" : "Next Step";
+        btnNext.classList.remove('btn-success');
+    }
+
+    // Scroll the form back to top for the new step
+    const scrollArea = document.getElementById('scrollArea');
+    if (scrollArea) scrollArea.scrollTop = 0;
+
+    const btnBack = document.getElementById('btnBack');
+
+// Show Back button if not first step
+if (currentStep > 0) {
+    btnBack.style.display = 'inline-flex';
+} else {
+    btnBack.style.display = 'none';
+}
+        }
+
+        function isStepValid() {
+    resetValidation();
+    let valid = true; // Use this to track the overall state
+
+   if (currentStep === 0) {
+    const nameEl = document.getElementById('form-name');
+    const emailEl = document.getElementById('form-email');
+    const clubNo = document.getElementById('form-clubNo');
+    const students = document.getElementById('form-studentNo');
+
+    // ✅ FIXED IDs
+    const scTypeText = document.getElementById('label1');
+    const sTypeText = document.getElementById('label2');
+    const lTypeText = document.getElementById('label3');
+
+    const dateText = document.getElementById('selectedDateText');
+
+    const fileEl = document.getElementById('form-file');
+    const dataBase = document.getElementById('form-data');
+
+    let valid = true;
+
+    // 1. Text Inputs
+    if (!nameEl || nameEl.value.trim().length < 3) {
+        showError('form-name', 'err-name');
+        valid = false;
+    }
+
+    if (clubNo && clubNo.value === "") {
+        showError('form-clubNo', 'err-clubNo');
+        valid = false;
+    }
+
+    if (students && students.value === "") {
+        showError('form-studentNo', 'err-studentNo');
+        valid = false;
+    }
+
+    // Optional Email Validation (better UX)
+    if (emailEl && !/^\S+@\S+\.\S+$/.test(emailEl.value)) {
+        showError('form-email', 'err-email');
+        valid = false;
+    }
+
+    // 2. Date
+    if (!dateText || dateText.innerText === "Select Date") {
+        showError('calInput', 'err-date');
+        valid = false;
+    }
+
+    // 3. Selects (FIXED)
+    if (!scTypeText || scTypeText.innerText === "Select School Type") {
+        showError('form-scType', 'err-scType');
+        valid = false;
+    }
+
+    if (!lTypeText || lTypeText.innerText === "Select Program") {
+        showError('form-lType', 'err-lType');
+        valid = false;
+    }
+
+    if (!sTypeText || sTypeText.innerText === "Select Student Type") {
+        showError('form-sType', 'err-sType');
+        valid = false;
+    }
+
+    // 4. Files
+    const hasFile = fileEl && (fileEl.files.length > 0 || fileEl.dataset.filedata || fileEl.dataset.existing);
+    const hasData = dataBase && (dataBase.files.length > 0 || dataBase.dataset.filedata || dataBase.dataset.existing);
+
+    if (!hasFile) {
+        showError('form-file', 'err-file');
+        valid = false;
+    }
+
+    if (!hasData) {
+        showError('form-data', 'err-data');
+        valid = false;
+    }
+
+    return valid;
+}
+
+    // --- STEP 1 ---
+    if (currentStep === 1) {
+        const cards = document.querySelectorAll("#assetGrid .upload-card");
+        cards.forEach(card => {
+            const index = card.id.split("-")[2];
+            const label = document.getElementById(`form-labelInput-${index}`);
+            const hasImage = card.classList.contains("has-image");
+            const hasLabel = !!(label && label.value && label.value.trim() !== "");
+
+            if (!hasImage) {
+                card.classList.add("err-img-missing", "has-error");
+                showError(`form-imageInput-${index}`, `err-image-${index}`);
+                valid = false;
+            }
+            if (!hasLabel) {
+                card.classList.add("err-label-missing", "has-error");
+                if (label) label.classList.add("input-error");
+                showError(`form-labelInput-${index}`, `err-label-${index}`);
+                valid = false;
+            }
+        });
+        return valid;
+    }
+
+    // --- STEP 2 ---
+    if (currentStep === 2) {
+        // Simple passthrough to window.app validation
+        return window.app ? window.app.validate() : false;
+    }
+
+    // --- STEP 3 ---
+    if (currentStep === 3) {
+        // Run the complex validation first
+        valid = validateFull(); 
+
+        // Run manual checks and update the valid flag
+        if (document.getElementById("form-about").value.trim() === "") { showError('form-about', 'err-about'); valid = false; }
+        if (document.getElementById("form-welcome").value.trim() === "") { showError('form-welcome', 'err-welcome'); valid = false; }
+        if (document.getElementById("form-value").value.trim() === "") { showError('form-value', 'err-value'); valid = false; }
+        if (document.getElementById("form-mission").value.trim() === "") { showError('form-mission', 'err-mission'); valid = false; }
+        if (document.getElementById("form-vision").value.trim() === "") { showError('form-vision', 'err-vision'); valid = false; }
+        if (document.getElementById("form-bio").value.trim() === "") { showError('form-bio', 'err-bio'); valid = false; }
+        if (document.getElementById("form-footer").value.trim() === "") { showError('form-footer', 'err-footer'); valid = false; }
+        if (document.getElementById("form-innovation").value.trim() === "") { showError('form-innovation', 'err-innovation'); valid = false; }
+        if (document.getElementById("form-excellence").value.trim() === "") { showError('form-excellence', 'err-excellence'); valid = false; }
+        if (document.getElementById("form-community").value.trim() === "") { showError('form-community', 'err-community'); valid = false; }
+
+
+        return valid;
+    }
+
+    // --- STEP 4 ---
+    if (currentStep === 4) {
+        return validateBranchData();
+    }
+
+    if (currentStep === 5) {
+    let valid = true;
+    let errorMsg = '';
+
+    // Inventory validation: at least 3 items selected and quantities > 0 and within range
+    const checkboxes = document.querySelectorAll('#pane-5 .item-list .hidden-check');
+    let selectedCount = 0;
+    const quantityErrors = [];
+
+    checkboxes.forEach((cb, idx) => {
+        if (cb.checked) {
+            selectedCount++;
+            const rowId = cb.closest('.item-row').id;
+            const qtyId = rowId.replace('row', 'qty');
+            const qtyInput = document.getElementById(qtyId);
+            const qty = parseInt(qtyInput.value, 10);
+            if (isNaN(qty) || qty < 1 || qty > 100) {
+                quantityErrors.push(`Please enter a valid quantity (1-100) for ${cb.closest('.item-row').querySelector('.item-name').textContent}`);
+                qtyInput.classList.add('input-error');
+                valid = false;
+            } else {
+                qtyInput.classList.remove('input-error');
+            }
+        }
+    });
+
+    if (selectedCount < 3) {
+        errorMsg += 'Please select at least 3 inventory items. ';
+        valid = false;
+    }
+    if (quantityErrors.length) {
+        errorMsg += quantityErrors.join('; ');
+    }
+
+    // Skills validation: at least 3 checkboxes selected
+    const skillCheckboxes = document.querySelectorAll('#pane-5 .selection-card .hidden-check');
+    const selectedSkills = Array.from(skillCheckboxes).filter(cb => cb.checked);
+    if (selectedSkills.length < 3) {
+        errorMsg += 'Please select at least 3 skills. ';
+        valid = false;
+    }
+
+    // Display error message
+    const errorDiv = document.getElementById('facilityErrors');
+    if (errorDiv) {
+        if (!valid) {
+            errorDiv.textContent = errorMsg;
+            errorDiv.style.display = 'block';
+            errorDiv.style.color = 'var(--error)';
+            errorDiv.style.backgroundColor = 'rgba(255,77,77,0.1)';
+            errorDiv.style.padding = '10px';
+            errorDiv.style.borderRadius = '8px';
+        } else {
+            errorDiv.style.display = 'none';
+        }
+    }
+
+    return valid;
+}
+
+    return true;
+}
+        function showError(inputId, hintId) {
+    const el = document.getElementById(inputId);
+    const hint = document.getElementById(hintId);
+
+    if (el) {
+    // 1. Identify the trigger/element to shake
+    const trigger = el.classList.contains('calendar-input') || el.classList.contains('select-trigger') 
+                    ? el 
+                    : el.querySelector('.select-trigger');
+
+    const target = trigger || el;
+
+    // 2. REPEAT SHAKE LOGIC:
+    // Remove the class first
+    target.classList.remove('shake', 'input-error');
+    
+    // Force a "reflow" (this is the magic line that allows the animation to restart)
+    void target.offsetWidth; 
+    
+    // Add the classes back
+    target.classList.add('input-error');
+    target.classList.add('shake');
+}
+    if (hint) {
+        if (!hint.dataset.originalText) {
+            hint.dataset.originalText = hint.textContent.trim();
+        }
+        hint.innerHTML = `<i data-lucide="circle-alert" size="14"></i> ${hint.dataset.originalText}`;
+        hint.style.display = 'flex';
+        hint.style.alignItems = 'center';
+        hint.style.gap = '5px';
+        
+        if (window.lucide) {
+            lucide.createIcons({
+                attrs: { class: 'error-icon' },
+                nameAttr: 'data-lucide'
+            });
+        }
+    }
+    return false;
+
+}
+
+        function resetValidation() {
+    // 1. Reset standard form elements
+    const inputs = document.querySelectorAll('input, textarea, select');
+    inputs.forEach(el => {
+        el.style.borderColor = '';
+        el.classList.remove('input-error');
+    });
+
+    // --- ADD THIS: Reset Custom Selects and Date Triggers ---
+    const customElements = document.querySelectorAll('.select-trigger, .calendar-input');
+    customElements.forEach(el => {
+        // Reset to your default border color (var(--text-dim))
+        el.style.borderColor = 'var(--text-dim)'; 
+        el.classList.remove('shake');
+    });
+
+    // 2. Clear all error text and hints
+    document.querySelectorAll('.error-hint').forEach(h => h.style.display = 'none');
+    // 3. Reset Asset Cards (Step 1)
+    document.querySelectorAll('.upload-card').forEach(card => {
+        card.classList.remove('has-error', 'err-img-missing', 'err-label-missing');
+    });
+
+    // 4. Reset Branch Cards (Step 4)
+    // Adjust the class selector if your branch cards use a different class name
+    const branchCards = document.querySelectorAll('.branch-card, .branch-item');
+    branchCards.forEach(card => {
+        card.classList.remove('has-error', 'validation-failed');
+        
+        // If your branch cards have internal inputs that get highlighted
+        const internalInputs = card.querySelectorAll('input, select');
+        internalInputs.forEach(input => {
+            input.style.borderColor = 'var(--white-border)';
+            input.classList.remove('input-error');
+        });
+    });
+}
+
+async function collectAllData() {
+    const data = {};
+
+    // 1. Text/Select Inputs
+    document.querySelectorAll('#multiStepForm input, #multiStepForm select, #multiStepForm textarea')
+    .forEach(el => {
+        if (!el.id || el.type === "file") return;
+        data[el.id] = el.value;
+    });
+
+// Inside collectAllData()
+const fileFields = [
+    { id: 'form-file', label: 'Legal PDF' },
+    { id: 'form-data', label: 'Database PDF' }
+];
+
+fileFields.forEach(field => {
+    const input = document.getElementById(field.id);
+    if (input) {
+        // Save the actual data and a flag/name for the label
+        data[field.id] = input.dataset.filedata || input.dataset.existing || "";
+        data[`${field.id}-name`] = input.dataset.filename || (data[field.id] ? `${field.label} Loaded` : "");
+    }
+});
+
+    // Corrected Loop for maker.js
+data.images = []; // Change to an array to match eb.html expectations
+const slots = [
+    "Home Hero", "Brand Logo", "Gallery 1", "Gallery 2",
+    "Gallery 3", "Gallery 4", "Gallery 5", "Gallery 6", "Male Uniform", "Female Uniform"
+];
+
+slots.forEach((name, i) => {
+        const idx = i + 1;
+        const preview = document.getElementById(`prev-${idx}`);
+        const labelIn = document.getElementById(`form-labelInput-${idx}`);
+
+        // Ensure we only push valid data
+        if (preview && preview.src && !preview.src.includes('window.location')) {
+            data.images.push({
+                src: preview.src,
+                label: labelIn ? labelIn.value : name
+            });
+        }
+    });
+
+// 4. ID CARD MAPPER (Canvas)
+    if (window.app && window.app.store) {
+        data.idMapping = {
+            front: {
+                img: window.app.store.front.img,
+                lines: window.app.store.front.lines,
+                photo: window.app.store.front.photo
+            },
+            back: {
+                img: window.app.store.back.img,
+                lines: window.app.store.back.lines,
+                photo: window.app.store.back.photo
+            }
+        };
+        const canvas = document.getElementById("canvas");
+        data.mapPreview = canvas ? canvas.toDataURL("image/jpeg", 0.3) : "";
+    }
+
+    // Inside collectAllData() in maker.js
+data.schoolMembers = [];
+const memberCards = document.querySelectorAll('.school-card'); 
+
+memberCards.forEach((card, i) => {
+    const preview = document.getElementById(`img-preview-${i}`);
+    data.schoolMembers.push({
+        name: document.getElementById(`name-in-${i}`)?.value || "",
+        role: document.getElementById(`role-in-${i}`)?.value || "",
+        text: document.getElementById(`quote-in-${i}`)?.value || "",
+        // This pulls the Base64 string we saved in previewImage
+        img: preview?.dataset?.img || "" 
+    });
+});
+
+    // 6. BRANCHES (Step 4)
+// 6. BRANCHES (Step 4)
+data.branches = [];
+const branchCount = Number(document.getElementById('branchCount').value) || 0;
+
+// REMOVE the locInput line from here (it was causing the error)
+
+for (let i = 1; i <= branchCount; i++) {
+    // MOVE it inside the loop so 'i' is defined
+    const locInput = document.getElementById(`loc-${i}`); 
+    
+    const selectedGrades = [];
+    const gradeDrop = document.getElementById(`grade-drop-${i}`);
+    
+    if (gradeDrop) {
+        // Find all checked inputs within this specific branch dropdown
+        gradeDrop.querySelectorAll('input[type="checkbox"]:checked').forEach(chk => {
+            selectedGrades.push(chk.parentElement.textContent.trim());
+        });
+    }
+
+    data.branches.push({
+        name: document.getElementById(`name-${i}`)?.value || "",
+        // Now locInput is correctly defined for this specific loop iteration
+        location: locInput?.dataset.coords ? JSON.parse(locInput.dataset.coords) : locInput?.value || "",
+        phone: document.getElementById(`phone-${i}`)?.value || "",
+        telegram: document.getElementById(`telegram-${i}`)?.value || "",
+        grades: selectedGrades 
+    });
+}
+
+    return data;
+}
+
+// Helper: Convert File object to Base64 string
+const toBase64 = file => new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = error => reject(error);
+});
+
+function validateETPhone(input) {
+    // Remove non-numeric characters
+    input.value = input.value.replace(/\D/g, '');
+    
+    // Simple visual feedback if it matches your 9-digit rule
+    if (/^9\d{8}$/.test(input.value)) {
+        input.style.borderColor = 'var(--accent-blue)';
+    } else {
+        input.style.borderColor = 'var(--error)';
+    }
+}
+window.viewProject = async function(id) {
+    const p = await db.projects.get(id);
+    await db.shared.put({ key: 'current_active', data: p });
+    window.location.href = 'eb.html';
+};
+
+document.addEventListener("DOMContentLoaded", () => {
+    window.app = new FormMapper();
+});
+
+        document.addEventListener('DOMContentLoaded', () => {
+    renderProjects();
+    document.querySelectorAll('#multiStepForm input, #multiStepForm select').forEach(element => {
+    element.addEventListener('input', function() {
+        // If the field has a value (and isn't the default "none" for selects)
+        if (this.value && this.value !== "none" && this.value !== "empty" && this.value !== "no") {
+            this.style.borderColor = 'var(--white-border)'; 
+            // Optional: this.style.borderColor = '#2ecc71'; // Green for valid
+            
+            // Hide the error message associated with this input
+            const errorHint = this.parentElement.querySelector('.error-hint');
+            if (errorHint) errorHint.style.display = 'none';
+        }
+    });
+});
+});
+
+
+        async function filterProjects() {
+    // Get the search query from the input
+    const q = document.getElementById('projectSearch').value.toLowerCase();
+    
+    // Fetch all projects from IndexedDB
+    const allProjects = await db.projects.toArray();
+    
+    // Filter the array based on the name
+    const filtered = allProjects.filter(p => 
+        p["form-name"] && p["form-name"].toLowerCase().includes(q)
+    );
+    
+    // Pass the filtered list to the render function
+    renderProjects(filtered);
+}
+
+        // branches
+        let map, marker, activeBranchId;
+
+        // --- Wizard Logic ---
+
+        // --- Step 3 Validation ---
+
+        function addGenericTopError(msg) {
+            const scrollArea = document.getElementById('scrollArea');
+            const err = document.createElement('div');
+            err.className = 'error-msg';
+            err.innerHTML = `<i class="fas fa-circle-exclamation"></i> ${msg}`;
+            scrollArea.prepend(err);
+            setTimeout(() => err.remove(), 3500);
+        }
+
+        function validateBranchData() {
+            const count = Number(document.getElementById('branchCount').value) || 0;
+            let errors = 0;
+
+            for (let i = 1; i <= count; i++) {
+                const card = document.querySelector(`.branch-card:nth-child(${i})`);
+                // If a card wasn't generated (shouldn't happen normally), show a top error and stop
+                if (!card) {
+                    addGenericTopError("Branch cards not found — regenerate branches.");
+                    return false;
+                }
+                card.querySelectorAll('.error-msg').forEach(e => e.remove());
+                card.querySelectorAll('.input-error').forEach(e => e.classList.remove('input-error'));
+
+                const addError = (el, msg) => {
+                    const err = document.createElement('div');
+                    err.className = 'error-msg';
+                    err.innerHTML = `<i class="fas fa-circle-exclamation"></i> ${msg}`;
+                    const wrapper = (el && (el.closest && el.closest('.input-group, .custom-dropdown, .btn-outline'))) || el || card;
+                    if (wrapper && wrapper.after) wrapper.after(err);
+                    if (el && el.tagName === 'INPUT') el.classList.add('input-error');
+                    errors++;
+                };
+
+                // Validate Relative Loc (Name)
+                const name = document.getElementById(`name-${i}`);
+                if (!name || !name.value.trim()) addError(name || card, "Location name is required");
+
+                // Validate Absolute Loc (Coordinates)
+                const loc = document.getElementById(`loc-${i}`);
+                if (!loc || !loc.value.trim()) addError(loc || card, "Please pin on map");
+
+                // Validate Grade Selection
+                const gradeBox = document.getElementById(`grade-drop-${i}`);
+                if (!gradeBox || gradeBox.querySelectorAll('input:checked').length === 0) {
+                    addError((gradeBox && gradeBox.querySelector('.dropdown-trigger')) || card, "Select at least one grade");
+                }
+
+                // Validate Telegram
+const telegram = document.getElementById(`telegram-${i}`);
+if (!telegram || !telegram.value.trim()) {
+    addError(telegram, "Telegram username is required");
+} else if (!/^@?[a-zA-Z0-9_]{5,}$/.test(telegram.value.trim())) {
+    addError(telegram, "Invalid Telegram username");
+}
+
+// Validate Phone
+const phone = document.getElementById(`phone-${i}`);
+if (!phone || !phone.value.trim()) {
+    addError(phone, "Phone number is required");
+} else if (!/^9\d{8}$/.test(phone.value.trim())) {
+    addError(phone, "Enter valid Ethiopian number (9XXXXXXXX)");
+}
+
+                // Validate Social Links if present
+                const socialContainer = document.getElementById(`links-${i}`);
+                const socialLinks = socialContainer ? socialContainer.querySelectorAll('input') : [];
+                socialLinks.forEach(link => {
+                    if (!link.value.trim()) addError(link, "Link cannot be empty");
+                    else if (!link.value.startsWith('https://')) addError(link, "Must start with https://");
+                });
+            }
+
+            if (errors > 0) {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                return false;
+            }
+            return true;
+        }
+
+        // --- Branch Generation Logic ---
+
+        function handleCountChange() {
+            updateBranchGrid();
+        }
+
+        function updateBranchGrid() {
+    const grid = document.getElementById('branchGrid');
+    const count = Math.min(Math.max(document.getElementById('branchCount').value, 1), 50);
+    grid.innerHTML = '';
+    for (let i = 1; i <= count; i++) {
+        const card = createBranchCard(i);
+        grid.appendChild(card);
+    }
+    
+    // Initialize maps for all branches after a short delay to ensure DOM is ready
+    setTimeout(() => {
+        for (let i = 1; i <= count; i++) {
+            initBranchMap(i);
+        }
+    }, 100);
+}
+
+// Store map instances and markers per branch
+const branchMaps = {};
+const branchMarkers = {};
+
+function initBranchMap(id) {
+    const container = document.getElementById(`map-${id}`);
+    if (!container) return;
+    
+    // Default center (Addis Ababa)
+    const defaultCenter = [9.0192, 38.7525];
+    
+    // Create map
+    const map = L.map(container).setView(defaultCenter, 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>'
+    }).addTo(map);
+    
+    // Add click handler to set marker and update coordinates
+    map.on('click', (e) => {
+        const { lat, lng } = e.latlng;
+        updateBranchLocation(id, lat, lng, map);
+    });
+    
+    branchMaps[id] = map;
+    
+    // Attach locate button event listener
+    const locateBtn = container.parentElement.querySelector(`.locate-btn[data-id="${id}"]`);
+    if (locateBtn) {
+        locateBtn.onclick = () => locateBranch(id);
+    }
+}
+
+function updateBranchLocation(id, lat, lng, map) {
+    // Correct way to get and set the values
+const locInput = document.getElementById(`loc-${id}`);
+const locDisplay = document.getElementById(`locDis-${id}`);
+
+// To update the display (call this inside your Locate Me function):
+    const val = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+    
+    // Set the hidden input value
+    locInput.value = val; 
+    
+    // Update the visible text display
+    locDisplay.innerText = val;
+    
+    // Add the animation class
+    locDisplay.classList.add('location-updated');
+    setTimeout(() => locDisplay.classList.remove('location-updated'), 1000);
+
+    
+    // Update or create marker
+    if (branchMarkers[id]) {
+        branchMarkers[id].setLatLng([lat, lng]);
+    } else {
+        branchMarkers[id] = L.marker([lat, lng], { draggable: true }).addTo(map);
+        // Allow marker drag to update coordinates
+        branchMarkers[id].on('dragend', function() {
+            const pos = this.getLatLng();
+            updateBranchLocation(id, pos.lat, pos.lng, map);
+        });
+    }
+    map.setView([lat, lng], 15);
+}
+
+function locateBranch(id) {
+    if (!navigator.geolocation) {
+        alert("Geolocation not supported by your browser.");
+        return;
+    }
+    
+    navigator.geolocation.getCurrentPosition(
+        (position) => {
+            const { latitude, longitude } = position.coords;
+            const map = branchMaps[id];
+            if (map) {
+                updateBranchLocation(id, latitude, longitude, map);
+            } else {
+                // If map not ready, wait a bit
+                setTimeout(() => locateBranch(id), 500);
+            }
+        },
+        (error) => {
+            console.error("Geolocation error:", error);
+            alert("Unable to retrieve your location. Please check permissions.");
+        },
+        { enableHighAccuracy: true, timeout: 10000 }
+    );
+}
+
+        function createBranchCard(id) {
+    const card = document.createElement('div');
+    card.className = 'branch-card';
+    card.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:center">
+            <h3 style="margin:0; color:var(--accent-blue);"><i class="fas fa-store"></i> Branch #${id}</h3>
+        </div>
+
+        <div class="input-group">
+            <i class="fas fa-pen-nib"></i>
+            <input type="text" id="name-${id}" placeholder=" ">
+            <label>Relative Location (Name)</label>
+        </div>
+
+        <div style="display: flex; gap: 10px; margin: 5px 0;">
+            <button type="button" class="locate-btn" data-id="${id}">
+                <i class="fas fa-location-dot"></i> Locate Me
+            </button>
+        </div>
+
+        <!-- Map container for this branch -->
+        <div id="map-${id}" style="height: 200px; border-radius: 12px; margin: 10px 0; border: 1px solid var(--border);"></div>
+
+        <div class="input-group location-display">
+    <input type="hidden" id="loc-${id}" value="">
+    <div class="coords-text">
+        <span><i data-lucide="locate" style="transform: scale(0.8); margin-bottom: -5px; margin-right:5px;"></i><span id="locDis-${id}">Waiting for location...</span></span>
+    </div>
+</div>
+
+        <div class="input-group" id="phone-group-${id}">
+            <i class="fas fa-phone"></i>
+            <input type="tel" id="phone-${id}" placeholder=" " oninput="validateETPhone(this)">
+            <label>Phone Number (+251)</label>
+        </div>
+
+        <div class="custom-dropdown" id="grade-drop-${id}">
+            <div class="dropdown-trigger" onclick="toggleDrop('grade-drop-${id}')">
+                <span><i class="fas fa-graduation-cap"></i> &nbsp; Available Grades</span>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="dropdown-content">
+                ${['Pre-Primary', 'Elementary', 'Middle', 'High School', 'University', 'College'].map(g => `
+<label class="checkbox-item">
+            <input type="checkbox" class="hidden-check" name="skill" value="html">
+            <div class="custom-box"><i data-lucide="check" size="14"></i></div>
+            <span class="label-text">${g}</span>
+        </label>`).join('')}
+            </div>
+        </div>
+
+        <div class="input-group">
+            <i class="fab fa-telegram"></i>
+            <input type="text" id="telegram-${id}" placeholder=" ">
+            <label>Telegram Username</label>
+        </div>
+
+        <div id="links-${id}" style="display:flex; flex-direction:column; gap:12px;"></div>
+    `;
+    return card;
+}
+
+
+
+        function toggleDrop(id) {
+            document.getElementById(id).classList.toggle('active');
+        }
+
+        function toggleSocial(branchId, platform, checked, icon) {
+            const container = document.getElementById(`links-${branchId}`);
+            if (checked) {
+                const div = document.createElement('div');
+                div.id = `link-${branchId}-${platform}`;
+                div.className = 'input-group';
+                div.style.marginTop = "10px";
+                div.innerHTML = `
+                    <i class="fab ${icon}"></i>
+                    <input type="text" placeholder=" ">
+                    <label>${platform} URL</label>
+                `;
+                container.appendChild(div);
+            } else {
+                document.getElementById(`link-${branchId}-${platform}`)?.remove();
+            }
+        }
+
+        // --- Map Functions ---
+
+        function openMap(id) {
+            activeBranchId = id;
+            document.getElementById('mapModal').style.display = 'flex';
+            if (!map) {
+                map = L.map('map').setView([9.0192, 38.7525], 13);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+                map.on('click', e => {
+                    if (marker) map.removeLayer(marker);
+                    marker = L.marker(e.latlng, { draggable: true }).addTo(map);
+                });
+            }
+            setTimeout(() => map.invalidateSize(), 300);
+        }
+
+        function confirmLocation() {
+            if (marker) {
+                const pos = marker.getLatLng();
+                document.getElementById(`loc-${activeBranchId}`).value = `${pos.lat.toFixed(6)}, ${pos.lng.toFixed(6)}`;
+                closeMap();
+            } else {
+                alert("Please click on the map to place a pin.");
+            }
+        }
+
+        function closeMap() {
+            document.getElementById('mapModal').style.display = 'none';
+        }
+
+        // Initial Grid Load
+        updateBranchGrid();
+
+        // web
+        let swiperInstance = null;
+
+        function updateSwiper() {
+            const wrapper = document.getElementById('swiper-wrapper');
+            let count = Math.min(parseInt(document.getElementById('cardCount').value) || 1, 15);
+
+            if (swiperInstance) swiperInstance.destroy(true, true);
+            wrapper.innerHTML = ''; 
+
+            for (let i = 0; i < count; i++) {
+                const slide = document.createElement('div');
+                slide.className = 'swiper-slide';
+                slide.innerHTML = `
+                    <div class="school-card upload-card" id="card-${i}">
+                        <div class="profile-wrapper" onclick="triggerUpload(${i})">
+                            <div class="profile-img" id="img-preview-${i}">
+                                <i class="fa-solid fa-camera" style="font-size:24px; color:#3b82f6"></i>
+                            </div>
+                            <input type="file" id="file-input-${i}" style="display:none" accept="image/*" onchange="previewImage(event, ${i})">
+                        </div>
+
+                        <input type="text" class="input-field name-in" id="name-in-${i}" placeholder="User Name">
+                        <input type="text" class="input-field role-in" id="role-in-${i}" style="color:#3b82f6; font-size:11px; font-weight:700" placeholder="JOB POSITION">
+                        <textarea class="input-field quote-in quote-input" id="quote-in-${i}" placeholder="Enter testimonial..."></textarea>
+
+                        <div class="error-list">
+                            <div class="error-text msg-img"><i class="fa-solid fa-circle-image"></i> Select an image</div>
+                            <div class="error-text msg-name"><i class="fa-solid fa-user-pen"></i> Name is required</div>
+                            <div class="error-text msg-role"><i class="fa-solid fa-briefcase"></i> Role is required</div>
+                            <div class="error-text msg-quote"><i class="fa-solid fa-message"></i> Testimonial required</div>
+                            <div class="error-text msg-short"><i class="fa-solid fa-triangle-exclamation"></i> Must be more than 5 words</div>
+                        </div>
+                    </div>
+                `;
+                wrapper.appendChild(slide);
+            }
+
+            swiperInstance = new Swiper(".mySwiper", {
+                effect: "coverflow",
+                centeredSlides: true,
+                slidesPerView: "auto",
+                autoHeight: true, // Swiper adjusts to the tallest card automatically
+                coverflowEffect: { rotate: 0, stretch: 0, depth: 100, modifier: 2, slideShadows: false },
+                pagination: { el: ".swiper-pagination", clickable: true },
+                navigation: {
+                nextEl: ".swiper-button-next",
+                prevEl: ".swiper-button-prev",
+            },
+            });
+        }
+
+        function triggerUpload(i) { document.getElementById(`file-input-${i}`).click(); }
+
+        function previewImage(event, i) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const preview = document.getElementById(`img-preview-${i}`);
+        
+        // 1. Show the visual preview
+        preview.style.backgroundImage = `url(${e.target.result})`;
+        preview.style.backgroundSize = "cover";
+        preview.style.backgroundPosition = "center";
+        preview.innerHTML = ""; // Remove the camera icon
+        
+        // 2. STICK THE DATA HERE so collectAllData can find it
+        preview.dataset.img = e.target.result; 
+        
+        // 3. Remove error border if it was there
+        const card = document.getElementById(`card-${i}`);
+        if (card) card.classList.remove('err-img-miss');
+    };
+    reader.readAsDataURL(file);
+}
+
+        function checkCardBorder(card) {
+            const errs = ['err-img-miss', 'err-name-miss', 'err-role-miss', 'err-quote-miss', 'err-quote-short'];
+            if (!errs.some(cls => card.classList.contains(cls))) card.classList.remove('has-error');
+        }
+
+        function validateFull() {
+    let isValid = true; // Track overall validity
+    const cards = document.querySelectorAll('.school-card');
+
+    cards.forEach(card => {
+        const preview = card.querySelector('.profile-img');
+        const hasImg = preview && preview.dataset.img;
+        const name = card.querySelector('.name-in').value.trim();
+        const role = card.querySelector('.role-in').value.trim();
+        const quote = card.querySelector('.quote-in').value.trim();
+        const words = quote === "" ? 0 : quote.split(/\s+/).filter(w => w.length > 0).length;
+
+        // Reset error states before re-validating
+        card.classList.remove('has-error', 'err-img-miss', 'err-name-miss', 'err-role-miss', 'err-quote-miss', 'err-quote-short');
+
+        // Check conditions (removed the 'return false' inside forEach)
+        if (!hasImg) card.classList.add('err-img-miss');
+        if (name === "") card.classList.add('err-name-miss');
+        if (role === "") card.classList.add('err-role-miss');
+        
+        if (quote === "") {
+            card.classList.add('err-quote-miss');
+        } else if (words <= 5) {
+            card.classList.add('err-quote-short');
+        }
+
+        // If any error class was added, mark this card and the whole form as invalid
+        const hasAnyError = [...card.classList].some(c => c.startsWith('err-'));
+        if (hasAnyError) {
+            card.classList.add('has-error');
+            isValid = false; 
+        }
+    });
+
+    // CRITICAL: Swiper update must happen BEFORE the final return
+    if (typeof swiperInstance !== 'undefined' && swiperInstance) {
+        swiperInstance.updateAutoHeight();
+    }
+
+    return isValid; 
+}
+        updateSwiper();
+
+        // cards
+        const TEXT_FIELDS = ["Full Name", "Grade", "Number", "Year", "Subcity", "Kebele", "House No", "Phone", "Contact Person", "Telephone", "Date", "Validity", "Signature"];
+        const ID_RATIO = 1.35; // Standard ID Aspect Ratio (Height/Width)
+
+        class FormMapper {
+            constructor() {
+                this.store = { front: { img: null, lines: [], photo: null }, back: { img: null, lines: [], photo: null } };
+                this.currentSide = 'front';
+                this.isDrawing = false;
+                this.startX = 0; this.startY = 0;
+                this.tempShape = null;
+
+                this.canvas = document.getElementById('canvas');
+this.ctx = this.canvas ? this.canvas.getContext('2d') : null;
+
+if(!this.canvas || !this.ctx) return;
+                this.bgImg = document.getElementById('bg-img');
+                this.floatingMenu = document.getElementById('floating-menu');
+                this.fieldSelect = document.getElementById('form-card');
+                this.saveBtn = document.getElementById('save-btn');
+                this.statusLabel = document.getElementById('status-label');
+                this.modeIndicator = document.getElementById('mode-indicator');
+
+                this.init();
+            }
+
+            init() {
+                if (this.canvas) {
+                    this.canvas.addEventListener('mousedown', e => this.handleDown(e));
+                    this.canvas.addEventListener('mousemove', e => this.handleMove(e));
+                    this.canvas.addEventListener('mouseup', e => this.handleUp(e));
+                    this.canvas.addEventListener('dblclick', e => this.handleDblClick(e));
+                }
+
+                // ESCAPE KEY SUPPORT
+                window.addEventListener('keydown', e => {
+                    if (e.key === 'Escape') this.resetDrawingState();
+                });
+
+                // Ensure save button exists before attempting to use
+                if (this.saveBtn) {
+                    this.saveBtn.addEventListener('click', () => {
+                        if (this.validate()) {
+                            alert('Mapping saved (mock).');
+                        } else {
+                            alert('Mapping is incomplete or invalid.');
+                        }
+                    });
+                }
+
+                this.updateDropdown();
+            }
+
+            getCounts() {
+                const fCount = this.store.front.lines.length;
+                const bCount = this.store.back.lines.length;
+                const photoExists = this.store.front.photo || this.store.back.photo;
+                const totalLines = fCount + bCount;
+                return { fCount, bCount, totalLines, photoExists, isFullyLocked: (totalLines === 13 && photoExists) };
+            }
+
+            updateDropdown() {
+                const used = [...this.store.front.lines, ...this.store.back.lines].map(l => l.name);
+                this.fieldSelect.innerHTML = '';
+                TEXT_FIELDS.forEach(f => {
+                    const opt = document.createElement('option');
+                    opt.value = f; opt.textContent = f;
+                    opt.disabled = used.includes(f);
+                    this.fieldSelect.appendChild(opt);
+                });
+            }
+
+            validate() {
+                const { fCount, bCount, totalLines, photoExists, isFullyLocked } = this.getCounts();
+                let msg = `Mapped: ${totalLines}/13 Inputs | Photo Area: ${photoExists ? '✅' : '❌'}`;
+                let isErr = false;
+
+                if (totalLines === 13 && (fCount === 0 || bCount === 0)) {
+                    msg = "❌ Error: Inputs must be shared across Front and Back.";
+                    isErr = true;
+                } else if (isFullyLocked) {
+                    msg = "✅ All fields mapped. Mapping is LOCKED.";
+                    if (this.modeIndicator) this.modeIndicator.style.display = 'none';
+                    if (this.saveBtn) this.saveBtn.classList.add('ready');
+                } else if (totalLines === 13) {
+                    msg = "Inputs complete. Next: Draw the ID Photo Area.";
+                    if (this.modeIndicator) this.modeIndicator.style.display = 'block';
+                }
+
+                if (this.statusLabel) {
+                    this.statusLabel.className = `status-msg ${isErr ? 'error' : (isFullyLocked ? 'success' : '')}`;
+                    this.statusLabel.innerHTML = msg;
+                }
+                return isFullyLocked && !isErr;
+            }
+
+            handleDown(e) {
+                const { isFullyLocked } = this.getCounts();
+                if (isFullyLocked || (this.floatingMenu && this.floatingMenu.style.display === 'flex')) return;
+                
+                if (!this.canvas) return;
+                const rect = this.canvas.getBoundingClientRect();
+                this.startX = e.clientX - rect.left;
+                this.startY = e.clientY - rect.top;
+                this.isDrawing = true;
+            }
+
+            handleMove(e) {
+                if (!this.isDrawing) return;
+                if (!this.canvas) return;
+                const rect = this.canvas.getBoundingClientRect();
+                const curX = e.clientX - rect.left;
+                const curY = e.clientY - rect.top;
+                const { totalLines } = this.getCounts();
+
+                if (totalLines < 13) {
+                    this.tempShape = { type: 'line', x1: this.startX, x2: curX, y: this.startY };
+                } else {
+                    let w = curX - this.startX;
+                    let h = Math.abs(w) * ID_RATIO; // Forced ID Proportions, use abs for direction
+                    // Keep height sign consistent with drag direction
+                    if (w < 0) {
+                        this.tempShape = { type: 'rect', x: this.startX + w, y: this.startY, w: Math.abs(w), h: h };
+                    } else {
+                        this.tempShape = { type: 'rect', x: this.startX, y: this.startY, w: w, h: h };
+                    }
+                }
+                this.draw();
+            }
+
+            handleUp(e) {
+                if (!this.isDrawing) return;
+                this.isDrawing = false;
+                const { totalLines, photoExists } = this.getCounts();
+
+                if (totalLines < 13) {
+                    if (this.tempShape && Math.abs(this.tempShape.x2 - this.startX) > 15) this.smartPosition();
+                    else this.resetDrawingState();
+                } else if (!photoExists) {
+                    if (this.tempShape && Math.abs(this.tempShape.w) > 30) {
+                        this.store[this.currentSide].photo = { ...this.tempShape };
+                        this.tempShape = null;
+                        this.validate();
+                        this.draw();
+                    } else this.resetDrawingState();
+                }
+            }
+
+            smartPosition() {
+                const menu = this.floatingMenu;
+                if (!menu || !this.tempShape) return;
+menu.style.display = 'flex';
+menu.style.visibility = 'hidden';
+menu.style.display = 'flex';
+
+const mWidth = menu.offsetWidth;
+const mHeight = menu.offsetHeight;
+
+menu.style.visibility = 'visible';
+                const cWidth = this.canvas.width, cHeight = this.canvas.height;
+
+                let left = Math.max(this.tempShape.x1, this.tempShape.x2) + 10;
+                let top = this.tempShape.y - 15;
+
+                // Smart X/Y Sifting
+                if (left + mWidth > cWidth) left = Math.min(this.tempShape.x1, this.tempShape.x2) - mWidth - 10;
+                if (left < 0 || left + mWidth > cWidth) left = (cWidth - mWidth) / 2;
+                if (top + mHeight > cHeight) top = cHeight - mHeight - 10;
+                if (top < 0) top = 10;
+
+                menu.style.left = left + "px";
+                menu.style.top = top + "px";
+            }
+
+            draw() {
+                if (!this.ctx || !this.canvas) return;
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                const data = this.store[this.currentSide];
+
+                if (data.photo) {
+                    this.ctx.fillStyle = 'rgba(0, 255, 204, 0.1)';
+                    this.ctx.strokeStyle = '#00ffcc';
+                    this.ctx.lineWidth = 2;
+                    this.ctx.strokeRect(data.photo.x, data.photo.y, data.photo.w, data.photo.h);
+                    this.ctx.fillRect(data.photo.x, data.photo.y, data.photo.w, data.photo.h);
+                    this.ctx.fillStyle = '#00ffcc';
+                    this.ctx.font = 'bold 9px Inter';
+                    this.ctx.fillText("ID PHOTO AREA", data.photo.x + 5, data.photo.y + 15);
+                }
+
+                data.lines.forEach(l => {
+                    this.ctx.strokeStyle = '#00a2ff';
+                    this.ctx.lineWidth = 3;
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(l.x1, l.y); this.ctx.lineTo(l.x2, l.y);
+                    this.ctx.stroke();
+                    this.ctx.fillStyle = '#00a2ff';
+                    const txt = l.name.toUpperCase();
+                    this.ctx.fillRect(Math.min(l.x1, l.x2), l.y - 18, this.ctx.measureText(txt).width + 8, 12);
+                    this.ctx.fillStyle = 'white';
+                    this.ctx.font = 'bold 8px Inter';
+                    this.ctx.fillText(txt, Math.min(l.x1, l.x2) + 4, l.y - 9);
+                });
+
+                if (this.tempShape) {
+                    this.ctx.strokeStyle = '#fff';
+                    this.ctx.lineWidth = 2;
+                    if (this.tempShape.type === 'line') {
+                        this.ctx.beginPath();
+                        this.ctx.moveTo(this.tempShape.x1, this.tempShape.y);
+                        this.ctx.lineTo(this.tempShape.x2, this.tempShape.y);
+                        this.ctx.stroke();
+                    } else {
+                        this.ctx.strokeRect(this.tempShape.x, this.tempShape.y, this.tempShape.w, this.tempShape.h);
+                    }
+                }
+            }
+
+            confirmField(){
+
+    const val = this.fieldSelect?.value;
+
+    if(!val || !this.tempShape) return;
+
+    this.store[this.currentSide].lines.push({
+        ...this.tempShape,
+        name: val
+    });
+
+    this.tempShape = null;
+
+    if(this.floatingMenu)
+        this.floatingMenu.style.display="none";
+
+    this.updateDropdown();
+    this.draw();
+    this.validate();
+}
+
+            resetDrawingState() {
+                if (this.floatingMenu) this.floatingMenu.style.display = 'none';
+                this.tempShape = null;
+                this.isDrawing = false;
+                this.draw();
+            }
+
+            handleDblClick(e) {
+                if (!this.canvas) return;
+                const rect = this.canvas.getBoundingClientRect();
+                const cx = e.clientX - rect.left, cy = e.clientY - rect.top;
+                const data = this.store[this.currentSide];
+
+                data.lines = data.lines.filter(l => !(Math.abs(cy - l.y) < 15 && cx >= Math.min(l.x1, l.x2) && cx <= Math.max(l.x1, l.x2)));
+                if (data.photo) {
+                    if (cx >= data.photo.x && cx <= data.photo.x + data.photo.w && cy >= data.photo.y && cy <= data.photo.y + data.photo.h) data.photo = null;
+                }
+                this.updateDropdown();
+                this.validate();
+                this.draw();
+                if (this.saveBtn) this.saveBtn.classList.remove('ready');
+            }
+
+            switchSide(side) {
+                this.currentSide = side;
+                document.querySelectorAll('.switch-btn').forEach(b => b.classList.toggle('active', b.id === `btn-${side}`));
+                this.render();
+            }
+
+            handleFile(input) {
+                if (input.files?.[0]) {
+                    const reader = new FileReader();
+                    reader.onload = e => { this.store[this.currentSide].img = e.target.result; this.render(); };
+                    reader.readAsDataURL(input.files[0]);
+                }
+            }
+render() {
+                const data = this.store[this.currentSide];
+                if (data.img) {
+                    this.bgImg.src = data.img;
+                    this.bgImg.onload = () => {
+                        document.getElementById('drop-zone').style.display = 'none';
+                        document.getElementById('canvas-wrap').style.display = 'block';
+                        document.getElementById('actions').style.display = 'flex';
+                        this.canvas.width = this.bgImg.width;
+                        this.canvas.height = this.bgImg.height;
+                        this.draw();
+                        this.validate();
+                    };
+                } else {
+                    document.getElementById('drop-zone').style.display = 'flex';
+                    document.getElementById('canvas-wrap').style.display = 'none';
+                    document.getElementById('actions').style.display = 'none';
+                }
+            }
+        }
+
+        // --- DATABASE WRAPPERS ---
+        async function getAllProjects() {
+            return await db.projects.toArray();
+        }
+
+async function saveProjectToDB(data) {
+    if (activeEditId) {
+        return await db.projects.update(activeEditId, data);
+    } else {
+        data.id = Date.now(); // Simple unique ID
+        return await db.projects.add(data);
+    }
+}
+
+// --- UPDATED GALLERY LOGIC ---
+let galleryData = {}; // We'll sync this with Dexie
+
+async function loadGallery() {
+    const items = await db.gallery.toArray();
+    items.forEach(item => {
+        galleryData[item.slotId] = item.data;
+    });
+}
+
+// Update handleFile to use Dexie
+async function handleFile(input, index) {
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = async function(e) {
+            const result = e.target.result;
+            const card = document.getElementById(`gallery-card-${index}`);
+            const img = document.getElementById(`prev-${index}`);
+            img.src = result;
+            card.classList.add("has-image");
+            
+            await db.gallery.put({ slotId: `slot-${index}`, data: { img: result, label: "" } });
+            galleryData[`slot-${index}`] = { img: result, label: "" };
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+// --- UPDATED STEP NAVIGATION & MODAL ---
+async function handleOpenModal(editId = null) {
+    activeEditId = editId;
+    currentStep = 0;
+    const form = document.getElementById('multiStepForm');
+    if (form) form.reset();
+    resetValidation();
+
+    // Clear UI state
+    document.querySelectorAll('.preview-img').forEach(img => img.src = "");
+    document.querySelectorAll('.upload-card').forEach(c => c.classList.remove("has-image"));
+    document.querySelectorAll('.label-input').forEach(input => input.value = "");
+
+    if (editId) {
+        const p = await db.projects.get(editId);
+        if (p) {
+            document.getElementById('modalMainHeading').innerText = "Edit Project";
+
+            // Restore Standard Inputs
+            Object.keys(p).forEach(key => {
+                const el = document.getElementById(key);
+                if (el && el.type !== 'file') el.value = p[key];
+            });
+
+// Inside the editId block of handleOpenModal(editId)
+if (p['form-file']) {
+    const el = document.getElementById('form-file');
+    const statusLabel = document.getElementById('file-status-label');
+    if (el) {
+        el.dataset.existing = p['form-file'];
+        el.dataset.filedata = p['form-file']; // important
+el.dataset.filename = p['form-file-name'];
+        if (statusLabel) {
+            statusLabel.innerText = p['form-file-name'] || "Legal PDF Loaded ✅";
+            statusLabel.style.display = 'block';
+        }
+    }
+}
+
+if (p['form-data']) {
+    const el = document.getElementById('form-data');
+    const statusLabel = document.getElementById('data-status-label');
+    if (el) {
+        el.dataset.existing = p['form-data'];
+        el.dataset.filedata = p['form-data']; // important
+el.dataset.filename = p['form-data-name'];
+        if (statusLabel) {
+            statusLabel.innerText = p['form-data-name'] || "Database PDF Loaded ✅";
+            statusLabel.style.display = 'block';
+        }
+    }
+}
+
+            // Restore Gallery (10 slots)
+if (p.images && Array.isArray(p.images)) {
+    p.images.forEach((imgData, index) => {
+        const idx = index + 1; // 1 to 10
+        const imgEl = document.getElementById(`prev-${idx}`); // Check if this exists
+        const card = document.getElementById(`gallery-card-${idx}`);
+        const labelInput = document.getElementById(`form-labelInput-${idx}`);
+
+        // ONLY attempt to set .src if imgEl is not null
+        if (imgEl && imgData.src && imgData.src.length > 10) {
+            imgEl.src = imgData.src;
+            if (card) card.classList.add("has-image");
+            galleryData[`slot-${idx}`] = { img: imgData.src, label: imgData.label || "" };
+        }
+        
+        if (labelInput) {
+            labelInput.value = imgData.label || "";
+        }
+    });
+}
+
+if (window.app && p.idMapping) {
+        // CRITICAL: We map 'fields' from DB back to 'lines' for the Class
+        window.app.store = {
+            front: {
+                img: p.idMapping.front?.img || null,
+                lines: p.idMapping.front?.lines || p.idMapping.front?.fields || [],
+                photo: p.idMapping.front?.photo || null
+            },
+            back: {
+                img: p.idMapping.back?.img || null,
+                lines: p.idMapping.back?.lines || p.idMapping.back?.fields || [],
+                photo: p.idMapping.back?.photo || null
+            }
+        };
+
+        window.app.currentSide = 'front';
+        window.app.selectedIdx = -1;
+
+        // Hide dropzone and render
+        const dropZone = document.getElementById('drop-zone');
+        if (window.app.store.front.img || window.app.store.back.img) {
+            if (dropZone) dropZone.style.display = 'none';
+        }
+        
+        window.app.render();
+        if (typeof window.app.renderFieldsList === 'function') window.app.renderFieldsList();
+    }
+
+    // Inside handleOpenModal(id) in maker.js
+if (p.schoolMembers && p.schoolMembers.length > 0) {
+    // 1. Set the count input
+    const countInput = document.getElementById('cardCount');
+    if (countInput) {
+        countInput.value = p.schoolMembers.length;
+        // 2. Trigger the function that creates the HTML cards
+        updateSwiper(); 
+    }
+
+    // 3. Fill the cards with the saved data
+    p.schoolMembers.forEach((member, i) => {
+        const preview = document.getElementById(`img-preview-${i}`);
+        if (preview && member.img) {
+            preview.style.backgroundImage = `url(${member.img})`;
+            preview.style.backgroundSize = "cover";
+            preview.innerHTML = "";
+            preview.dataset.img = member.img; // Restore the data back to the dataset
+        }
+        
+        if (document.getElementById(`name-in-${i}`)) 
+            document.getElementById(`name-in-${i}`).value = member.name;
+        if (document.getElementById(`role-in-${i}`)) 
+            document.getElementById(`role-in-${i}`).value = member.role;
+        if (document.getElementById(`quote-in-${i}`)) 
+            document.getElementById(`quote-in-${i}`).value = member.text;
+    });
+}
+            // Inside handleOpenModal(editId) in maker.js
+if (p.branches) {
+    const branchCountInput = document.getElementById('branchCount');
+    if (branchCountInput) {
+        branchCountInput.value = p.branches.length;
+        updateBranchGrid(); // This creates the HTML elements first
+
+        p.branches.forEach((branch, index) => {
+            const id = index + 1;
+            
+            // Restore Text Inputs
+            if (document.getElementById(`name-${id}`)) {
+                document.getElementById(`name-${id}`).value = branch.name || "";
+                document.getElementById(`loc-${id}`).value = branch.location || "";
+                document.getElementById(`phone-${id}`).value = branch.phone || "";
+                document.getElementById(`telegram-${id}`).value = branch.telegram || "";
+            }
+
+            // --- RESTORE CHECKBOXES ---
+            if (branch.grades && Array.isArray(branch.grades)) {
+                const gradeDrop = document.getElementById(`grade-drop-${id}`);
+                if (gradeDrop) {
+                    const checkboxes = gradeDrop.querySelectorAll('.check-item');
+                    checkboxes.forEach(labelEl => {
+                        const checkbox = labelEl.querySelector('input');
+                        const gradeName = labelEl.textContent.trim();
+                        
+                        // If the grade name exists in the saved array, check it
+                        if (branch.grades.includes(gradeName)) {
+                            checkbox.checked = true;
+                        }
+                    });
+                }
+            }
+        });
+    }
+}
+        }
+    } else {
+        // Mode: Create New Project
+        document.getElementById('modalMainHeading').innerText = "New Project";
+        galleryData = {}; // Clear local gallery state
+        
+        // Ensure branch grid is reset to default (e.g., 1 branch)
+        const branchCountInput = document.getElementById('branchCount');
+        if (branchCountInput) {
+            branchCountInput.value = 1;
+            updateBranchGrid();
+        }
+
+        updateStepView();
+    }
+
+    document.getElementById('projectModal').style.display = 'flex';
+    updateStepView(); // Refresh the sidebar and progress indicators
+}
+
+function handleStepZeroFile(input, statusId) {
+    const file = input.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        // Store the Base64 data on the element
+        input.dataset.filedata = e.target.result; 
+        // Store the filename so we can recover it later
+        input.dataset.filename = file.name; 
+        
+        const label = document.getElementById(statusId);
+        if (label) {
+            label.innerText = `Attached: ${file.name} ✅`;
+            label.style.color = "var(--accent-blue)"; // Optional: visual feedback
+        }
+    };
+    reader.readAsDataURL(file);
+}
+
+async function saveData() {
+    const fullData = await collectAllData();
+    const images = [...fullData.images]; // Extract images
+    delete fullData.images;              // Remove from main project object
+
+    let projectId;
+    if (activeEditId) {
+        await db.projects.update(activeEditId, fullData);
+        projectId = activeEditId;
+        // Clear old images for this project before re-saving
+        await db.gallery.where("projectId").equals(projectId).delete();
+    } else {
+        projectId = await db.projects.add(fullData);
+    }
+
+    // Add the relationship: Save each image linked to the projectId
+    const assetPromises = images.map(img => {
+        return db.gallery.add({
+            projectId: projectId,
+            src: img.src,
+            label: img.label
+        });
+    });
+
+    await Promise.all(assetPromises);
+    await renderProjects();
+    handleCloseModal();
+}
+
+async function renderProjects(dataToDisplay = null) {
+    const grid = document.getElementById('gridDisplay');
+    if (!grid) return; // Safety check
+
+    grid.innerHTML = ''; 
+
+    let projects = dataToDisplay ? 
+        (Array.isArray(dataToDisplay) ? dataToDisplay : [dataToDisplay]) : 
+        await db.projects.toArray();
+
+    // 2. Handle empty state
+    if (!projects || projects.length === 0) {
+        grid.innerHTML = `
+            <div style="grid-column: 1/-1; text-align: center; padding: 50px; color: var(--text-dim);">
+                <i class="fas fa-folder-open" style="font-size: 3rem; margin-bottom: 15px;"></i>
+                <p>No active deployments found.</p>
+            </div>`;
+        return;
+    }
+
+    // 3. Render (The .map() is now safe)
+    grid.innerHTML = projects.map(p => {
+        const displayImg = (p.images && p.images[0] && p.images[0].src) 
+                           ? p.images[0].src 
+                           : 'placeholder.jpg';
+
+        const cleanSlug = p["form-name"]
+            ? p["form-name"]
+                .toLowerCase()
+                .replace(/\s+/g, '')
+                .replace(/[^\w]/g, '')
+            : 'noname';
+
+            const nowDate = new Date().toLocaleDateString();
+        return `
+            <div class="site-card">
+                <div class="card-banner">
+                    <span class="card-badge">${p["form-scType"] || 'N/A'}</span>
+                    <img src="${displayImg}" alt="Banner">
+                </div>
+                <div class="card-body">
+                    <h3>${p["form-name"] || 'Untitled Project'}</h3>
+                    <div class="info-row"><i class="fas fa-user"></i> ${p["form-sType"] || 'N/A'}</div>
+                    <div class="info-row"><i class="fas fa-calendar"></i> ${nowDate || 'N/A'}</div>
+                    <div class="info-row"><i class="fas fa-link"></i> www.${cleanSlug}.com</div>
+                </div>
+                <div class="card-footer" style="display: flex; gap: 10px; padding: 15px;">
+                    <button class="btn btn-outline" onclick="handleOpenModal(${p.id})">Edit</button>
+                    <button class="btn btn-danger" onclick="deleteProject(${p.id})">Delete</button>
+                    <button class="btn btn-primary" onclick="launchProject(${p.id})">Launch</button>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+async function deleteProject(id) {
+    if (confirm("Decommission this instance?")) {
+        await db.projects.delete(id);
+        renderProjects();
+    }
+}
+
+async function launchProject(id) {
+    // 1. Fetch the specific project data from Dexie using the ID
+    const p = await db.projects.get(id);
+    
+    // 2. Display the data in the console for debugging
+    console.log("--- Launching Project Data ---");
+    console.log("Project ID:", id);
+    console.log("Full Project Object:", p);
+    
+    // 3. (Existing Logic) Store in a 'shared' table for the next page to read
+    await db.shared.put({ key: 'current_active', data: p });
+    
+    // 4. (Existing Logic) Open the eb.html display page
+    window.open("../home/eb.html", "_blank");
+}
+
+// --- INITIALIZATION ---
+document.addEventListener("DOMContentLoaded", async () => {
+    await loadGallery();
+    window.app = new FormMapper();
+    renderProjects();
+});
+
+// --- Elements ---
+const calInput = document.getElementById('calInput');
+const calDropdown = document.getElementById('calDropdown');
+const grid = document.getElementById('calendarGrid');
+const monthDisplay = document.getElementById('monthDisplay');
+const dateText = document.getElementById('selectedDateText');
+
+let currentNavDate = new Date();
+let selectedDate = null;
+
+const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+const weekdays = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
+
+// --- 1. Calendar Logic ---
+function renderCalendar() {
+    if (!grid) return;
+    grid.innerHTML = '';
+    const year = currentNavDate.getFullYear();
+    const month = currentNavDate.getMonth();
+    monthDisplay.innerText = `${months[month]} ${year}`;
+
+    weekdays.forEach(day => {
+        const el = document.createElement('div');
+        el.className = 'weekday';
+        el.innerText = day;
+        grid.appendChild(el);
+    });
+
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+    for (let i = 0; i < firstDay; i++) {
+        const el = document.createElement('div');
+        el.className = 'day empty';
+        grid.appendChild(el);
+    }
+
+    for (let i = 1; i <= daysInMonth; i++) {
+        const el = document.createElement('div');
+        el.className = 'day';
+        el.innerText = i;
+        if (new Date().toDateString() === new Date(year, month, i).toDateString()) el.classList.add('today');
+        if (selectedDate && selectedDate.toDateString() === new Date(year, month, i).toDateString()) el.classList.add('selected');
+
+        el.onclick = (e) => {
+            e.stopPropagation();
+            selectedDate = new Date(year, month, i);
+            
+            // Update Text & Color (Dim to Bright)
+            dateText.innerText = selectedDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+            dateText.classList.remove('is-placeholder');
+            dateText.style.color = "#ffffff";
+            dateText.style.opacity = "1";
+
+            // Reset Border & Close
+            calDropdown.classList.remove('show');
+            calInput.style.borderColor = "var(--text-dim)";
+            calInput.style.boxShadow = "none";
+            renderCalendar();
+        };
+        grid.appendChild(el);
+    }
+}
+
+// Calendar Trigger
+if (calInput) {
+    calInput.onclick = (e) => {
+        e.stopPropagation();
+        // Close other custom selectors
+        document.querySelectorAll('.custom-select-wrapper').forEach(w => w.classList.remove('open'));
+        
+        const isOpen = calDropdown.classList.toggle('show');
+        if (isOpen) {
+            calInput.style.borderColor = "var(--primary)";
+        } else {
+            calInput.style.borderColor = "var(--text-dim)";
+        }
+    };
+}
+
+// --- 2. Custom Select Logic ---
+function toggleMenu(menuId) {
+    const menu = document.getElementById(menuId);
+    const wrapper = menu.closest('.custom-select-wrapper');
+    const trigger = wrapper.querySelector('.select-trigger');
+
+    // Close calendar if open
+    if (calDropdown) calDropdown.classList.remove('show');
+    if (calInput) { calInput.style.borderColor = "var(--text-dim)"; calInput.style.boxShadow = "none"; }
+
+    // Close other menus
+    document.querySelectorAll('.custom-select-wrapper').forEach(w => {
+        if (w !== wrapper) {
+            w.classList.remove('open');
+            w.querySelector('.select-trigger').style.borderColor = "var(--text-dim)";
+        }
+    });
+
+    const isOpen = wrapper.classList.toggle('show');
+    trigger.style.borderColor = isOpen ? "var(--primary)" : "var(--text-dim)";
+    trigger.style.borderColor = isOpen ? "var(--primary)" : "var(--text-dim)";
+}
+
+function selectValue(element, value, labelId, menuId) {
+    const label = document.getElementById(labelId);
+    const menu = document.getElementById(menuId);
+    const wrapper = menu.closest('.custom-select-wrapper');
+
+    label.textContent = value;
+    label.classList.remove('is-placeholder');
+    label.style.color = "#ffffff";
+    label.style.opacity = "1";
+
+    menu.querySelectorAll('.option-item').forEach(opt => opt.classList.remove('selected'));
+    element.classList.add('selected');
+
+    wrapper.classList.remove('open');
+    wrapper.querySelector('.select-trigger').style.borderColor = "var(--text-dim)";
+}
+
+// --- 3. Global Close Logic ---
+document.addEventListener('click', (e) => {
+    if (!e.target.closest('.custom-select-wrapper') && !e.target.closest('#calInput') && !e.target.closest('#calDropdown')) {
+        // Close Selects
+        document.querySelectorAll('.custom-select-wrapper').forEach(w => {
+            w.classList.remove('open');
+            w.querySelector('.select-trigger').style.borderColor = "var(--text-dim)";
+            w.querySelector('.select-trigger').style.boxShadow = "none";
+        });
+        // Close Calendar
+        if (calDropdown) calDropdown.classList.remove('show');
+        if (calInput) { calInput.style.borderColor = "var(--text-dim)"; calInput.style.boxShadow = "none"; }
+    }
+});
+
+// Previous Month
+document.getElementById('prevMonth').onclick = (e) => {
+    e.preventDefault(); // Extra safety against refresh
+    e.stopPropagation();
+    
+    // Decrement the month
+    currentNavDate.setMonth(currentNavDate.getMonth() - 1);
+    
+    // Re-render to show the new month AND year
+    renderCalendar();
+};
+
+// Next Month
+document.getElementById('nextMonth').onclick = (e) => {
+    e.preventDefault(); // Extra safety against refresh
+    e.stopPropagation();
+    
+    // Increment the month
+    currentNavDate.setMonth(currentNavDate.getMonth() + 1);
+    
+    // Re-render to show the new month AND year
+    renderCalendar();
+};
+
+renderCalendar();
+
+    function toggleMenu(menuId, trigger) {
+        // Close other menus
+        document.querySelectorAll('.options-menu').forEach(menu => {
+            if(menu.id !== menuId) menu.classList.remove('show');
+        });
+        document.querySelectorAll('.select-trigger').forEach(trig => {
+            if(trig !== trigger) trig.classList.remove('active');
+        });
+
+        // Toggle current
+        const menu = document.getElementById(menuId);
+        menu.classList.toggle('show');
+        trigger.classList.toggle('active');
+    }
+
+    // Selection Logic
+    document.querySelectorAll('.option-item').forEach(item => {
+        item.addEventListener('click', (e) => {
+            const wrapper = item.closest('.custom-select-wrapper');
+            const label = wrapper.querySelector('.select-text');
+            const trigger = wrapper.querySelector('.select-trigger');
+            const menu = wrapper.querySelector('.option-item');
+
+            label.textContent = item.textContent;
+            
+            lucide.createIcons();
+            menu.classList.remove('show');
+            trigger.classList.remove('active');
+            e.stopPropagation();
+        });
+    });
+
+    // Close on click outside
+    window.addEventListener('click', (e) => {
+        if (!e.target.closest('.custom-select-wrapper')) {
+            document.querySelectorAll('.options-menu').forEach(m => m.classList.remove('show'));
+            document.querySelectorAll('.select-trigger').forEach(t => t.classList.remove('active'));
+        }
+    });
+
+    const dropzones = document.querySelectorAll('.dropzone');
+
+    dropzones.forEach(zone => {
+        const input = zone.querySelector('.file-input-hidden');
+        const info = zone.querySelector('.file-info');
+        const nameSpan = zone.querySelector('.file-name');
+
+        // Drag events
+        ['dragenter', 'dragover'].forEach(eName => {
+            zone.addEventListener(eName, (e) => {
+                e.preventDefault();
+                zone.classList.add('dragover');
+            });
+        });
+
+        ['dragleave', 'drop'].forEach(eName => {
+            zone.addEventListener(eName, (e) => {
+                e.preventDefault();
+                zone.classList.remove('dragover');
+            });
+        });
+
+        // Drop event
+        zone.addEventListener('drop', (e) => {
+            input.files = e.dataTransfer.files;
+            handleDisplay(input, info, nameSpan);
+        });
+
+        // Change event (Browsing)
+        input.addEventListener('change', () => {
+            handleDisplay(input, info, nameSpan);
+        });
+    });
+
+    function handleDisplay(input, infoBox, nameLabel) {
+        if (input.files.length > 0) {
+            const count = input.files.length;
+            nameLabel.textContent = count === 1 
+                ? input.files[0].name 
+                : `${count} files ready`;
+            infoBox.style.display = 'inline-block';
+        }
+    }
+
+    function toggleMenu(menuId) {
+    const menu = document.getElementById(menuId);
+    if (!menu) return;
+
+    const wrapper = menu.closest('.custom-select-wrapper');
+    const trigger = wrapper.querySelector('.select-trigger');
+    
+    // Close others
+    document.querySelectorAll('.custom-select-wrapper').forEach(w => {
+        if (w !== wrapper) {
+            w.classList.remove('open');
+            w.querySelector('.select-trigger').style.borderColor = "var(--text-dim)";
+            w.querySelector('.select-trigger').style.boxShadow = "none";
+        }
+    });
+
+    // Toggle current
+    const isOpen = wrapper.classList.toggle('open');
+    
+    if (isOpen) {
+        trigger.style.borderColor = "var(--primary)";
+    } else {
+        trigger.style.borderColor = "var(--text-dim)";
+    }
+}
+
+function selectValue(element, value, labelId, menuId) {
+    const label = document.getElementById(labelId);
+    const menu = document.getElementById(menuId);
+    if (!menu || !label) return;
+
+    const wrapper = menu.closest('.custom-select-wrapper');
+    const trigger = wrapper.querySelector('.select-trigger');
+    const leadingIcon = trigger.querySelector('i:first-child');
+
+    // 1. Update Text Content
+    label.textContent = value;
+
+    // 2. Dim to Bright Logic (Keep these as they are on the trigger)
+    label.classList.remove('is-placeholder');
+    label.classList.add('is-active');
+    label.style.color = "#ffffff";
+    label.style.fontWeight = "500";
+    label.style.opacity = "1";
+
+    if (leadingIcon) {
+        leadingIcon.style.color = "var(--primary)";
+        leadingIcon.style.opacity = "1";
+    }
+
+    // 3. Update Option Highlights (CLASS ONLY)
+    menu.querySelectorAll('.option-item').forEach(opt => {
+        opt.classList.remove('selected');
+        // Remove any previous manual inline styles to let CSS take over
+        opt.style.background = "";
+        opt.style.color = "";
+    });
+    element.classList.add('selected');
+    wrapper.classList.remove('open');
+    trigger.style.borderColor = "var(--text-dim)";
+    trigger.style.boxShadow = "none";
+}
+
+// Global listener to close all selectors when clicking anywhere else
+document.addEventListener('click', (e) => {
+    // Check if the click was inside a custom select wrapper
+    const isClickInside = e.target.closest('.custom-select-wrapper');
+
+    // If not, close all menus and reset all borders
+    if (!isClickInside) {
+        document.querySelectorAll('.custom-select-wrapper').forEach(wrapper => {
+            // 1. Remove the 'open' class (triggers CSS OUT animation)
+            wrapper.classList.remove('open');
+
+            // 2. Reset the trigger border and glow to default
+            const trigger = wrapper.querySelector('.select-trigger');
+            if (trigger) {
+                trigger.style.borderColor = "var(--text-dim)";
+                trigger.style.boxShadow = "none";
+            }
+        });
+    }
+});
+function toggleRow(checkbox, inputId, rowId) {
+        const input = document.getElementById(inputId);
+        const row = document.getElementById(rowId);
+        
+        if (checkbox.checked) {
+            input.disabled = false;
+            row.classList.add('active');
+            input.focus();
+        } else {
+            input.disabled = true;
+            input.value = "";
+            row.classList.remove('active');
+        }
+    }
+    
+const teacherData = [
+    { name: "Dr. Aris Thorne", role: "Quantum Physics Head", subject: "Theoretical Physics", exp: "12+ Years", quote: "The universe is under no obligation to make sense to you." },
+    { name: "Prof. Elena Vance", role: "Lead Biologist", subject: "Genetics", exp: "8+ Years", quote: "Nature never hurries, yet everything is accomplished." },
+    { name: "Marcus Sterling", role: "Art History Dean", subject: "Renaissance Art", exp: "15+ Years", quote: "Every child is an artist. The problem is how to remain one." },
+    { name: "Sarah Jenkins", role: "Chief Technologist", subject: "Computer Science", exp: "10+ Years", quote: "Code is like humor. When you have to explain it, it’s bad." },
+    { name: "Sarah Jenkins", role: "Chief Technologist", subject: "Computer Science", exp: "10+ Years", quote: "Code is like humor. When you have to explain it, it’s bad." },
+    { name: "Sarah Jenkins", role: "Chief Technologist", subject: "Computer Science", exp: "10+ Years", quote: "Code is like humor. When you have to explain it, it’s bad." }
+];
+
+const container = document.getElementById('cardContainer');
+
+function createCard(data, index) {
+    return `
+        <div class="upload-card" data-card-index="${index}">
+            <div class="media-area" data-media-index="${index}">
+                <img src="" class="preview-img" data-preview="${index}">
+                <div class="placeholder-content" data-placeholder="${index}">
+                    <i class="fas fa-cloud-arrow-up"></i><br>
+                    <span>Upload Photo</span>
+                </div>
+                <input type="file" class="teacher-file-input" data-file-index="${index}" hidden accept="image/*">
+                <div class="experience-badge editable" contenteditable="true">${data.exp}</div>
+            </div>
+            <div class="info-content">
+                <span class="name-title editable" contenteditable="true">${data.name}</span>
+                <span class="role-title editable" contenteditable="true">${data.role}</span>
+                <div class="subject-row">
+                    <i class="fas fa-book-open"></i>
+                    <span class="editable" contenteditable="true">${data.subject}</span>
+                </div>
+                <p class="quote editable" contenteditable="true">"${data.quote}"</p>
+                <div class="stars-container">
+                    ${[1,2,3,4,5].map(star => `
+                        <span class="star active" data-rating="${star}" onclick="setRating(this, ${star})">★</span>
+                    `).join('')}
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+// Render all cards
+container.innerHTML = teacherData.map((t, i) => createCard(t, i)).join('');
+
+// Event delegation: click on .media-area triggers the hidden file input
+container.addEventListener('click', (e) => {
+    const mediaArea = e.target.closest('.media-area');
+    if (mediaArea) {
+        const index = mediaArea.getAttribute('data-media-index');
+        if (index !== null) {
+            const fileInput = document.querySelector(`.teacher-file-input[data-file-index="${index}"]`);
+            if (fileInput) fileInput.click();
+        }
+    }
+});
+
+// Event delegation: handle file selection and preview
+container.addEventListener('change', (e) => {
+    const fileInput = e.target.closest('.teacher-file-input');
+    if (fileInput) {
+        const index = fileInput.getAttribute('data-file-index');
+        const file = fileInput.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(ev) {
+                const preview = document.querySelector(`.preview-img[data-preview="${index}"]`);
+                const placeholder = document.querySelector(`.placeholder-content[data-placeholder="${index}"]`);
+                if (preview && placeholder) {
+                    preview.src = ev.target.result;
+                    preview.style.display = 'block';
+                    placeholder.style.display = 'none';
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+});
+
+function setRating(el, rating) {
+    const container = el.parentElement;
+    const stars = container.querySelectorAll('.star');
+    stars.forEach((star, idx) => {
+        if (idx < rating) {
+            star.classList.add('active');
+        } else {
+            star.classList.remove('active');
+        }
+    });
+}</script>
+</html>

@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eb academy</title>
+    <style>
+        /* --- BEAUTIFUL DARK THEME CSS --- */
+        :root {
+            --bg-dark: #0f172a;
+            --sidebar-dark: #1e293b;
+            --accent-blue: #38bdf8;
+            --text-main: #f1f5f9;
+            --text-dim: #94a3b8;
+            --border-color: #334155;
+            --hover-color: #334155;
+            --card-bg: #1e293b;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            margin: 0;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Layout */
+        .app-wrapper { display: flex; width: 100%; height: 100%; }
+
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            background: var(--sidebar-dark);
+            padding: 24px;
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo { font-size: 1.5rem; font-weight: 800; color: var(--accent-blue); margin-bottom: 30px; letter-spacing: -1px; }
+
+        .compose-btn {
+            background: var(--accent-blue);
+            color: #000;
+            border: none;
+            padding: 14px;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.2s;
+            margin-bottom: 25px;
+        }
+        .compose-btn:hover { background: #7dd3fc; transform: translateY(-2px); }
+
+        .nav-items div {
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            color: var(--text-dim);
+            transition: 0.2s;
+            margin-bottom: 5px;
+        }
+        .nav-items div:hover, .nav-items div.active { background: var(--hover-color); color: var(--text-main); }
+
+        /* Main Content */
+        .main-container { flex: 1; display: flex; flex-direction: column; }
+        
+        .header {
+            padding: 20px 30px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .search-bar {
+            background: var(--sidebar-dark);
+            border: 1px solid var(--border-color);
+            padding: 10px 20px;
+            border-radius: 20px;
+            color: white;
+            width: 400px;
+        }
+
+        .content-split { display: flex; flex: 1; overflow: hidden; }
+
+        /* Message List */
+        .msg-list {
+            width: 350px;
+            border-right: 1px solid var(--border-color);
+            overflow-y: auto;
+        }
+
+        .msg-card {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .msg-card:hover { background: #1e293b; }
+        .msg-card.active { border-left: 4px solid var(--accent-blue); background: #1e293b; }
+        .msg-card .sender { font-weight: 600; font-size: 0.95rem; margin-bottom: 4px; display: block; }
+        .msg-card .subject { font-size: 0.85rem; color: var(--text-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        /* Viewer & Compose */
+        .viewer { flex: 1; padding: 40px; overflow-y: auto; background: var(--bg-dark); }
+        
+        .form-group { margin-bottom: 20px; }
+        label { display: block; color: var(--text-dim); margin-bottom: 8px; font-size: 0.8rem; }
+        
+        input[type="text"], input[type="email"], textarea {
+            width: 100%;
+            background: var(--sidebar-dark);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px;
+            color: white;
+            font-size: 1rem;
+        }
+
+        .file-drop {
+            border: 2px dashed var(--border-color);
+            padding: 30px;
+            text-align: center;
+            border-radius: 12px;
+            color: var(--text-dim);
+            margin: 20px 0;
+        }
+
+        .attachment-preview img, .attachment-preview video {
+            max-width: 100%;
+            border-radius: 12px;
+            margin-top: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .hidden { display: none; }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-dark); }
+        ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="app-wrapper">
+    <aside class="sidebar">
+        <div class="logo">MAIL</div>
+        <button class="compose-btn" onclick="ui('compose')">New Message</button>
+        <div class="nav-items">
+            <div class="active">Inbox</div>
+            <div>Sent</div>
+            <div>Starred</div>
+            <div>Drafts</div>
+        </div>
+    </aside>
+
+    <main class="main-container">
+        <header class="header">
+            <input type="text" class="search-bar" placeholder="Search emails...">
+            <div style="color: var(--text-dim)">Welcome, User</div>
+        </header>
+
+        <div class="content-split">
+            <div class="msg-list" id="msgList">
+                </div>
+
+            <div class="viewer">
+                <div id="view-empty" style="text-align:center; margin-top:100px; color: var(--text-dim);">
+                    <h2>Select a conversation</h2>
+                    <p>Or start a new one to send files</p>
+                </div>
+
+                <div id="view-compose" class="hidden">
+                    <h2 style="margin-top:0">Compose</h2>
+                    <div class="form-group">
+                        <input type="email" id="to" placeholder="Recipient Email">
+                    </div>
+                    <div class="form-group">
+                        <input type="text" id="subject" placeholder="Subject">
+                    </div>
+                    <textarea id="body" rows="8" placeholder="Type your message..."></textarea>
+                    
+                    <div class="file-drop">
+                        <input type="file" id="fileInput" style="display:none">
+                        <button onclick="document.getElementById('fileInput').click()" style="background:none; border: 1px solid var(--accent-blue); color: var(--accent-blue); padding: 8px 15px; border-radius: 5px; cursor: pointer;">
+                            Add Image/Video/File
+                        </button>
+                        <p id="fileNameDisplay" style="margin-top:10px; font-size: 0.8rem;"></p>
+                    </div>
+                    
+                    <button class="compose-btn" style="width: 150px" onclick="handleSend()">Send Mail</button>
+                </div>
+
+                <div id="view-read" class="hidden">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                        <h1 id="readSubject" style="margin:0 0 10px 0;"></h1>
+                        <button onclick="ui('compose')" style="background:none; color: var(--accent-blue); border:none; cursor:pointer;">Reply</button>
+                    </div>
+                    <p style="color: var(--accent-blue)" id="readFrom"></p>
+                    <hr style="border:0; border-top: 1px solid var(--border-color); margin: 20px 0;">
+                    <p id="readBody" style="line-height: 1.6;"></p>
+                    <div id="readAttachment" class="attachment-preview"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script>
+    let emails = JSON.parse(localStorage.getItem('novamail_data')) || [];
+
+    // --- UI CONTROLLER ---
+    function ui(view) {
+        document.getElementById('view-empty').classList.add('hidden');
+        document.getElementById('view-compose').classList.add('hidden');
+        document.getElementById('view-read').classList.add('hidden');
+        
+        if(view === 'compose') document.getElementById('view-compose').classList.remove('hidden');
+        if(view === 'read') document.getElementById('view-read').classList.remove('hidden');
+        if(view === 'empty') document.getElementById('view-empty').classList.remove('hidden');
+    }
+
+    // --- RENDER LIST ---
+    function renderList() {
+        const list = document.getElementById('msgList');
+        list.innerHTML = emails.map((m, i) => `
+            <div class="msg-card" onclick="openEmail(${i})">
+                <span class="sender">${m.to}</span>
+                <span class="subject">${m.subject || '(No Subject)'}</span>
+            </div>
+        `).join('');
+    }
+
+    // --- FILE HANDLING & SEND ---
+    function handleSend() {
+        const file = document.getElementById('fileInput').files[0];
+        const newMail = {
+            to: document.getElementById('to').value,
+            subject: document.getElementById('subject').value,
+            body: document.getElementById('body').value,
+            date: new Date().toLocaleTimeString()
+        };
+
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                newMail.fileData = e.target.result;
+                newMail.fileName = file.name;
+                newMail.fileType = file.type;
+                finalizeSend(newMail);
+            };
+            reader.readAsDataURL(file);
+        } else {
+            finalizeSend(newMail);
+        }
+    }
+
+    function finalizeSend(mail) {
+        emails.unshift(mail);
+        localStorage.setItem('novamail_data', JSON.stringify(emails));
+        renderList();
+        ui('empty');
+        // Clear inputs
+        document.getElementById('to').value = '';
+        document.getElementById('subject').value = '';
+        document.getElementById('body').value = '';
+        document.getElementById('fileInput').value = '';
+        alert("Message sent successfully!");
+    }
+
+    // --- OPEN EMAIL ---
+    function openEmail(index) {
+        const m = emails[index];
+        ui('read');
+        document.getElementById('readSubject').innerText = m.subject;
+        document.getElementById('readFrom').innerText = `To: ${m.to}`;
+        document.getElementById('readBody').innerText = m.body;
+        
+        const attachArea = document.getElementById('readAttachment');
+        attachArea.innerHTML = '';
+        if(m.fileData) {
+            if(m.fileType.startsWith('image/')) {
+                attachArea.innerHTML = `<img src="${m.fileData}">`;
+            } else if(m.fileType.startsWith('video/')) {
+                attachArea.innerHTML = `<video controls src="${m.fileData}"></video>`;
+            } else {
+                attachArea.innerHTML = `<div style="background:var(--sidebar-dark); padding:15px; border-radius:8px;">📎 Attached File: ${m.fileName}</div>`;
+            }
+        }
+    }
+
+    // Listen for file name changes
+    document.getElementById('fileInput').addEventListener('change', function(e) {
+        document.getElementById('fileNameDisplay').innerText = e.target.files[0] ? "Selected: " + e.target.files[0].name : "";
+    });
+
+    renderList();
+</script>
+
+</body>
+</html>

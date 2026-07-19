@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background-color: black;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 50px;
+            font-family: sans-serif;
+            margin: 0;
+        }
+
+        /* Profile Toggle Button */
+        .profileBtn {
+            width: 60px;
+            height: 60px;
+            color: white;
+            border-radius: 50%;
+            background-color: blue;
+            border: 2px solid blue;
+            outline: none;
+            transition: .3s;
+            cursor: pointer;
+            box-shadow: 0 4px 12px blue;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative; /* Keeps it anchored */
+            z-index: 10;
+        }
+
+        button:hover {
+            background-color: rgb(107, 107, 241);
+        }
+
+        /* Resetting the global 'i' styling to fit inside buttons */
+        i {
+            font-size: 24px;
+        }
+
+        /* Profile Card - Positioned Absolutely so it doesn't push the button */
+        .container {
+            position: absolute;
+            top: 130px; /* Adjust based on where you want it to appear */
+            width: 280px;
+            background-color: #111;
+            border: 1px solid blue;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            color: white;
+            display: none; /* Hidden by default */
+            box-shadow: 0 10px 25px rgba(0, 0, 255, 0.3);
+        }
+
+        .container i.large-user {
+            width: 80px;
+            height: 80px;
+            background-color: blue;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px auto;
+            font-size: 40px;
+        }
+
+        .details {
+            text-align: left;
+            margin-top: 15px;
+        }
+
+        .details label {
+            color: blue;
+            font-size: 11px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .details p {
+            background: #222;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 5px 0 15px 0;
+            font-size: 14px;
+            border-left: 3px solid blue;
+        }
+
+    </style>
+</head>
+<body>
+
+    <button onclick="show()" class="profileBtn hide"><i class="fas fa-user"></i></button>
+
+    <div class="container" id="profileBox">
+        <i class="fas fa-user large-user"></i>
+        
+        <div class="details">
+            <label>Username</label>
+            <p id="displayUser"></p>
+
+            <label>Email</label>
+            <p id="displayEmail"></p>
+        </div>
+    </div>
+
+    <script>
+        function show() {
+            const emailProfile = document.getElementById('displayUser');
+            const userProfile = document.getElementById('displayUser');
+
+            emailProfile.innerHTML = email.value || rEmail.value;
+            userProfile.innerHTML = `${fName.value} ${lName.value}` || userName.value;
+            var box = document.getElementById("profileBox");
+            if (box.style.display === "block") {
+                box.style.display = "none";
+            } else {
+                box.style.display = "block";
+            }
+        }
+    </script>
+</body>
+</html>

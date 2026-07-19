@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>School Testimonials</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    
+    <style>
+        :root {
+            --bg: #0f172a;        /* Dark Navy */
+            --card: #1e293b;      /* Slate Blue */
+            --blue: #3b82f6;      /* Bright School Blue */
+            --text: #f1f5f9;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 100px 0;
+            overflow-x: hidden;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 80px;
+        }
+
+        .header h1 { font-size: 2.5rem; letter-spacing: -1px; }
+        .header span { color: var(--blue); }
+
+        /* Swiper Container */
+        .swiper {
+            width: 100%;
+            padding-bottom: 80px !important; /* Space for the dots */
+            height: 450px;
+        }
+
+        .swiper-slide {
+            width: 300px; 
+            transition: 0.5s ease;
+            filter: blur(2px);
+            opacity: 0.4;
+            margin-top: 100px;
+        }
+
+        /* The Main Center Slide */
+        .swiper-slide-active {
+            filter: blur(0);
+            opacity: 1;
+        }
+
+        /* Card Styling */
+        .school-card {
+            background: var(--card);
+            border-radius: 24px;
+            padding: 30px;
+            text-align: center;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+        }
+
+        .profile-wrapper {
+            position: relative;
+            width: 130px;
+            height: 130px;
+            margin: -80px auto 20px auto;
+        }
+
+        .profile-img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 5px solid var(--blue);
+            object-fit: cover;
+            background: var(--bg);
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
+        }
+
+        .name { font-size: 1.2rem; font-weight: bold; margin-bottom: 5px; }
+        .grade { color: var(--blue); font-size: 0.9rem; font-weight: 700; text-transform: uppercase; }
+        .quote { color: #94a3b8; line-height: 1.6; font-style: italic; margin-top: 15px; }
+
+        /* Pagination Points (Dots) */
+        .swiper-pagination-bullet {
+            background: #475569 !important;
+            opacity: 1;
+            width: 10px;
+            height: 10px;
+            transition: 0.3s;
+        }
+
+        .swiper-pagination-bullet-active {
+            background: var(--blue) !important;
+            width: 30px; /* Stretches the active dot */
+            border-radius: 5px;
+        }
+
+        /* Navigation Arrows */
+        .swiper-button-next, .swiper-button-prev {
+            color: var(--blue) !important;
+            top: 60% !important;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="swiper mySwiper">
+        <div class="swiper-wrapper">
+            </div>
+        
+        <div class="swiper-pagination"></div>
+        
+        <div class="swiper-button-next"></div>
+        <div class="swiper-button-prev"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+    <script>
+        const swiperWrapper = document.querySelector('.swiper-wrapper');
+        
+        // School-specific data
+        const schoolMembers = [
+            { name: "Adonyas Berhanu", role: "12th Grade Student", text: "The STEM program here transformed how I view engineering. The facilities are top-notch!" },
+            { name: "Mr. Kebede", role: "Deputy President", text: "Teaching here is a joy because the students are genuinely curious and driven to succeed." },
+            { name: "Ms. Melkam", role: "Class President", text: "Our student council has been able to implement real changes thanks to the supportive staff." },
+            { name: "Ms. Yeshimebet", role: "Deputy President", text: "I felt completely prepared for my freshman year at University thanks to the AP courses here." },
+            { name: "Nathnael", role: "10th Grade Student", text: "The basketball program and the arts department have helped me find my true passions." },
+            { name: "MrsMs. Yeshimebet", role: "Deputy President", text: "We believe in nurturing creativity. Every student has a unique voice that deserves to be heard." },
+            { name: "Zabloon Dawit", role: "9th Grade Student", text: "Starting high school was scary, but the mentorship program made me feel right at home." },
+            { name: "Biniam Malede", role: "Parent", text: "Seeing my son thrive academically and socially has been the best experience for our family." },
+            { name: "Ms. Yeshimebet", role: "Deputy President", text: "Character is built on the court and in the classroom. We focus on the whole student." },
+            { name: "Mr. Demerew", role: "Administration", text: "Our mission is to foster a safe, innovative environment for the leaders of tomorrow." }
+        ];
+
+        // Create the 10 slides
+        schoolMembers.forEach((member, index) => {
+            swiperWrapper.innerHTML += `
+                <div class="swiper-slide">
+                    <div class="school-card">
+                        <div class="profile-wrapper">
+                            <img src="https://i.pravatar.cc/150?u=school${index}" class="profile-img" alt="Student">
+                        </div>
+                        <div class="name">${member.name}</div>
+                        <div class="grade">${member.role}</div>
+                        <p class="quote">"${member.text}"</p>
+                    </div>
+                </div>`;
+        });
+
+        // Initialize Swiper
+        var swiper = new Swiper(".mySwiper", {
+            effect: "coverflow",
+            grabCursor: true,
+            centeredSlides: true,
+            slidesPerView: "auto",
+            loop: true,
+            // Autoplay (Timer)
+            autoplay: {
+                delay: 3000, // Changes every 3 seconds
+                disableOnInteraction: false, // Keeps sliding even if user clicks
+            },
+            coverflowEffect: {
+                rotate: 0,
+                stretch: 0,
+                depth: 200,
+                modifier: 1.5,
+                slideShadows: false,
+            },
+            pagination: {
+                el: ".swiper-pagination",
+                clickable: true, // Allows clicking the dots to switch
+            },
+            navigation: {
+                nextEl: ".swiper-button-next",
+                prevEl: ".swiper-button-prev",
+            },
+        });
+    </script>
+</body>
+</html>

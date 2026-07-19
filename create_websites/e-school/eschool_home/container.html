@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dark Mode Dashboard</title>
+    <style>
+        :root {
+            --primary: #1e293b;
+            --accent: #d4af37;
+            --sky: #38bdf8;
+        }
+
+        body {
+            background-color: #0f172a;
+            color: #f1f5f9;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            min-height: 100vh;
+        }
+
+        .main-trigger {
+            padding: 12px 24px;
+            background-color: var(--sky);
+            color: #0f172a;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 14px 0 rgba(56, 189, 248, 0.39);
+        }
+
+        .overlay, .file-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(8px);
+            justify-content: center;
+            align-items: center;
+            z-index: 20;
+        }
+
+        .file-overlay { 
+            z-index: 30; 
+            backdrop-filter: blur(12px); 
+            overflow-y: auto;
+            padding: 20px 0;
+        }
+
+        .contain {
+            width: 500px;
+            background: #1e293b;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        }
+
+        .contain-large {
+            width: 600px;
+            background: #1e293b;
+            padding: 30px;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .copy-wrapper, .id-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            background: rgba(255,255,255,0.05);
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+
+        .copy-btn, .eye-btn, .btn-secondary, .btn-primary {
+            background: transparent;
+            border: 1px solid var(--sky);
+            color: var(--sky);
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.8rem;
+            transition: 0.3s;
+        }
+
+        .copy-btn svg, .eye-btn svg { fill: var(--sky); transition: 0.3s; }
+
+        .copy-btn:hover, .eye-btn:hover, .btn-secondary:hover, .btn-primary:hover {
+            background: var(--sky);
+            color: #0f172a;
+        }
+
+        .copy-btn:hover svg, .eye-btn:hover svg { fill: #0f172a; }
+
+        .close-btn { margin-top: 15px; font-size: 0.8rem; color: #64748b; cursor: pointer; text-decoration: underline; }
+        .passkey-text { letter-spacing: 2px; font-family: monospace; }
+        h4 { text-align: left; margin: 15px 0 5px 10px; color: #38bdf8; font-size: 0.9rem; }
+
+        .container {
+            width: 500px; 
+            height: 300px; 
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            overflow: hidden;
+            border: 1px solid #ddd;
+            position: relative;
+            text-align: center;
+            color: black;
+        }
+
+        .header-logo {
+            width: 60px;
+            margin-top: 30px;
+            margin-left: -160px;
+            position: absolute;
+            transform: scale(1.2);
+        }
+
+        .student-photo {
+            width: 140px;
+            height: 180px;
+            object-fit: cover;
+            border: 3px solid var(--primary);
+            border-radius: 10px;
+            margin: 10px auto;
+            position: absolute;
+            transform: scale(1.1);
+            margin-top: -20px;
+            margin-left: 90px;
+        }
+
+        .body h3 { font-size: small; line-height: 3px; }
+        .blue { color: rgb(2, 2, 138); }
+        .separetor { color: rgb(161, 137, 3); font-weight: 900; margin-top: -25px; }
+        .row1, .row2, .row3 { display: flex; flex-direction: row; }
+
+        .print-btn-large {
+            background: var(--sky);
+            color: #0f172a;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+        }
+
+        /* FIXED PRINT LOGIC */
+        @media print {
+            @page { margin: 0; }
+            body { background: white !important; }
+            
+            /* Hide everything in the body */
+            body * { visibility: hidden; }
+
+            /* Show ONLY the fileOverlay and its children */
+            #fileOverlay, #fileOverlay * {
+                visibility: visible;
+            }
+
+            /* Position the overlay for the print page */
+            #fileOverlay {
+                display: block !important;
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                background: white !important;
+                backdrop-filter: none !important;
+                padding: 0;
+                margin: 0;
+            }
+
+            /* Center the IDs on the printed page */
+            .contain-large {
+                box-shadow: none !important;
+                background: white !important;
+                width: 100% !important;
+                border: none !important;
+                padding: 20px 0 !important;
+                gap: 50px !important;
+            }
+
+            /* Hide the text headers and UI buttons while printing */
+            #fileOverlay h3, .print-btn-large, .btn-secondary, .main-trigger, .close-btn {
+                display: none !important;
+            }
+
+            .container {
+                box-shadow: none !important;
+                border: 1px solid #000 !important;
+                margin: 0 auto !important;
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <button class="main-trigger" onclick="toggleContainer()">Open Dashboard</button>
+
+    <div class="overlay" id="blurOverlay">
+        <div class="contain" id="mainContainer">
+            <h1 style="margin-bottom: 5px;">WELCOME</h1>
+            
+            <h4>Print your id card</h4>
+            <div class="id-wrapper">
+                <span style="font-size: 0.85rem;">This is your school ID card</span>
+                <div style="display: flex; gap: 5px;">
+                    <button class="btn-secondary" onclick="toggleFiles()">View</button>
+                    <button class="btn-primary" onclick="window.print()">Print</button>
+                </div>
+            </div>
+
+            <h4>Copy your username and passkey</h4>
+            <div class="copy-wrapper">
+                <span id="userName">Zabloon Biniam Malede</span>
+                <button class="copy-btn" onclick="copyText('userName', this)">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="14" width="14" viewBox="0 0 448 512"><path d="M384 336H192c-8.8 0-16-7.2-16-16V64c0-8.8 7.2-16 16-16h140.1L384 99.9V336zm0-288H192c-35.3 0-64 28.7-64 64V320c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V112c0-35.3-28.7-64-64-64zM64 128c-35.3 0-64 28.7-64 64V448c0 35.3 28.7 64 64 64H256c35.3 0 64-28.7 64-64V416H272v32c0 8.8-7.2 16-16 16H64c-8.8 0-16-7.2-16-16V192c0-8.8 7.2-16 16-16H96V128H64z"/></svg>
+                    <span>Copy</span>
+                </button>
+            </div>
+
+            <div class="copy-wrapper">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span id="text2" class="passkey-text">••••••••••••</span>
+                    <button class="eye-btn" onclick="togglePassView('text2', this)">
+                        <svg id="eyeIcon" xmlns="http://www.w3.org/2000/svg" height="14" width="16" viewBox="0 0 576 512"><path d="M288 32c-80.8 0-145.5 32-203.9 80.7C31.2 160.1 0 212.1 0 256s31.2 95.9 84.1 143.3C142.5 448 207.2 480 288 480s145.5-32 203.9-80.7c52.9-47.4 84.1-99.4 84.1-143.3s-31.2-95.9-84.1-143.3C433.5 64 368.8 32 288 32zM144 256a144 144 0 1 1 288 0 144 144 0 1 1 -288 0zm144-64a64 64 0 1 0 0 128 64 64 0 1 0 0-128z"/></svg>
+                    </button>
+                </div>
+                <button class="copy-btn" onclick="copyText('text2', this, true)">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="14" width="14" viewBox="0 0 448 512"><path d="M384 336H192c-8.8 0-16-7.2-16-16V64c0-8.8 7.2-16 16-16h140.1L384 99.9V336zm0-288H192c-35.3 0-64 28.7-64 64V320c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V112c0-35.3-28.7-64-64-64zM64 128c-35.3 0-64 28.7-64 64V448c0 35.3 28.7 64 64 64H256c35.3 0 64-28.7 64-64V416H272v32c0 8.8-7.2 16-16 16H64c-8.8 0-16-7.2-16-16V192c0-8.8 7.2-16 16-16H96V128H64z"/></svg>
+                    <span>Copy</span>
+                </button>
+            </div>
+
+            <div class="close-btn" onclick="toggleContainer()">Close Dashboard</div>
+        </div>
+    </div>
+
+    <div class="file-overlay" id="fileOverlay">
+        <div class="contain-large" style="border: 2px solid var(--accent);">
+            <h3 style="color: white; margin: 0;">Student ID Card Preview</h3>
+            
+            <div class="container front">
+                <img src="Screenshot 2026-01-09 232109.png" alt="" class="header-logo">
+                <h1 style="color: red; font-size: larger;">EB ACADEMY</h1>
+                <h3 style="text-align: center; color: blue; font-size: small; width: 200px; margin-left: 150px; line-height: 13px; margin-top: -10px;">ኤል-ቤቴል ሕፃናት - መሰናዶ ትምህርት ቤት ኅ/የተ/የ/ማ El-Bethel Kindergarten - Preparatory School P.L.C</h3>
+                <h3 style="font-size: smaller; margin-top: -15px; color: black;">011-111-08-82    011-646-33</h3>
+                <div class="separetor">____________________________________________________________________</div>
+                <img src="WIN_20260131_20_25_05_Pro.jpg" alt="" class="student-photo">
+                <h2 style="line-height: 5px; margin-left: -230px; color: red; font-size: small;">የተማሪ መታወቂያ ካርድ</h2>
+                <h2 style="line-height: 5px; margin-left: -230px; color: red; font-size: small; text-decoration: underline;">STUDENT ID CARD</h2>
+                <h3 style="line-height: 5px; color: rgb(2, 2, 138); margin-left: -370px; font-size: small; margin-top: 20px;">የተማሪው ስም</h3>
+                <h3 style="line-height: 5px; margin-left: -168px; font-size: small;  color: black;">Name <span id="out-name">_____________________________________________</span></h3>
+                <h3 style="line-height: 5px; color: rgb(2, 2, 138); margin-left: -330px; font-size: small;">ክፍል</h3>
+                <h3 style="line-height: 5px; margin-left: -200px; font-size: small;  color: black;">Class <span id="out-class">________________________</span></h3>
+                <h3 style="line-height: 5px; color: rgb(2, 2, 138); margin-left: -310px; font-size: small; ">የት/ዘመን</h3>
+                <h3 style="line-height: 5px; color: rgb(2, 2, 138); margin-left: 180px; font-size: small; position: absolute; margin-top: -18px;">ተራ.ቁ.</h3>
+                <h3 style="line-height: 5px; font-size: small; margin-left: -140px;  color: black;">Year <span id="out-year">_______________</span> No. <span id="out-no">________________</span></h3>
+            </div>
+
+            <div class="container back">
+                <div class="title">
+                    <h2 style="line-height: 5px; text-align: center; color: red; font-size: 16px; margin-top: 20px;">የተማሪው አድራሻ</h2>
+                    <h2 style="line-height: 5px;text-align: center; color: red; font-size: 16px; text-decoration: underline;">STUDENT ADDRESS</h2>
+                </div>
+                <div class="body">
+                    <div class="row1">
+                        <div class="subcity">
+                            <h3 class="blue" style="margin-left: 20px;">ክ/ከተማ <span id="out-subcity">___________________</span></h3>
+                            <h3 style="margin-left: -80px;  color: black;">Subcity</h3>
+                        </div>
+                        <div class="kebele">
+                            <h3 class="blue">ቀበሌ/ወረዳ <span id="out-kebele">___________________</span></h3>
+                            <h3 style="margin-left: -70px;  color: black;">Kebele/Woreda</h3>
+                        </div>
+                        <div class="house">
+                            <h3 class="blue">የቤ.ቁ <span id="out-house">___________________</span></h3>
+                            <h3 style="margin-left: -70px;  color: black;">House No.</h3>
+                        </div>
+                    </div>
+                    <div class="row2">
+                        <div class="phone">
+                            <h3 class="blue" style="margin-left: 20px;">ስልክ ቁጥር (የቤት) <span id="out-telephone">____________________________</span></h3>
+                            <h3 style="margin-left: -50px;  color: black;">Telephone Number (residence)</h3>
+                        </div>
+                        <div class="mobile">
+                            <h3 class="blue">ሞባይል <span id="out-moblie">____________________________</span></h3>
+                            <h3 style="margin-left: -150px;  color: black;">Mobile</h3>
+                        </div>
+                    </div>
+                    <div class="date">
+                        <h3 class="blue" style="text-align: left; margin-left: 20px;">የተሰጠበት ቀን <span id="out-date">______________________________________________</span></h3>
+                        <h3 style="text-align: left; margin-left: 20px;  color: black;">Date Issued</h3>
+                    </div>
+                    <div class="contact">
+                        <h3 class="blue" style="text-align: left; margin-left: 20px;">በአደጋ ጊዜ ተጠሪ <span id="out-contact">___________________________________________</span></h3>
+                        <h3 style="text-align: left; margin-left: 20px;  color: black;">Contact Person</h3>
+                    </div>
+                    <div class="unit">
+                        <h3 class="blue" style="text-align: left; margin-left: 20px;">የሚያገለግልበት ጊዜ <span id="out-valid">________________________________________</span></h3>
+                        <h3 style="text-align: left; margin-left: 20px;  color: black;">Valid Unit</h3>
+                    </div>
+                    <div class="sign">
+                        <h3 class="blue" style="margin-left: 150px;">የት/ቤቱ/ር/መ ፊርማ <span id="out-sign">____________________________</span></h3>
+                        <h3 style="color: black;">Principal's Signature</h3>
+                    </div>
+                </div>
+            </div>
+
+            <button class="print-btn-large" onclick="window.print()">Print ID Card Now</button>
+            <button class="btn-secondary" style="width: 100%; justify-content: center;" onclick="toggleFiles()">Return to Dashboard</button>
+        </div>
+    </div>
+
+    <script>
+        let REAL_PASSKEY = "EB-PASS-7782";
+        let isPassVisible = false;
+
+        function toggleContainer() {
+            const overlay = document.getElementById('blurOverlay');
+            overlay.style.display = (overlay.style.display === "flex") ? "none" : "flex";
+        }
+
+        function toggleFiles() {
+            const fileOverlay = document.getElementById('fileOverlay');
+            fileOverlay.style.display = (fileOverlay.style.display === "flex") ? "none" : "flex";
+        }
+
+        function togglePassView(elementId, btn) {
+            const el = document.getElementById(elementId);
+            isPassVisible = !isPassVisible;
+            if (isPassVisible) {
+                el.innerText = REAL_PASSKEY;
+                el.style.letterSpacing = "normal";
+                btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" height="14" width="20" viewBox="0 0 640 512"><path d="M38.8 5.1C28.4-3.1 13.3-1.2 5.1 9.2S-1.2 34.7 9.2 42.9l592 464c10.4 8.2 25.5 6.3 33.7-4.1s6.3-25.5-4.1-33.7L525.6 386.7c39.6-40.6 66.4-86.1 79.9-118.4c13.3-32.1 14.5-55.1 14.5-55.1s-31.2-95.9-84.1-143.3C477.5 23 412.8-9 332-9c-63.5 0-118 20.1-164.4 53L123.6 12.1C113.1 3.9 98 5.8 89.9 16.3S81.6 41.8 92 50L38.8 5.1z"/></svg>`;
+            } else {
+                el.innerText = "••••••••••••";
+                el.style.letterSpacing = "2px";
+                btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" height="14" width="16" viewBox="0 0 576 512"><path d="M288 32c-80.8 0-145.5 32-203.9 80.7C31.2 160.1 0 212.1 0 256s31.2 95.9 84.1 143.3C142.5 448 207.2 480 288 480s145.5-32 203.9-80.7c52.9-47.4 84.1-99.4 84.1-143.3s-31.2-95.9-84.1-143.3C433.5 64 368.8 32 288 32zM144 256a144 144 0 1 1 288 0 144 144 0 1 1 -288 0zm144-64a64 64 0 1 0 0 128 64 64 0 1 0 0-128z"/></svg>`;
+            }
+        }
+
+        function copyText(elementId, btn, isPasskey = false) {
+            const text = isPasskey ? REAL_PASSKEY : document.getElementById(elementId).innerText;
+            const span = btn.querySelector('span');
+
+            navigator.clipboard.writeText(text).then(() => {
+                span.innerText = "Copied!";
+                btn.style.borderColor = "#22c55e";
+                btn.style.color = "#22c55e";
+                setTimeout(() => {
+                    span.innerText = "Copy";
+                    btn.style.borderColor = "var(--sky)";
+                    btn.style.color = "var(--sky)";
+                }, 1500);
+            });
+        }
+
+         function syncText(field) {
+            const inputVal = document.getElementById('in-' + field).value;
+            document.getElementById('out-' + field).innerText = inputVal;
+        }
+
+        // Function to update photo live
+        function updatePhoto(event) {
+            const output = document.getElementById('student-photo');
+            output.src = URL.createObjectURL(event.target.files[0]);
+            output.onload = function() {
+                URL.revokeObjectURL(output.src) // free memory
+            }
+        }
+    </script>
+</body>
+</html>

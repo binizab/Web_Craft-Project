@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Risk Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0f172a;
+            --card: #1e293b;
+            --accent: #38bdf8;
+            --danger: #ef4444;
+            --text: #f8fafc;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            justify-content: center;
+            padding: 40px;
+        }
+
+        .container { width: 100%; max-width: 700px; }
+
+        h2 { border-left: 5px solid var(--accent); padding-left: 15px; margin-bottom: 30px; }
+
+        .student-card {
+            background: var(--card);
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: 0.3s;
+        }
+
+        .student-card:hover { border-color: var(--accent); }
+
+        .name { font-weight: 600; font-size: 1.1rem; }
+        
+        .stats { font-size: 0.9rem; color: #94a3b8; }
+
+        .badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .badge-danger { background: rgba(239, 68, 68, 0.2); color: var(--danger); border: 1px solid var(--danger); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Students Requiring Attention</h2>
+    <div id="studentList">
+        </div>
+</div>
+
+<script>
+    // Simulated Database
+    const students = [
+        { name: "Alex Johnson", attendance: 92, incidents: 1 },
+        { name: "Sarah Miller", attendance: 78, incidents: 4 }, // High Risk
+        { name: "Michael Chen", attendance: 84, incidents: 0 }, // Low Attendance
+        { name: "Emma Wilson", attendance: 98, incidents: 5 }, // High Incidents
+        { name: "David Brown", attendance: 95, incidents: 0 }
+    ];
+
+    const listContainer = document.getElementById('studentList');
+
+    function displayAtRiskStudents() {
+        // Filter: High incidents (>=3) OR Low attendance (<85)
+        const atRisk = students.filter(s => s.incidents >= 3 || s.attendance < 85);
+
+        if (atRisk.length === 0) {
+            listContainer.innerHTML = "<p>No at-risk records found.</p>";
+            return;
+        }
+
+        listContainer.innerHTML = atRisk.map(s => `
+            <div class="student-card">
+                <div>
+                    <div class="name">${s.name}</div>
+                    <div class="stats">
+                        Attendance: ${s.attendance}% | Discipline: ${s.incidents} Incidents
+                    </div>
+                </div>
+                <div class="badge badge-danger">
+                    ${s.incidents >= 3 ? 'Discipline Alert' : 'Attendance Alert'}
+                </div>
+            </div>
+        `).join('');
+    }
+
+    displayAtRiskStudents();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Textbook Library | Direct PDF Access</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-gradient-start: #0a0f1c;
+                --bg-gradient-end: #0f172a;
+                --card-bg: rgba(30, 41, 59, 0.7);
+                --card-border: rgba(56, 189, 248, 0.25);
+                --accent: #38bdf8;
+                --accent-glow: rgba(56, 189, 248, 0.3);
+                --text-primary: #f1f5f9;
+                --text-secondary: #cbd5e1;
+                --text-muted: #94a3b8;
+                --shadow-sm: 0 8px 20px rgba(0, 0, 0, 0.3);
+                --shadow-hover: 0 25px 35px -12px rgba(0, 0, 0, 0.5);
+            }
+
+            body {
+                font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+                background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+                color: var(--text-primary);
+                min-height: 100vh;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+
+            body::before {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: radial-gradient(circle at 30% 20%, rgba(56, 189, 248, 0.06), transparent 70%);
+                pointer-events: none;
+                z-index: 0;
+            }
+
+            header {
+                width: 100%;
+                position: relative;
+                z-index: 2;
+                padding: 2rem 1.5rem;
+                text-align: center;
+                backdrop-filter: blur(8px);
+                background: rgba(15, 23, 42, 0.6);
+                border-bottom: 1px solid rgba(56, 189, 248, 0.25);
+                box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+            }
+
+            header h1 {
+                font-size: clamp(1.8rem, 7vw, 3rem);
+                font-weight: 700;
+                background: linear-gradient(125deg, #ffffff, var(--accent));
+                background-clip: text;
+                -webkit-background-clip: text;
+                color: transparent;
+                letter-spacing: -0.02em;
+                display: inline-flex;
+                align-items: center;
+                gap: 10px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .subhead {
+                margin-top: 0.6rem;
+                color: var(--text-secondary);
+                font-size: clamp(0.85rem, 3vw, 1rem);
+                opacity: 0.85;
+            }
+
+            .container {
+                width: 94%;
+                max-width: 1400px;
+                margin: 2.5rem auto;
+                padding: 0 0 2.5rem;
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+                gap: 2rem;
+                position: relative;
+                z-index: 2;
+            }
+
+            .book-card {
+                background: var(--card-bg);
+                backdrop-filter: blur(12px);
+                border: 1px solid var(--card-border);
+                border-radius: 1.5rem;
+                padding: 1.3rem 1.2rem 1.3rem;
+                transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+                cursor: pointer;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                box-shadow: var(--shadow-sm);
+            }
+
+            .book-card:hover {
+                transform: translateY(-6px);
+                border-color: var(--accent);
+                box-shadow: var(--shadow-hover);
+                background: rgba(30, 41, 59, 0.85);
+            }
+
+            .book-cover-img {
+                width: 100%;
+                aspect-ratio: 3 / 4;
+                object-fit: cover;
+                border-radius: 1rem;
+                margin-bottom: 1.2rem;
+                box-shadow: 0 8px 18px rgba(0, 0, 0, 0.4);
+                transition: transform 0.25s ease, box-shadow 0.3s ease;
+                background: #1e293b;
+                border: 1px solid rgba(56, 189, 248, 0.3);
+            }
+
+            .book-card:hover .book-cover-img {
+                transform: scale(0.98);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+                border-color: var(--accent);
+            }
+
+            .book-title {
+                font-size: clamp(1.1rem, 4vw, 1.3rem);
+                font-weight: 700;
+                margin: 0.5rem 0 0.2rem;
+                letter-spacing: -0.2px;
+                line-height: 1.3;
+            }
+
+            .book-subject {
+                font-size: 0.75rem;
+                color: var(--text-muted);
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                font-weight: 500;
+            }
+
+            .book-description {
+                font-size: 0.8rem;
+                color: var(--text-secondary);
+                margin-top: 0.5rem;
+                line-height: 1.4;
+                opacity: 0.85;
+            }
+
+            .open-btn {
+                margin-top: 1.2rem;
+                padding: 0.7rem 0;
+                background: rgba(56, 189, 248, 0.1);
+                backdrop-filter: blur(4px);
+                color: var(--accent);
+                border: 1px solid rgba(56, 189, 248, 0.5);
+                border-radius: 2rem;
+                font-weight: 600;
+                font-size: 0.85rem;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                text-align: center;
+                width: 100%;
+                font-family: inherit;
+            }
+
+            .book-card:hover .open-btn {
+                background: var(--accent);
+                color: #0f172a;
+                border-color: var(--accent);
+                box-shadow: 0 0 12px var(--accent-glow);
+            }
+
+            .footer-info {
+                text-align: center;
+                padding: 1.2rem;
+                border-top: 1px solid rgba(56, 189, 248, 0.2);
+                width: 100%;
+                font-size: 0.8rem;
+                color: var(--text-muted);
+                background: rgba(10, 15, 28, 0.6);
+                backdrop-filter: blur(6px);
+                margin-top: auto;
+            }
+
+            @media (max-width: 768px) {
+                .container {
+                    gap: 1.5rem;
+                    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+                    width: 92%;
+                }
+            }
+
+            @media (max-width: 550px) {
+                .container {
+                    grid-template-columns: 1fr;
+                    max-width: 400px;
+                    gap: 1.4rem;
+                }
+                .book-card {
+                    flex-direction: row;
+                    flex-wrap: wrap;
+                    align-items: center;
+                    gap: 0.8rem;
+                    padding: 1rem;
+                }
+                .book-cover-img {
+                    width: 85px;
+                    aspect-ratio: 3 / 4;
+                    margin-bottom: 0;
+                    flex-shrink: 0;
+                }
+                .book-info-mobile {
+                    flex: 1;
+                    min-width: 150px;
+                }
+                .book-title {
+                    font-size: 1rem;
+                    margin-top: 0;
+                }
+                .open-btn {
+                    width: auto;
+                    padding: 0.5rem 1.2rem;
+                    margin-top: 0;
+                    margin-left: auto;
+                }
+                .book-card > div:first-child {
+                    display: flex;
+                    gap: 0.8rem;
+                    align-items: center;
+                    width: 100%;
+                }
+                .book-card > div:first-child .book-cover-img {
+                    margin-bottom: 0;
+                }
+                .book-description {
+                    font-size: 0.7rem;
+                }
+            }
+
+            @media (max-width: 480px) {
+                .open-btn {
+                    width: 100%;
+                    margin-top: 0.6rem;
+                }
+                .book-card > div:first-child {
+                    flex-wrap: wrap;
+                }
+                .book-card {
+                    padding: 1rem;
+                }
+            }
+
+            .book-card:focus-visible {
+                outline: 2px solid var(--accent);
+                outline-offset: 3px;
+                transform: scale(1.01);
+            }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>📖 Textbook Library <span style="font-size:0.6em;">✦</span></h1>
+    <div class="subhead">direct PDF access • click any card or button to open the book</div>
+</header>
+
+<div class="container" id="libraryContainer">
+    <!-- Book 1 - Biology (using the specific PDF you provided) -->
+    <div class="book-card" data-pdf="https://fetena.net/books_asset/books_26/collection/grade%209-biology_fetena_net_ffbb.pdf" data-title="Biology">
+        <div>
+            <img class="book-cover-img" src="https://images.unsplash.com/photo-1530026186672-2cd00ffc50fe?w=300&h=400&fit=crop" alt="Biology textbook cover" loading="lazy">
+            <div class="book-title">Biology</div>
+            <div class="book-subject">Grade 9 Student Textbook</div>
+            <div class="book-description">Cells, genetics, ecology & human biology — complete curriculum.</div>
+        </div>
+        <button class="open-btn">📘 Open PDF</button>
+    </div>
+
+    <!-- Book 2 - Mathematics -->
+    <div class="book-card" data-pdf="https://fetena.net/books_asset/books_26/collection/grade%209-mathematics_fetena_net_2c5b.pdf" data-title="Mathematics">
+        <div>
+            <img class="book-cover-img" src="https://images.unsplash.com/photo-1509228468518-180dd4864904?w=300&h=400&fit=crop" alt="Mathematics textbook cover" loading="lazy">
+            <div class="book-title">Mathematics</div>
+            <div class="book-subject">Student Textbook</div>
+            <div class="book-description">Algebra, geometry, trigonometry & statistics fundamentals.</div>
+        </div>
+        <button class="open-btn">📘 Open PDF</button>
+    </div>
+
+    <!-- Book 3 - Physics -->
+    <div class="book-card" data-pdf="https://fetena.net/books_asset/books_26/collection/grade%209-physics_fetena_net_558f.pdf" data-title="Physics">
+        <div>
+            <img class="book-cover-img" src="https://images.unsplash.com/photo-1636466497217-26a8cbeaf0aa?w=300&h=400&fit=crop" alt="Physics textbook cover" loading="lazy">
+            <div class="book-title">Physics</div>
+            <div class="book-subject">Student Textbook</div>
+            <div class="book-description">Mechanics, waves, electricity & modern physics concepts.</div>
+        </div>
+        <button class="open-btn">📘 Open PDF</button>
+    </div>
+
+    <!-- Book 4 - Chemistry -->
+    <div class="book-card" data-pdf="https://fetena.net/books_asset/books_26/collection/grade%209-chemistry_fetena_net_5c8d.pdf" data-title="Chemistry">
+        <div>
+            <img class="book-cover-img" src="https://images.unsplash.com/photo-1603126857599-f6e157fa2fe6?w=300&h=400&fit=crop" alt="Chemistry textbook cover" loading="lazy">
+            <div class="book-title">Chemistry</div>
+            <div class="book-subject">Student Textbook</div>
+            <div class="book-description">Atomic structure, chemical reactions & periodic table.</div>
+        </div>
+        <button class="open-btn">📘 Open PDF</button>
+    </div>
+
+    <!-- Book 5 - History -->
+    <div class="book-card" data-pdf="https://fetena.net/books_asset/books_26/collection/grade%209-history_fetena_net_f7c3.pdf" data-title="History">
+        <div>
+            <img class="book-cover-img" src="https://images.unsplash.com/photo-1461360228754-6e81c478b882?w=300&h=400&fit=crop" alt="History textbook cover" loading="lazy">
+            <div class="book-title">History</div>
+            <div class="book-subject">Student Textbook</div>
+            <div class="book-description">World civilizations, modern era & historical analysis.</div>
+        </div>
+        <button class="open-btn">📘 Open PDF</button>
+    </div>
+
+    <!-- Book 6 - Geography -->
+    <div class="book-card" data-pdf="https://fetena.net/books_asset/books_26/collection/grade%209-geography_fetena_net_a1e2.pdf" data-title="Geography">
+        <div>
+            <img class="book-cover-img" src="data:image/jpeg;base64,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" alt="Geography textbook cover" loading="lazy">
+            <div class="book-title">Geography</div>
+            <div class="book-subject">Student Textbook</div>
+            <div class="book-description">Physical geography, climate, maps & human-environment interaction.</div>
+        </div>
+        <button class="open-btn">📘 Open PDF</button>
+    </div>
+
+    <!-- Book 7 - English -->
+    <div class="book-card" data-pdf="https://fetena.net/books_asset/books_26/collection/grade%209-english_fetena_net_3d6a.pdf" data-title="English">
+        <div>
+            <img class="book-cover-img" src="https://images.unsplash.com/photo-1457369804613-52c61a468e7d?w=300&h=400&fit=crop" alt="English textbook cover" loading="lazy">
+            <div class="book-title">English</div>
+            <div class="book-subject">Language & Literature</div>
+            <div class="book-description">Grammar, composition, reading comprehension & writing skills.</div>
+        </div>
+        <button class="open-btn">📘 Open PDF</button>
+    </div>
+
+    <!-- Book 8 - Information Technology -->
+    <div class="book-card" data-pdf="https://fetena.net/books_asset/books_26/collection/grade%209-ict_fetena_net_9b4f.pdf" data-title="ICT">
+        <div>
+            <img class="book-cover-img" src="https://images.unsplash.com/photo-1515879218367-8466d910aaa4?w=300&h=400&fit=crop" alt="ICT textbook cover" loading="lazy">
+            <div class="book-title">Information Technology</div>
+            <div class="book-subject">ICT Student Book</div>
+            <div class="book-description">Computer basics, internet, programming & digital literacy.</div>
+        </div>
+        <button class="open-btn">📘 Open PDF</button>
+    </div>
+
+    <!-- Book 9 - Economics -->
+    <div class="book-card" data-pdf="https://fetena.net/books_asset/books_26/collection/grade%209-economics_fetena_net_6e8a.pdf" data-title="Economics">
+        <div>
+            <img class="book-cover-img" src="https://images.unsplash.com/photo-1580674684081-7617fbf3d745?w=300&h=400&fit=crop" alt="Economics textbook cover" loading="lazy">
+            <div class="book-title">Economics</div>
+            <div class="book-subject">Student Textbook</div>
+            <div class="book-description">Microeconomics, macroeconomics & basic economic principles.</div>
+        </div>
+        <button class="open-btn">📘 Open PDF</button>
+    </div>
+</div>
+
+
+<script>
+    function openBook(pdfUrl) {
+        if (pdfUrl && pdfUrl.trim() !== "") {
+            window.open(pdfUrl, '_blank');
+        } else {
+            console.warn("No PDF URL provided");
+            alert("PDF link is not available for this book.");
+        }
+    }
+
+    // Get all book cards
+    const bookCards = document.querySelectorAll('.book-card');
+    
+    // Attach event listeners to each card and its button
+    bookCards.forEach(card => {
+        // Get the PDF URL from data-pdf attribute
+        const pdfUrl = card.getAttribute('data-pdf');
+        
+        // Card click handler - opens PDF unless clicking on the button (to avoid double trigger)
+        card.addEventListener('click', (e) => {
+            // Check if the clicked element is the button or inside the button
+            let target = e.target;
+            let isButtonClick = false;
+            
+            while (target && target !== card) {
+                if (target.classList && target.classList.contains('open-btn')) {
+                    isButtonClick = true;
+                    break;
+                }
+                target = target.parentNode;
+            }
+            
+            // If not clicking the button, open PDF from card's data attribute
+            if (!isButtonClick && pdfUrl) {
+                openBook(pdfUrl);
+            }
+        });
+        
+        // Get the button inside this card
+        const btn = card.querySelector('.open-btn');
+        if (btn) {
+            // Replace any existing onclick and use our clean event listener
+            btn.removeAttribute('onclick');
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation(); // Prevent card click from firing
+                if (pdfUrl) {
+                    openBook(pdfUrl);
+                }
+            });
+        }
+    });
+    
+    // Optional: Touch feedback for mobile devices
+    if ('ontouchstart' in window) {
+        document.querySelectorAll('.book-card').forEach(card => {
+            card.addEventListener('touchstart', function() {
+                this.style.transform = 'scale(0.98)';
+                setTimeout(() => { 
+                    if(this) this.style.transform = ''; 
+                }, 120);
+            });
+        });
+    }
+    
+    // Accessibility: keyboard navigation (Enter or Space on focused card)
+    bookCards.forEach(card => {
+        card.setAttribute('tabindex', '0');
+        card.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                const pdfUrl = card.getAttribute('data-pdf');
+                if (pdfUrl) {
+                    openBook(pdfUrl);
+                }
+            }
+        });
+    });
+    
+    console.log("📚 Textbook Library ready — PDFs open in new tab on click");
+</script>
+</body>
+</html>

@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EB Academy | P2P File Transfer</title>
+    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+    <style>
+        :root {
+            --bg: #0f172a;
+            --sidebar: #1e293b;
+            --accent: #38bdf8;
+            --text: #f1f5f9;
+            --border: #334155;
+            --success: #22c55e;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            margin: 0;
+            display: flex;
+            height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: var(--sidebar);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        .id-card {
+            background: #0f172a;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid var(--accent);
+            margin-bottom: 20px;
+        }
+
+        .nav-item {
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-bottom: 5px;
+            transition: 0.2s;
+        }
+
+        .nav-item:hover { background: var(--border); }
+
+        /* Main Area */
+        .main { flex: 1; display: flex; flex-direction: column; }
+        
+        .header {
+            padding: 20px 40px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .content-area { flex: 1; padding: 40px; overflow-y: auto; display: flex; flex-direction: column; align-items: center; }
+
+        /* Messaging UI */
+        .p2p-box {
+            width: 100%;
+            max-width: 600px;
+            background: var(--sidebar);
+            padding: 30px;
+            border-radius: 15px;
+            border: 1px solid var(--border);
+        }
+
+        input, textarea {
+            width: 100%;
+            background: #0f172a;
+            border: 1px solid var(--border);
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+        }
+
+        .btn {
+            background: var(--accent);
+            color: black;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .status { font-size: 0.8rem; color: var(--success); margin-bottom: 10px; }
+        .hidden { display: none; }
+
+        .received-msg {
+            background: var(--sidebar);
+            border: 1px solid var(--accent);
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 20px;
+            width: 100%;
+            max-width: 600px;
+        }
+    </style>
+</head>
+<body>
+
+    <aside class="sidebar">
+        <h2 style="color: var(--accent);">EB P2P</h2>
+        <div class="id-card">
+            <div style="font-size: 0.7rem; color: var(--accent);">YOUR ADDRESS ID:</div>
+            <div id="my-id" style="font-weight: bold; word-break: break-all;">Connecting...</div>
+        </div>
+        <div class="nav-item" onclick="showView('send')">📤 Send File/Mail</div>
+        <div class="nav-item" onclick="showView('inbox')">📥 Inbox (<span id="count">0</span>)</div>
+    </aside>
+
+    <main class="main">
+        <header class="header">
+            <div id="conn-status" style="color: #64748b;">● Not Connected</div>
+        </header>
+
+        <div class="content-area">
+            <div id="view-send" class="p2p-box">
+                <h3>Direct Send</h3>
+                <input type="text" id="remote-id" placeholder="Paste Recipient ID">
+                <input type="text" id="subject" placeholder="Subject">
+                <textarea id="message" rows="5" placeholder="Your message..."></textarea>
+                <input type="file" id="file-input">
+                <button class="btn" onclick="sendData()">Transfer P2P</button>
+            </div>
+
+            <div id="view-inbox" class="hidden" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
+                <h3>Received Messages</h3>
+                <div id="msg-container"></div>
+            </div>
+        </div>
+    </main>
+
+<script>
+    const peer = new Peer();
+    let inbox = [];
+
+    // Initialize Peer
+    peer.on('open', (id) => {
+        document.getElementById('my-id').innerText = id;
+    });
+
+    // Handle INCOMING Connection and Data
+    peer.on('connection', (conn) => {
+        document.getElementById('conn-status').innerText = "● Incoming Transfer...";
+        document.getElementById('conn-status').style.color = "var(--success)";
+
+        conn.on('data', (data) => {
+            inbox.unshift(data);
+            updateInboxUI();
+            alert("New P2P Message Received!");
+        });
+    });
+
+    // SEND Function
+    function sendData() {
+        const remoteId = document.getElementById('remote-id').value;
+        const file = document.getElementById('file-input').files[0];
+        
+        if (!remoteId) return alert("Enter a Recipient ID");
+
+        const conn = peer.connect(remoteId);
+
+        conn.on('open', () => {
+            const payload = {
+                subject: document.getElementById('subject').value,
+                message: document.getElementById('message').value,
+                timestamp: new Date().toLocaleTimeString()
+            };
+
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = () => {
+                    payload.file = reader.result;
+                    payload.fileName = file.name;
+                    payload.fileType = file.type;
+                    conn.send(payload);
+                    finishSend();
+                };
+                reader.readAsDataURL(file);
+            } else {
+                conn.send(payload);
+                finishSend();
+            }
+        });
+    }
+
+    function finishSend() {
+        alert("P2P Transfer Complete!");
+        document.getElementById('subject').value = '';
+        document.getElementById('message').value = '';
+        document.getElementById('file-input').value = '';
+    }
+
+    function updateInboxUI() {
+        document.getElementById('count').innerText = inbox.length;
+        const container = document.getElementById('msg-container');
+        container.innerHTML = inbox.map(m => `
+            <div class="received-msg">
+                <small style="color: var(--accent)">${m.timestamp}</small>
+                <h4>${m.subject || 'No Subject'}</h4>
+                <p>${m.message}</p>
+                ${m.file ? renderAttachment(m) : ''}
+            </div>
+        `).join('');
+    }
+
+    function renderAttachment(m) {
+        if (m.fileType.startsWith('image/')) return `<img src="${m.file}" style="max-width:100%; border-radius:8px; margin-top:10px;">`;
+        return `<div style="background:#0f172a; padding:10px; border-radius:5px; margin-top:10px;">📎 ${m.fileName}</div>`;
+    }
+
+    function showView(view) {
+        document.getElementById('view-send').classList.toggle('hidden', view !== 'send');
+        document.getElementById('view-inbox').classList.toggle('hidden', view !== 'inbox');
+        if (view === 'inbox') {
+            document.getElementById('view-inbox').style.display = 'flex';
+        }
+    }
+</script>
+</body>
+</html>

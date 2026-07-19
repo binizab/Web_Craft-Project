@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stakeholder Inline Cards</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --primary-red: #4e01f4;
+            --bg-dark: #151515;
+            --transition-speed: 0.5s;
+            --circle-size: 180px;      /* Smaller initial circle */
+            --rect-width: 300px;       /* Good size for content */
+            --rect-height: 220px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap; /* Ensures responsiveness */
+            gap: 30px;       /* Spacing between inline cards */
+            min-height: 100vh;
+            background: var(--bg-dark);
+            padding: 20px;
+        }
+
+        .card {
+            position: relative;
+            width: var(--circle-size);
+            height: var(--circle-size);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: var(--transition-speed);
+            /* Margin right helps prevent cards overlapping when they expand */
+            margin: 20px 0; 
+            transform: scale(0.9);
+        }
+
+        /* The Circle/Shape */
+        .card .circle {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: var(--bg-dark);
+            transition: var(--transition-speed);
+            z-index: 1;
+            border: 2px solid var(--primary-red);
+            box-shadow: 0 0 30px var(--primary-red);
+        }
+
+        /* Hover Expansion to Rectangle */
+        .card:hover .circle {
+            width: var(--rect-width);
+            height: var(--rect-height);
+            border-radius: 20px;
+            background: var(--primary-red);
+            /* Shifts the rectangle left so the expansion looks centered */
+            left: calc((var(--rect-width) - var(--circle-size)) / -2);
+            top: calc((var(--rect-height) - var(--circle-size)) / -2);
+        }
+
+        /* Initial Content (Icon + Word) */
+        .initial-view {
+            position: relative;
+            z-index: 10;
+            color: white;
+            text-align: center;
+            transition: var(--transition-speed);
+        }
+
+        .initial-view i {
+            font-size: 50px; /* Scaled down for smaller circle */
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .initial-view h3 {
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+        }
+
+        .card:hover .initial-view {
+            opacity: 0;
+            visibility: hidden;
+            transform: scale(0);
+        }
+
+        /* Detailed Content inside the rectangle */
+        .content {
+            position: absolute;
+            width: 220px;
+            padding: 10px;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition-speed);
+            z-index: 11;
+            color: white;
+            /* Positioning inside the expanded rectangle */
+            margin-left: 50px; 
+        }
+
+        .card:hover .content {
+            opacity: 1;
+            visibility: visible;
+            left: -100px; /* Slight slide-in effect */
+        }
+
+        .content h2 {
+            text-transform: uppercase;
+            font-size: 1.4em;
+            margin-bottom: 5px;
+        }
+
+        .content p {
+            font-size: 0.75em;
+            margin-bottom: 10px;
+            line-height: 1.3;
+        }
+
+        .content a {
+            display: inline-block;
+            padding: 6px 15px;
+            background: white;
+            color: #000;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 0.75em;
+        }
+
+        /* Tilting Image on the right */
+        .product-img {
+            position: absolute;
+            height: 250px;
+            z-index: 12;
+            transition: var(--transition-speed);
+            pointer-events: none;
+            opacity: 0;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        /* Hover: Slide right and tilt */
+        .card:hover .product-img {
+            opacity: 1;
+            left: 130%; /* Moves it to the right side of the rectangle */
+            transform: translate(-50%, -50%) rotate(15deg);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card" style="margin-left: 45px;">
+        <div class="circle"></div>
+        <div class="initial-view">
+            <i class="fas fa-user-graduate"></i>
+            <h3>STUDENT</h3>
+        </div>
+        <div class="content">
+            <h2>Student</h2>
+            <p>Access your grades, learning paths, and upcoming tasks.</p>
+            <a href="#">Enter Portal</a>
+        </div>
+        <img src="student.png" class="product-img" alt="Student">
+    </div>
+
+    <div class="card" style="margin-left: 100px;">
+        <div class="circle"></div>
+        <div class="initial-view">
+            <i class="fas fa-chalkboard-teacher"></i>
+            <h3>TEACHER</h3>
+        </div>
+        <div class="content">
+            <h2>Teacher</h2>
+            <p>Manage your classrooms, assignments, and student feedback.</p>
+            <a href="#">Class Management</a>
+        </div>
+        <img src="teacher.png" class="product-img" alt="Teacher">
+    </div>
+
+    <div class="card" style="margin-left: 100px;">
+        <div class="circle"></div>
+        <div class="initial-view">
+            <i class="fas fa-user-shield"></i>
+            <h3>ADMIN</h3>
+        </div>
+        <div class="content">
+            <h2>Admin</h2>
+            <p>Full control over system settings, users, and reporting.</p>
+            <a href="#">Settings</a>
+        </div>
+        <img src="admin.png" class="product-img" alt="Admin">
+    </div>
+
+    <div class="card" style="margin-left: 100px;">
+        <div class="circle"></div>
+        <div class="initial-view">
+            <i class="fas fa-users"></i>
+            <h3>PARENT</h3>
+        </div>
+        <div class="content">
+            <h2>Parent</h2>
+            <p>Track your child's progress and stay updated with school news.</p>
+            <a href="#">Parent View</a>
+        </div>
+        <img src="parent.png" class="product-img" alt="Parent">
+    </div>
+
+</body>
+</html>

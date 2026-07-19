@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>EB Academy | Unified Student Hub</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="student_eschool_dash.css">
+</head>
+<body>
+    <div class="dashboard">
+        <!-- Desktop Sidebar -->
+        <aside class="sidebar expanded" id="desktopSidebar">
+            <div class="sidebar-content">
+                <div class="logo-area">
+                    <div class="logo-icon"><i class="fas fa-graduation-cap"></i></div>
+                    <span class="logo-text">EB Academy</span>
+                </div>
+                <div class="nav-section" id="desktopNavContainer"></div>
+                <div class="sidebar-footer">
+                    <div class="profile-card-mini" id="sidebarProfileBtn">
+                        <div class="avatar-small"><i class="fas fa-user-astronaut"></i></div>
+                        <div class="profile-info-mini"><span>Alex Kim</span><small>Student</small></div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Mobile Overlay -->
+        <div class="mobile-overlay" id="mobileOverlay"></div>
+        <div class="mobile-sidebar" id="mobileSidebar">
+            <div class="sidebar-content">
+                <div class="logo-area"><div class="logo-icon"><i class="fas fa-graduation-cap"></i></div><span class="logo-text">EB Academy</span></div>
+                <div class="nav-section" id="mobileNavContainer"></div>
+            </div>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="main-content">
+            <header class="top-bar">
+                <button class="menu-btn" id="menuBtn"><i class="fas fa-bars"></i></button>
+                <button class="desktop-toggle" id="toggleSidebar"><i class="fas fa-chevron-left"></i></button>
+                <div class="header-title"><p>Student Portal</p><h1 id="currentViewTitle">Dashboard</h1></div>
+                <div class="header-actions">
+                    <button class="icon-btn" id="themeToggle"><i class="fas fa-moon"></i></button>
+                    <button class="icon-btn" id="settingsBtn"><i class="fas fa-cog"></i></button>
+                    <button class="icon-btn" id="globalProfileBtn"><i class="fas fa-user-circle"></i></button>
+                </div>
+            </header>
+            <main id="dynamicViewContainer" class="dynamic-view"></main>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="modal-glass">
+        <div class="modal-card"><div class="modal-header"><h3>Preferences</h3><button class="close-modal">&times;</button></div>
+        <div class="modal-body"><label>Theme</label><div class="theme-options"><button data-theme="light">Light</button><button data-theme="dark">Dark</button><button data-theme="system">System</button></div>
+        <div class="user-info-card"><h4>Alex Johnson</h4><p>alex@ebacademy.edu</p><span>Computer Science · 2026</span></div></div></div>
+    </div>
+
+    <!-- Floating Profile Card -->
+    <div id="floatingProfileCard" class="floating-profile"><div class="avatar-large"><i class="fas fa-user-graduate"></i></div><h4>Alex Kim</h4><p>Student · CS Major</p><div class="profile-stats"><span>12 Courses</span><span>98% Avg</span></div></div>
+
+    <script src="https://unpkg.com/dexie/dist/dexie.js"></script>
+    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+    <script src="student_eschool_dash.js"></script>
+</body>
+</html>

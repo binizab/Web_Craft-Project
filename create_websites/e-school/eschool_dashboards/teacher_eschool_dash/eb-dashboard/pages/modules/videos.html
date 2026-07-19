@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EB Academy | Video Hub Pro</title>
+    <style>
+        :root {
+            --bg: #050508;
+            --sidebar: #0a0a0f;
+            --card-bg: #11111a;
+            --accent: #3b82f6; /* Electric Blue */
+            --accent-glow: rgba(59, 130, 246, 0.5);
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+            --glass: rgba(255, 255, 255, 0.03);
+            --border: #1e293b;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        /* Navbar / Header */
+        .nav-header {
+            position: fixed;
+            top: 0; width: 100%;
+            height: 70px;
+            background: rgba(5, 5, 8, 0.8);
+            backdrop-filter: blur(12px);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 5%;
+            box-sizing: border-box;
+            z-index: 1000;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .logo { font-weight: 800; font-size: 1.2rem; color: var(--accent); letter-spacing: 1px; }
+
+        /* Hero Header */
+        .hero-banner {
+            width: 100%;
+            height: 75vh;
+            background: linear-gradient(to top, var(--bg), transparent 80%), 
+                        linear-gradient(to right, rgba(5, 5, 8, 0.9), transparent),
+                        url('https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&q=80');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 0 8%;
+            box-sizing: border-box;
+        }
+
+        .hero-content h1 { font-size: 4rem; margin: 0; line-height: 1; }
+        .hero-content span { color: var(--accent); }
+        .hero-content p { max-width: 550px; font-size: 1.1rem; color: var(--text-dim); margin: 20px 0; }
+
+        .watch-now {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 16px 40px;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 0 20px var(--accent-glow);
+        }
+        .watch-now:hover { transform: scale(1.05); background: #2563eb; }
+
+        /* Video Row */
+        .content-section { padding: 60px 8%; }
+        .row-title { font-size: 1.4rem; font-weight: bold; margin-bottom: 30px; display: flex; align-items: center; gap: 15px; }
+        .row-title::before { content: ''; width: 4px; height: 24px; background: var(--accent); border-radius: 4px; }
+
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 30px;
+        }
+
+        .video-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: 0.4s cubic-bezier(0.2, 1, 0.3, 1);
+            border: 1px solid var(--border);
+            position: relative;
+        }
+
+        .video-card:hover { 
+            transform: translateY(-12px); 
+            border-color: var(--accent);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+        }
+
+        .thumb-container {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+
+        .play-overlay {
+            position: absolute; inset: 0;
+            background: rgba(59, 130, 246, 0.2);
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0; transition: 0.3s;
+        }
+
+        .video-card:hover .play-overlay { opacity: 1; }
+
+        .play-icon {
+            width: 60px; height: 60px;
+            background: var(--accent);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 1.5rem;
+            box-shadow: 0 0 20px var(--accent-glow);
+        }
+
+        /* Profile Circle Overlay */
+        .profile-badge {
+            position: absolute;
+            bottom: -20px;
+            right: 20px;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            border: 3px solid var(--card-bg);
+            background-size: cover;
+            background-position: center;
+            z-index: 10;
+            background-color: #333;
+        }
+
+        .info { padding: 30px 20px 20px; }
+        .info h4 { margin: 0; font-size: 1.1rem; font-weight: 600; }
+        .info p { margin: 8px 0 0; font-size: 0.85rem; color: var(--text-dim); }
+
+        /* Professional Video Modal */
+        #videoOverlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(2, 2, 5, 0.98);
+            z-index: 9999;
+            justify-content: center; align-items: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .player-wrapper {
+            width: 90%;
+            max-width: 1100px;
+            position: relative;
+            animation: playerAppear 0.5s cubic-bezier(0.2, 1, 0.3, 1);
+        }
+
+        @keyframes playerAppear {
+            from { opacity: 0; transform: scale(0.9) translateY(30px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .close-player {
+            position: absolute;
+            top: -60px; right: 0;
+            color: var(--text-dim);
+            font-size: 0.9rem;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: 0.3s;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .close-player:hover { color: white; }
+
+        .iframe-container {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            background: black;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 0 100px rgba(59, 130, 246, 0.2);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        iframe { width: 100%; height: 100%; border: none; }
+    </style>
+</head>
+<body>
+
+    <header class="nav-header">
+        <div class="logo">EB ACADEMY</div>
+        <div style="display: flex; gap: 20px; align-items: center;">
+            <div style="width: 35px; height: 35px; border-radius: 50%; background: var(--accent); display: grid; place-items: center; font-weight: bold; font-size: 0.8rem;">JD</div>
+        </div>
+    </header>
+
+    <div class="hero-banner">
+        <div class="hero-content">
+            <h1>Unlock Your <span>Potential.</span></h1>
+            <p>Access the most comprehensive library of video lessons designed specifically for the EB Academy curriculum.</p>
+            <button class="watch-now" onclick="playVideo('dQw4w9WgXcQ')">▶ Continue Watching</button>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <div class="row-title">Recommended for You</div>
+        <div class="video-grid">
+            
+            <div class="video-card" onclick="playVideo('m6G_6-Y32aE')">
+                <div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/m6G_6-Y32aE/maxresdefault.jpg');">
+                    <div class="play-overlay">
+                        <div class="play-icon">▶</div>
+                    </div>
+                    <div class="profile-badge" style="background-image: url('https://i.pravatar.cc/150?u=1');"></div>
+                </div>
+                <div class="info">
+                    <h4>Mastering Quadratic Equations</h4>
+                    <p>Advanced Mathematics • 14 mins</p>
+                </div>
+            </div>
+
+            <div class="video-card" onclick="playVideo('L-S-fN_yMvY')">
+                <div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/L-S-fN_yMvY/maxresdefault.jpg');">
+                    <div class="play-overlay">
+                        <div class="play-icon">▶</div>
+                    </div>
+                    <div class="profile-badge" style="background-image: url('https://i.pravatar.cc/150?u=2');"></div>
+                </div>
+                <div class="info">
+                    <h4>The Physics of Light</h4>
+                    <p>Physics • 10 mins</p>
+                </div>
+            </div>
+
+            <div class="video-card" onclick="playVideo('9iMGFqMmUFs')">
+                <div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/9iMGFqMmUFs/maxresdefault.jpg');">
+                    <div class="play-overlay">
+                        <div class="play-icon">▶</div>
+                    </div>
+                    <div class="profile-badge" style="background-image: url('https://i.pravatar.cc/150?u=3');"></div>
+                </div>
+                <div class="info">
+                    <h4>Human Anatomy: The Heart</h4>
+                    <p>Biology • 22 mins</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div id="videoOverlay">
+        <div class="player-wrapper">
+            <div class="close-player" onclick="stopVideo()">Close Player [Esc]</div>
+            <div class="iframe-container" id="playerFrame"></div>
+        </div>
+    </div>
+<script src="https://unpkg.com/dexie/dist/dexie.js"></script>
+    <script>
+       // 1. Initialize Database - VERSION MUST MATCH videosT.html (Version 2)
+    const db = new Dexie("EBAcademyDB");
+    db.version(2).stores({
+        videos: '++id, title, youtubeId, type, file, timestamp'
+    });
+
+    // 2. Function to sync the Hub with the Database
+    async function refreshVideoGrid(gridElement) {
+        if (!gridElement) return;
+
+        // Fetch all videos from IndexedDB
+        const allVideos = await db.videos.orderBy('timestamp').reverse().toArray();
+        
+        // Clear current grid
+        gridElement.innerHTML = ''; 
+
+        allVideos.forEach(video => {
+            const isLocal = video.type === 'local';
+            
+            // Choose thumbnail: Local files get a placeholder, YouTube gets its own thumb
+            const thumb = isLocal 
+                ? 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&q=80&w=500' 
+                : `https://img.youtube.com/vi/${video.youtubeId}/maxresdefault.jpg`;
+
+            const card = document.createElement('div');
+            card.className = 'video-card';
+            
+            // Call the unified player
+            card.onclick = () => window.playVideoSource(video);
+
+            card.innerHTML = `
+                <div class="thumb-container" style="background-image: url('${thumb}');">
+                    <div class="play-overlay"><div class="play-icon">▶</div></div>
+                    <div class="profile-badge" style="background-color: var(--accent); display: grid; place-items: center; color: white; font-size: 0.7rem; font-weight: bold;">
+                        ${isLocal ? 'PC' : 'YT'}
+                    </div>
+                </div>
+                <div class="info">
+                    <h4>${video.title}</h4>
+                    <p>${isLocal ? '💾 Uploaded Lesson' : '📺 YouTube Stream'} • Academy Content</p>
+                </div>
+            `;
+            gridElement.appendChild(card);
+        });
+    }
+
+    // 3. Unified Player (Handles both File Blobs and YouTube IDs)
+    window.playVideoSource = function(video) {
+        const frame = document.getElementById('playerFrame');
+        const overlay = document.getElementById('videoOverlay');
+        frame.innerHTML = ''; 
+
+        if (video.type === 'local') {
+            // Create a temporary browser URL for the local file
+            const videoURL = URL.createObjectURL(video.file);
+            const videoEl = document.createElement('video');
+            videoEl.src = videoURL;
+            videoEl.controls = true;
+            videoEl.autoplay = true;
+            videoEl.style.width = "100%";
+            videoEl.style.height = "100%";
+            frame.appendChild(videoEl);
+            
+            // Memory Management: Revoke URL when finished
+            videoEl.onremove = () => URL.revokeObjectURL(videoURL);
+        } else {
+            // Standard YouTube Iframe
+            frame.innerHTML = `
+                <iframe src="https://www.youtube.com/embed/${video.youtubeId}?autoplay=1&rel=0" 
+                        allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+        }
+
+        overlay.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    };
+
+    window.stopVideo = function() {
+        document.getElementById('playerFrame').innerHTML = '';
+        document.getElementById('videoOverlay').style.display = 'none';
+        document.body.style.overflow = 'auto';
+    };
+
+    // 4. Initial Load
+    window.onload = () => {
+        // Find the grid (make sure the class is .video-grid in your HTML)
+        const grid = document.querySelector('.video-grid');
+        refreshVideoGrid(grid);
+    };
+
+    // Esc key listener
+    document.addEventListener('keydown', (e) => {
+        if (e.key === "Escape") window.stopVideo();
+    });
+    </script>
+</body>
+</html>

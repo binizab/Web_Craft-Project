@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Main Page</title>
+</head>
+<link rel="stylesheet" href="webCraft.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<body>
+<header id="main-header" class="header">
+  <div class="header-container">
+    <a href="#home" class="logo">
+      Web<span class="text-primary">Craft</span><span class="text-accent">.</span>
+    </a>
+
+    <button id="menu-toggle" class="menu-toggle">
+      <span class="icon-menu"><i data-lucide="menu"></i></span>
+      <span class="icon-close" style="display: none;"><i data-lucide="x"></i></span>
+    </button>
+
+    <nav id="nav-menu" class="nav-links">
+      
+      <a href="#home" class="nav-link active">Home</a>
+      <a href="#features" class="nav-link">Features</a>
+      <a href="#services" class="nav-link">Services</a>
+      <a href="#pricing" class="nav-link">Pricing</a>
+      <a href="#testimonials" class="nav-link">Testimonials</a>
+      <a href="#contact" class="nav-link">Contact</a>
+      <div id="gatekeeper">
+      <a onclick="navTo('viewSignIn')" class="btn-get-started">
+        <span class="btn-get-started">Get Started</span>
+        <div class="shimmer"></div>
+      </a>
+    </div>
+    
+    </nav>
+    <div class="settings-wrapper">
+        <button class="btn-toggle" id="theme_toggle">
+            <i class="fas fa-sun" style="transform: scale(0.7);"></i>
+        </button>
+    </div>
+  </div>
+</header>
+    <section id="home" class="hero-section">
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="blob blob-3"></div>
+  <div class="container hero-container">
+    <div class="hero-content animate-slide-in-left" style="margin-top: -50px;">
+      
+
+      <h1 class="hero-title" style="margin-top: 130px;">
+        We Build Beautiful 
+        <span class="highlight">
+          Websites
+          <svg class="underline-svg" viewBox="0 0 200 8" fill="none">
+            <path d="M2 6C50 2 150 2 198 6" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+          </svg>
+        </span> 
+        That Work
+      </h1>
+
+      <div class="typed-container">
+        <span id="typed-text"></span>
+      </div>
+
+      <p class="hero-description">
+        From idea to launch — we design, develop, and deliver responsive, high-performance websites tailored for schools, businesses, and creators.
+      </p>
+
+      <div class="hero-actions">
+        <a href="#pricing" class="btn btn-primary">See Pricing</a>
+        <a href="#features" class="btn btn-outline">Explore Features</a>
+      </div>
+
+      <div class="trust-badges">
+        <div class="badge-item"><i class="fas fa-bolt"></i> Fast Delivery</div>
+        <div class="badge-item"><i class="fas fa-shield-alt"></i> Secure & Reliable</div>
+        <div class="badge-item"><i class="fas fa-magic"></i> Modern Design</div>
+      </div>
+    </div>
+
+    <div class="hero-image-wrapper animate-scale-up" style="margin-top: 100px;">
+      <div class="image-container">
+        <div class="image-glow"></div>
+        <div class="hero-visual">
+    <dotlottie-player 
+        src="https://lottie.host/8065dbfb-6b3c-4123-939f-7182924983bb/S1b4RbyJ3U.lottie" 
+        background="transparent" 
+        speed="1" 
+        style="width: 100%; height: 100%;" 
+        loop 
+        autoplay>
+    </dotlottie-player>
+</div>
+        
+        <div class="floating-badge top-right">🚀 50+ Sites Delivered</div>
+        <div class="floating-badge bottom-left">⭐ 5-Star Rated</div>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<script src="https://unpkg.com/typed.js@2.1.0/dist/typed.umd.js"></script>
+<section id="features" class="features-section">
+  <div class="bg-blur"></div>
+
+  <div class="container relative">
+    <div class="section-header reveal">
+      <span class="subtitle">Why Choose Us</span>
+      <h2 class="title">Powerful <span class="text-primary">Features</span></h2>
+      <p class="description">
+        Everything you need to launch a professional website — all in one place.
+      </p>
+    </div>
+
+    <div class="features-grid reveal delay-200">
+      <div class="feature-card tilt-card" data-tilt-strength="10">
+        <div class="card-bg-gradient"></div>
+        <div class="card-content">
+          <div class="icon-box">
+            <i data-lucide="smartphone" style="color: var(--primary);"></i>
+          </div>
+          <h3>Fully Responsive</h3>
+          <p style="color: var(--muted);">Pixel-perfect on every device — mobile, tablet, and desktop.</p>
+        </div>
+      </div>
+
+      <div class="feature-card tilt-card" data-tilt-strength="10">
+        <div class="card-bg-gradient"></div>
+        <div class="card-content">
+          <div class="icon-box">
+            <i data-lucide="palette" style="color: var(--primary);"></i>
+          </div>
+          <h3>Custom Design</h3>
+          <p style="color: var(--muted);">Unique, branded designs tailored to your school or business identity.</p>
+        </div>
+      </div>
+
+      <div class="feature-card tilt-card" data-tilt-strength="10">
+        <div class="card-bg-gradient"></div>
+        <div class="card-content">
+          <div class="icon-box">
+            <i data-lucide="rocket" style="color: var(--primary);"></i>
+          </div>
+          <h3>Lightning Fast</h3>
+          <p style="color: var(--muted);">Optimized for performance with sub-second load times worldwide.</p>
+        </div>
+      </div>
+
+      <div class="feature-card tilt-card" data-tilt-strength="10">
+        <div class="card-bg-gradient"></div>
+        <div class="card-content">
+          <div class="icon-box">
+            <i data-lucide="shield-check" style="color: var(--primary);"></i>
+          </div>
+          <h3>Secure by Default</h3>
+          <p style="color: var(--muted);">Hardened security best practices baked into every project.</p>
+        </div>
+      </div>
+      <div class="feature-card tilt-card" data-tilt-strength="10">
+        <div class="card-bg-gradient"></div>
+        <div class="card-content">
+          <div class="icon-box">
+            <i data-lucide="search" style="color: var(--primary);"></i>
+          </div>
+          <h3>SEO Optimized</h3>
+          <p style="color: var(--muted);">Built to rank — semantic markup and modern SEO out of the box.</p>
+        </div>
+      </div>
+
+      <div class="feature-card tilt-card" data-tilt-strength="10">
+        <div class="card-bg-gradient"></div>
+        <div class="card-content">
+          <div class="icon-box">
+            <i data-lucide="wrench" style="color: var(--primary);"></i>
+          </div>
+          <h3>Easy to Maintain</h3>
+          <p style="color: var(--muted);">Clean architecture so updates and changes are a breeze.</p>
+        </div>
+      </div>
+      </div>
+  </div>
+</section>
+<section id="about" class="about-section">
+  <div class="container">
+    <div class="about-wrapper">
+      
+      <div class="image-column reveal-left" id="tilt-card">
+        <div class="image-inner">
+          <img src="hero-mockup-CDHXrDLs.jpg" alt="Our team" loading="lazy">
+          <div class="overlay"></div>
+        </div>
+      </div>
+
+      <div class="content-column reveal-right">
+        <span class="subtitle">Who I Am</span>
+        <h2 class="title">Crafting Digital <span class="highlight">Experiences</span></h2>
+        <p class="description">
+          WebCraft is a web development agency specializing in building modern, responsive websites for schools, businesses, and startups. We combine cutting-edge technology with stunning design to deliver websites that perform.
+        </p>
+
+        <div class="stats-grid">
+          <div class="stat-card" style="color: var(--primary);">
+            <i data-lucide="globe"></i>
+            <div class="stat-num">50+</div>
+            <div class="stat-label">Websites Built</div>
+          </div>
+          <div class="stat-card">
+            <i data-lucide="users" style="color: var(--primary);"></i>
+            <div class="stat-num">30+</div>
+            <div class="stat-label">Happy Clients</div>
+          </div>
+          <div class="stat-card">
+            <i data-lucide="award" style="color: var(--primary);"></i>
+            <div class="stat-num">2+</div>
+            <div class="stat-label">Years Experience</div>
+          </div>
+          <div class="stat-card">
+            <i data-lucide="clock" style="color: var(--primary);"></i>
+            <div class="stat-num">24/7</div>
+            <div class="stat-label">Support</div>
+          </div>
+        </div>
+
+        <a href="#contact" class="cta-button">Work With Us</a>
+      </div>
+
+    </div>
+  </div>
+</section>
+<section id="services" class="services-section">
+  <div class="bg-blur-bottom"></div>
+
+  <div class="container">
+    <div class="section-header reveal">
+      <span class="subtitle">What We Do</span>
+      <h2 class="title">Our <span class="text-primary">Services</span></h2>
+      <p class="description">
+        End-to-end web solutions for every need — from concept to deployment and beyond.
+      </p>
+    </div>
+
+    <div class="services-grid reveal delay-200">
+      
+      <div class="service-card tilt-card" data-tilt-strength="12">
+        <div class="card-overlay gradient-1"></div>
+        <div class="card-content">
+          <div class="icon-wrapper">
+            <i data-lucide="store" style="color: var(--primary); transform: scale(1.2);"></i>
+          </div>
+          <h3>E-commerce websites</h3>
+          <p>Fully custom-built websites designed to the system of e-commerce for you.</p>
+          <a href="#" class="learn-more">Learn More →</a>
+        </div>
+      </div>
+
+      <div class="service-card tilt-card" data-tilt-strength="12">
+        <div class="card-overlay gradient-2"></div>
+        <div class="card-content">
+          <div class="icon-wrapper">
+            <i data-lucide="school" style="color: var(--primary); transform: scale(1.2);"></i>
+          </div>
+          <h3>School Platforms</h3>
+          <p>Complete digital ecosystems for schools — portals, dashboards, enrollment systems.</p>
+          <a href="#" class="learn-more">Learn More →</a>
+        </div>
+      </div>
+
+      <div class="service-card tilt-card" data-tilt-strength="12">
+        <div class="card-overlay gradient-1"></div>
+        <div class="card-content">
+          <div class="icon-wrapper">
+            <i data-lucide="user" style="color: var(--primary); transform: scale(1.2);"></i>
+          </div>
+          <h3>Custom Portfolio</h3>
+          <p>Fully custom-built portfolios designed from scratch to showcase your work and achievements.</p>
+          <a href="#" class="learn-more">Learn More →</a>
+        </div>
+      </div>
+
+      <div class="service-card tilt-card" data-tilt-strength="12">
+        <div class="card-overlay gradient-2"></div>
+        <div class="card-content">
+          <div class="icon-wrapper">
+            <i data-lucide="search" style="color: var(--primary); transform: scale(1.2);"></i>
+          </div>
+          <h3>Search Websites</h3>
+          <p>Search for websites like e-commerce, e-school, and portfolio website and platforms created by us.</p>
+          <a href="#" class="learn-more">Learn More →</a>
+        </div>
+      </div>
+
+      <div class="service-card tilt-card" data-tilt-strength="12">
+        <div class="card-overlay gradient-1"></div>
+        <div class="card-content">
+          <div class="icon-wrapper">
+            <i data-lucide="cable" style="color: var(--primary); transform: scale(1.2);"></i>
+          </div>
+          <h3>Connect</h3>
+          <p>Connect with workers through their portfolios and with schools through their platforms.</p>
+          <a href="#" class="learn-more">Learn More →</a>
+        </div>
+      </div>
+
+      <div class="service-card tilt-card" data-tilt-strength="12">
+        <div class="card-overlay gradient-2"></div>
+        <div class="card-content">
+          <div class="icon-wrapper">
+            <i data-lucide="bitcoin" style="color: var(--primary); transform: scale(1.2);"></i>
+          </div>
+          <h3>Buy</h3>
+          <p>Access the virtual market when ever you are with the connection of our self made e-commerce websites.</p>
+          <a href="#" class="learn-more">Learn More →</a>
+        </div>
+      </div>
+
+      </div>
+  </div>
+</section>
+<section id="pricing" class="pricing-section">
+  <div class="bg-blur-right"></div>
+
+  <div class="container relative z-10">
+    <div class="section-header reveal">
+      <span class="subtitle">Pricing</span>
+      <h2 class="title">Simple <span class="text-primary">Pricing</span></h2>
+      <p class="description">
+        Transparent pricing with no hidden fees. Choose the plan that fits your needs.
+      </p>
+    </div>
+
+    <div class="pricing-grid reveal delay-200">
+      
+      <div class="pricing-card tilt-card" data-tilt-strength="8">
+        <div class="card-content">
+          <h3 class="plan-name">Portfolio</h3>
+          <p class="plan-desc">Websites to introduce yourself to companies like developer.</p>
+          <div class="plan-price">
+            <span class="amount">500ETB</span>
+          </div>
+          <ul class="plan-features">
+            <li><i class="fas fa-check"></i> Portfolio website</li>
+            <li><i class="fas fa-check"></i> Admin Dashboard</li>
+            <li><i class="fas fa-check"></i> CV download</li>
+            <li><i class="fas fa-check"></i> Hire form</li>
+          </ul>
+          <a href="#contact" class="btn-plan outline">Get Started</a>
+        </div>
+      </div>
+
+      <div class="pricing-card tilt-card popular" data-tilt-strength="8">
+        <div class="popular-badge">
+          <i class="fas fa-star"></i> Your Current
+        </div>
+        <div class="card-content">
+          <h3 class="plan-name">E-school</h3>
+          <p class="plan-desc">Website to digitize school activities</p>
+          <div class="plan-price">
+            <span class="amount">10000ETB</span>
+            <span class="period">/ one-time</span>
+          </div>
+          <ul class="plan-features">
+            <li><i class="fas fa-check"></i> Stake Holder Dashboards</li>
+            <li><i class="fas fa-check"></i> Front Website</li>
+            <li><i class="fas fa-check"></i> Owner Dashboard</li>
+            <li><i class="fas fa-check"></i> Information Provison</li>
+          </ul>
+          <a href="#contact" class="btn-plan solid">Get Started</a>
+        </div>
+      </div>
+
+      <div class="pricing-card tilt-card" data-tilt-strength="8">
+        <div class="card-content">
+          <h3 class="plan-name">E-commerce</h3>
+          <p class="plan-desc">Commerce website that manage stock and cart of consumers.</p>
+          <div class="plan-price">
+            <span class="amount">1000ETB</span>
+            <span class="period">/ one-time</span>
+          </div>
+          <ul class="plan-features">
+            <li><i class="fas fa-check"></i> Informal Website</li>
+            <li><i class="fas fa-check"></i> Consumer Online Buying</li>
+            <li><i class="fas fa-check"></i> Admin Dashboard</li>
+            <li><i class="fas fa-check"></i> Online selling</li>
+          </ul>
+          <a href="#contact" class="btn-plan outline">Get Started</a>
+        </div>
+        </div>
+
+    </div>
+  </div>
+</section>
+    <section id="testimonials" class="testimonials-section">
+  <div class="container relative z-10">
+    <div class="section-header reveal">
+      <span class="subtitle">Testimonials</span>
+      <h2 class="title">What Our <span class="text-primary">Clients</span> Say</h2>
+      <p class="description">
+        Don't just take our word for it — hear from some of our satisfied clients.
+      </p>
+    </div>    
+
+    <div class="testimonials-grid reveal delay-200">
+      
+      <div class="testimonial-card">
+        <i class="fas fa-quote-right quote-icon"></i>
+        <div class="stars">
+          <i class="fas fa-star"></i>
+          <i class="fas fa-star"></i>
+          <i class="fas fa-star"></i>
+          <i class="fas fa-star"></i>
+          <i class="fas fa-star"></i>
+        </div>
+        <p class="testimonial-text">"WebCraft transformed our school's online presence. The website is beautiful, easy to manage, and parents love it. Enrollment inquiries doubled in the first month!"</p>
+        <div class="client-info">
+          <div class="client-avatar">A</div>
+          <div class="client-details">
+            <p class="client-name">Aster Kebede</p>
+            <p class="client-role">Principal, Bright Future Academy</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="testimonial-card">
+        <i class="fas fa-quote-right quote-icon"></i>
+        <div class="stars">
+          <i class="fas fa-star"></i>
+          <i class="fas fa-star"></i>
+          <i class="fas fa-star"></i>
+          <i class="fas fa-star"></i>
+          <i class="fas fa-star"></i>
+        </div>
+        <p class="testimonial-text">"WebCraft provided me with an exceptional website that has greatly improved my connection for employment."</p>
+        <div class="client-info">
+          <div class="client-avatar">D</div>
+          <div class="client-details">
+            <p class="client-name">Daniel Tesfaye</p>
+            <p class="client-role">Developer</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="testimonial-card">
+        <i class="fas fa-quote-right quote-icon"></i>
+        <div class="stars">
+          <i class="fas fa-star"></i>
+          <i class="fas fa-star"></i>
+          <i class="fas fa-star"></i>
+          <i class="fas fa-star"></i>
+          <i class="fas fa-star"></i>
+        </div>
+        <p class="testimonial-text">"Professional, fast, and creative. The team delivered exactly what we envisioned and more. Our online sales have tripled since the launch."</p>
+        <div class="client-info">
+          <div class="client-avatar">M</div>
+          <div class="client-details">
+            <p class="client-name">Mohamed Ahemed</p>
+            <p class="client-role">Founder, NovaTrade Ethiopia</p>
+          </div>
+        </div>
+      </div>
+      </div>
+  </div>
+</section>
+<section id="faq" class="faq-section">
+  <div class="container max-w-3xl">
+    <div class="section-header reveal">
+      <span class="subtitle">FAQ</span>
+      <h2 class="title">Frequently Asked <span class="text-primary">Questions</span></h2>
+    </div>
+
+    <div class="faq-list reveal delay-200">
+      
+      <div class="faq-item active">
+        <div class="faq-question">
+          <i class="fas fa-question-circle" style="margin-right: -350px; color: var(--primary);"></i>
+          <h3>How long does it take to build a website?</h3>
+          <i class="fas fa-chevron-down toggle-icon"></i>
+        </div>
+        <div class="faq-answer">
+          <p>Depending on the plan, our turnaround is 5–15 business days. Simple landing pages can be delivered in as little as 3 days, while complex platforms may take up to 4 weeks.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question">
+          <i class="fas fa-question-circle" style="margin-right: -300px; color: var(--primary);"></i>
+          <h3>Can I update the website myself after launch?</h3>
+          <i class="fas fa-chevron-down toggle-icon"></i>
+        </div>
+        <div class="faq-answer">
+          <p>Yes! We provide a user-friendly content management system (CMS) that allows you to easily update your website's content, images, and more without any technical skills.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question">
+          <i class="fas fa-question-circle" style="margin-right: -350px; color: var(--primary);"></i>
+          <h3 style="margin-left: 100px;">What if I need changes after the project is delivered?</h3>
+          <i class="fas fa-chevron-down toggle-icon"></i>
+        </div>
+        <div class="faq-answer">
+          <p>We offer post-launch support and maintenance packages to accommodate any changes or updates you may need. Just reach out to our team, and we'll be happy to assist you!</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question">
+          <i class="fas fa-question-circle" style="margin-right: -300px; color: var(--primary);"></i>
+          <h3>Do you provide hosting and domain services?</h3>
+          <i class="fas fa-chevron-down toggle-icon"></i>
+        </div>
+        <div class="faq-answer">
+          <p>Yes! We can help you set up hosting and register a custom domain. We partner with top hosting providers to ensure your site is fast, secure, and always online.</p>
+        </div>
+      </div>
+
+      </div>
+  </div>
+</section>
+<section id="cta" class="cta-section">
+  <div class="cta-blobs">
+    <div class="blob blob-top"></div>
+    <div class="blob blob-bottom"></div>
+  </div>
+
+  <div class="container max-w-4xl reveal">
+    <div class="cta-badge">
+      <i class="fas fa-rocket"></i> Ready to Launch?
+    </div>
+
+    <h2 class="cta-title">
+      Let's Build Your Dream <span class="text-primary">Website</span> Today
+    </h2>
+
+    <p class="cta-description">
+      Join dozens of satisfied clients who trusted us to bring their web vision to life. 
+      Get started with a free consultation — no commitment required.
+    </p>
+
+    <div class="cta-actions">
+      <a href="#contact" class="btn btn-primary btn-xl group">
+        <span class="btn-text">Start Your Project</span>
+        <i class="fas fa-arrow-right arrow-icon"></i>
+        <div class="shimmer"></div>
+      </a>
+      
+      <a href="#pricing" class="btn btn-outline btn-xl">
+        View Pricing
+      </a>
+    </div>
+  </div>
+</section>
+<section id="contact" class="contact-section">
+  <div class="contact-bg-blob"></div>
+
+  <div class="container relative z-10">
+    <div class="section-header reveal">
+      <span class="subtitle">Contact</span>
+      <h2 class="title">Get In <span class="text-primary">Touch</span></h2>
+      <p class="description">Ready to start your project? Reach out and let's discuss your vision.</p>
+    </div>
+
+    <div class="contact-flex reveal delay-200">
+      <div class="contact-info-card">
+        <h3>Let's Talk</h3>
+        <p class="info-intro">Have a project in mind? We'd love to hear about it. Drop us a message or reach out through any of our channels.</p>
+        
+        <div class="info-list">
+          <div class="info-item">
+            <i class="fas fa-map-marker-alt"></i>
+            <div>
+              <strong>Office</strong>
+              <p>Addis Ababa, Ethiopia</p>
+            </div>
+          </div>
+          <div class="info-item">
+            <i class="fas fa-envelope"></i>
+            <div>
+              <strong>Email</strong>
+              <p>biniamzabloon@gmail.com</p>
+            </div>
+          </div>
+          <div class="info-item">
+            <i class="fas fa-phone"></i>
+            <div>
+              <strong>Phone</strong>
+              <p>+251 906 980 382</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="social-stack">
+          <a href="#" class="social-link"><i class="fab fa-youtube"></i> YouTube</a>
+          <a href="#" class="social-link"><i class="fab fa-linkedin"></i> LinkedIn</a>
+          <a href="#" class="social-link"><i class="fab fa-tiktok"></i> TikTok</a>
+        </div>
+      </div>
+
+      <form id="contact-form" class="contact-form-card">
+        <div class="form-grid">
+          <div class="form-group">
+            <label><i class="fas fa-user"></i> Name</label>
+            <input type="text" name="name" required placeholder="Zabloon Biniam">
+          </div>
+          <div class="form-group">
+            <label><i class="fas fa-envelope"></i> Email</label>
+            <input type="email" name="email" required placeholder="zabloon.biniam@example.com">
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label><i class="fas fa-lightbulb"></i> Subject</label>
+          <input type="text" name="subject" placeholder="Subject">
+        </div>
+
+        <div class="form-group">
+          <label><i class="fas fa-paper-plane"></i> Message</label>
+          <textarea name="message" rows="4" required placeholder="Tell us about your project..."></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-full group" style="cursor: pointer; outline: none; border: none;">
+          <i class="fas fa-paper-plane send-icon"></i>
+          <span style="padding-left: 5px;">Send Message</span>
+          <div class="shimmer"></div>
+        </button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container max-w-6xl">
+    
+    <div class="footer-grid">
+      
+      <div class="footer-col">
+        <h3 class="footer-logo">
+          Web<span class="text-primary">Craft</span><span class="text-accent">.</span>
+        </h3>
+        <p class="footer-text">
+          Building modern, responsive, and high-performance websites for schools, businesses, and startups.
+        </p>
+      </div>
+
+      <div class="footer-col">
+        <h4 class="footer-heading">Services</h4>
+        <ul class="footer-links">
+          <li><a href="#">Custom Websites</a></li>
+          <li><a href="#">School Platforms</a></li>
+          <li><a href="#">E-Commerce</a></li>
+          <li><a href="#">Search Websites</a></li>
+          <li><a href="#">Website Redesign</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4 class="footer-heading">Website</h4>
+        <ul class="footer-links">
+          <li><a href="#features">Features</a></li>
+          <li><a href="#about">About Us</a></li>
+          <li><a href="#services">Our Services</a></li>
+          <li><a href="#pricing">Pricing</a></li>
+          <li><a href="#testimonials">Testimonials</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4 class="footer-heading">Contact</h4>
+        <div class="contact-info">
+          <div class="contact-item">
+            <i class="fas fa-map-marker-alt"></i>
+            <span>Addis Ababa, Ethiopia</span>
+          </div>
+          <div class="contact-item">
+            <i class="fas fa-envelope"></i>
+            <span>biniamzabloon@gmail.com</span>
+          </div>
+          <div class="contact-item">
+            <i class="fas fa-code"></i>
+            <span>+251 906 980 382</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p class="copyright">
+        &copy; <span id="current-year"></span> WebCraft. All rights reserved.
+      </p>
+      <div class="legal-links">
+    <a href="#" onclick="event.preventDefault(); openLegalModal('terms')">Terms</a>
+    <a href="#" onclick="event.preventDefault(); openLegalModal('privacy')">Privacy</a>
+    <a href="#" onclick="event.preventDefault(); openLegalModal('cookies')">Cookies</a>
+</div>
+    </div>
+
+  </div>
+</footer>
+
+    <div id="modal-overlay" onclick="closeAll()">
+        <div id="custom-alert">
+    <i class="fas fa-info-circle"></i>
+    <span id="alert-text">Message here</span>
+</div>
+        <div class="signContainer" id="viewSignIn" onclick="event.stopPropagation()">
+            <h1 class="form-title">Welcome Back</h1>
+            <div class="sign-group">
+                <i class="fas fa-envelope left-icon"></i>
+                <input type="email" id="logEmail" placeholder="Email Address">
+            </div>
+            <div class="sign-group">
+    <i class="fas fa-lock left-icon"></i>
+    <input type="password" id="logPass" placeholder="Password">
+    <i class="fas fa-eye toggle-password" onclick="togglePass('logPass', this)"></i>
+</div>
+            <button class="submit-btn" id="doSignIn">Sign In</button>
+            <button class="google-btn" id="doGoogle">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="18"> Continue with Google
+            </button>
+            <div class="links">New here? <span onclick="navTo('viewSignUp')">Register</span></div>
+        </div>
+
+        <div class="signContainer" id="viewSignUp" onclick="event.stopPropagation()">
+            <h1 class="form-title">Create Account</h1>
+            <div class="sign-group"><i class="fas fa-user left-icon"></i><input type="text" id="regName" placeholder="Full Name"></div>
+            <div class="sign-group"><i class="fas fa-envelope left-icon"></i><input type="email" id="regEmail" placeholder="Email Address"></div>
+<div class="sign-group">
+    <i class="fas fa-lock left-icon"></i>
+    <input type="password" id="regPass" placeholder="Password (min. 6 chars)">
+    <i class="fas fa-eye toggle-password" onclick="togglePass('regPass', this)"></i>
+</div>
+            <button class="submit-btn" id="requestOTP">Log In</button>
+            <div id="regLoader" class="reg-loader"></div>
+            <div class="links">Already registered? <span onclick="navTo('viewSignIn')">Log In</span></div>
+        </div>
+
+        <div class="signContainer" id="viewProfile" onclick="event.stopPropagation()">
+            <div style="text-align: center;">
+                <h1 id="userGreet">Hello!</h1>
+                <p id="userMail" style="color: #94a3b8; margin-bottom: 30px;"></p>
+                <button class="submit-btn" id="doSignOut" style="background: var(--error)">Log Out</button>
+            </div>
+        </div>
+
+    </div>
+<!-- BANK PAYMENT MODAL - Ethiopian Context -->
+<div id="bankPaymentModal" class="bank-modal-overlay">
+    <div class="bank-modal" onclick="event.stopPropagation()">
+        <div class="modal-header">
+            <h3><i class="fas fa-university"></i> Bank Transfer (Ethiopia)</h3>
+            <button class="close-modal" id="closeBankModalBtn"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="bank-note">
+            <i class="fas fa-shield-alt"></i> 
+            <span>Secure payment via CBE, Dashen, Awash, or other local banks. We'll verify within 24h.</span>
+        </div>
+        <form id="bankPaymentForm">
+            <input type="hidden" id="selectedPlanName">
+            <input type="hidden" id="selectedAmount">
+            <div class="form-group">
+                <label><i class="fas fa-user"></i> Full Name (as per bank account)</label>
+                <input type="text" id="accountHolder" placeholder="Full name" required>
+            </div>
+            <div class="form-group">
+                <label><i class="fas fa-building"></i> Select Bank</label>
+                <select id="bankSelect" required>
+                    <option value="" disabled selected>-- Choose your bank --</option>
+                    <option value="Commercial Bank of Ethiopia (CBE)">Commercial Bank of Ethiopia (CBE)</option>
+                    <option value="Dashen Bank">Dashen Bank</option>
+                    <option value="Awash Bank">Awash Bank</option>
+                    <option value="Abyssinia Bank">Abyssinia Bank</option>
+                    <option value="Hibret Bank">Hibret Bank</option>
+                    <option value="Oromia Bank">Oromia International Bank</option>
+                    <option value="Nib Bank">Nib International Bank</option>
+                    <option value="Zemen Bank">Zemen Bank</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label><i class="fas fa-credit-card"></i> Bank Account Number</label>
+                <input type="text" id="accountNumber" placeholder="Account number" required>
+            </div>
+            <div class="form-group">
+                <label><i class="fas fa-phone"></i> Phone Number (for reference)</label>
+                <input type="text" id="paymentRef" placeholder="09XX XXX XXX">
+            </div>
+            <button type="submit" class="btn-submit-payment">Confirm & Submit Payment Request</button>
+            <div class="payment-status" id="paymentMsg"></div>
+        </form>
+    </div>
+</div>
+
+<!-- LEGAL MODALS: Terms, Privacy, Cookies -->
+<div id="legalModal" class="legal-modal-overlay">
+    <div class="legal-modal" onclick="event.stopPropagation()">
+        <div class="modal-header">
+            <h3 id="legalModalTitle"><i class="fas fa-file-contract"></i> Terms of Service</h3>
+            <button class="close-legal-modal"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="legal-content" id="legalContent">
+            <!-- Dynamic content loads here -->
+        </div>
+    </div>
+</div>
+
+<!-- SERVICE DETAILS MODAL -->
+<div id="serviceModal" class="service-modal-overlay">
+    <div class="service-modal" onclick="event.stopPropagation()">
+        <div class="modal-header">
+            <h3 id="serviceModalTitle"><i class="fas fa-info-circle"></i> Service Details</h3>
+            <button class="close-service-modal"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="service-modal-content" id="serviceModalContent">
+            <!-- Dynamic content loads here -->
+        </div>
+    </div>
+</div>
+</body>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script src="https://unpkg.com/@dotlottie/player-component@latest/dist/dotlottie-player.mjs" type="module"></script>
+<script src="sign.js" type="module"></script>
+<script src="webCraft.js"></script>
+</html>

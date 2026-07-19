@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduVend | School Store Command</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --primary: #ca8a04; /* Harvest Gold */
+            --primary-light: #fefce8;
+            --secondary: #1e293b;
+            --bg: #f8fafc;
+            --white: #ffffff;
+            --text: #334155;
+            --danger: #dc2626;
+            --success: #16a34a;
+            --border: #e2e8f0;
+            --radius: 12px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+        }
+
+        .wrapper {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            min-height: 100vh;
+        }
+
+        /* --- Sidebar --- */
+        .sidebar {
+            background: var(--secondary);
+            color: white;
+            padding: 2rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 800;
+            font-size: 1.4rem;
+            color: var(--primary);
+            margin-bottom: 3rem;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0.8rem 1rem;
+            text-decoration: none;
+            color: #94a3b8;
+            font-weight: 600;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            transition: 0.3s;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+
+        .nav-item.active { border-left: 4px solid var(--primary); }
+
+        /* --- Main --- */
+        .main { padding: 2.5rem; }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* --- Stats --- */
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .stat-card {
+            background: var(--white);
+            padding: 1.5rem;
+            border-radius: var(--radius);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border-bottom: 3px solid var(--border);
+        }
+
+        .stat-card h4 { font-size: 0.75rem; color: #64748b; text-transform: uppercase; }
+        .stat-card p { font-size: 1.5rem; font-weight: 800; margin-top: 0.5rem; color: var(--secondary); }
+
+        /* --- Dashboard Body --- */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1.6fr 1fr;
+            gap: 2rem;
+        }
+
+        .panel {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+        }
+
+        .panel-title { font-weight: 800; margin-bottom: 1.5rem; font-size: 1.1rem; }
+
+        /* --- Inventory Table --- */
+        .item-list { width: 100%; border-collapse: collapse; }
+        .item-list th { text-align: left; font-size: 0.75rem; color: #94a3b8; padding-bottom: 1rem; }
+        .item-list td { padding: 1rem 0; border-top: 1px solid var(--border); font-size: 0.9rem; }
+
+        .stock-tag {
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+        .low { background: #fee2e2; color: #dc2626; }
+        .good { background: #dcfce7; color: #16a34a; }
+
+        /* --- Order Sidebar --- */
+        .order-card {
+            background: var(--bg);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--primary);
+        }
+
+        @media (max-width: 1024px) {
+            .wrapper { grid-template-columns: 1fr; }
+            .sidebar { display: none; }
+            .stat-grid { grid-template-columns: repeat(2, 1fr); }
+            .content-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="wrapper">
+        <aside class="sidebar">
+            <div class="logo">
+                <i data-lucide="shopping-cart"></i>
+                <span>EduVend</span>
+            </div>
+            <nav>
+                <a href="#" class="nav-item active"><i data-lucide="layout-dashboard"></i> Dashboard</a>
+                <a href="#" class="nav-item"><i data-lucide="package"></i> Inventory</a>
+                <a href="#" class="nav-item"><i data-lucide="truck"></i> Purchase Orders</a>
+                <a href="#" class="nav-item"><i data-lucide="users"></i> Student Accounts</a>
+                <a href="#" class="nav-item"><i data-lucide="bar-chart-3"></i> Sales Reports</a>
+            </nav>
+        </aside>
+
+        <main class="main">
+            <header class="header">
+                <div>
+                    <h1 style="font-weight: 800;">Store Overview</h1>
+                    <p style="color: #64748b;">Managing: <strong>Central Campus Store</strong></p>
+                </div>
+                <button class="btn-primary"><i data-lucide="plus"></i> New Transaction</button>
+            </header>
+
+            <div class="stat-grid">
+                <div class="stat-card">
+                    <h4>Today's Sales</h4>
+                    <p>$1,240.50</p>
+                </div>
+                <div class="stat-card">
+                    <h4>Orders to Pick Up</h4>
+                    <p>18</p>
+                </div>
+                <div class="stat-card" style="border-bottom-color: var(--danger);">
+                    <h4>Low Stock Items</h4>
+                    <p style="color: var(--danger);">06</p>
+                </div>
+                <div class="stat-card">
+                    <h4>Active Pre-orders</h4>
+                    <p>42</p>
+                </div>
+            </div>
+
+            <div class="content-grid">
+                <section class="panel">
+                    <h3 class="panel-title">Recent Inventory Activity</h3>
+                    <table class="item-list">
+                        <thead>
+                            <tr>
+                                <th>Product Name</th>
+                                <th>Category</th>
+                                <th>Stock</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Varsity Jacket (Large)</strong></td>
+                                <td>Apparel</td>
+                                <td>12</td>
+                                <td><span class="stock-tag good">IN STOCK</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Scientific Calculator</strong></td>
+                                <td>Stationery</td>
+                                <td>3</td>
+                                <td><span class="stock-tag low">LOW STOCK</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>School Tie (Standard)</strong></td>
+                                <td>Uniform</td>
+                                <td>45</td>
+                                <td><span class="stock-tag good">IN STOCK</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Spiral Notebook (A4)</strong></td>
+                                <td>Stationery</td>
+                                <td>2</td>
+                                <td><span class="stock-tag low">CRITICAL</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </section>
+
+                <aside>
+                    <div class="panel">
+                        <h3 class="panel-title">Pending Pickups</h3>
+                        
+                        <div class="order-card">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                                <strong style="font-size: 0.9rem;">Order #8821</strong>
+                                <span style="font-size: 0.7rem; color: #64748b;">10 mins ago</span>
+                            </div>
+                            <p style="font-size: 0.8rem;">Student: <strong>Mark Harrison</strong></p>
+                            <p style="font-size: 0.75rem; color: #64748b;">Items: 2x Polo Shirt, 1x Gym Shorts</p>
+                        </div>
+
+                        <div class="order-card">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                                <strong style="font-size: 0.9rem;">Order #8819</strong>
+                                <span style="font-size: 0.7rem; color: #64748b;">1 hr ago</span>
+                            </div>
+                            <p style="font-size: 0.8rem;">Student: <strong>Sophia Lee</strong></p>
+                            <p style="font-size: 0.75rem; color: #64748b;">Items: 1x Winter Coat</p>
+                        </div>
+
+                        <button style="width: 100%; padding: 0.75rem; background: var(--secondary); color: white; border: none; border-radius: 8px; font-weight: 700; cursor: pointer;">View All Pickups</button>
+                    </div>
+
+                    <div class="panel" style="margin-top: 1.5rem; background: var(--primary-light); border: 1px dashed var(--primary);">
+                        <h4 style="font-size: 0.8rem; color: var(--primary); display: flex; align-items: center; gap: 5px;">
+                            <i data-lucide="info" size="16"></i> Restock Needed
+                        </h4>
+                        <p style="font-size: 0.75rem; margin-top: 5px;">Vendor delivery for <strong>Athletic Gear</strong> is scheduled for Wednesday.</p>
+                    </div>
+                </aside>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>

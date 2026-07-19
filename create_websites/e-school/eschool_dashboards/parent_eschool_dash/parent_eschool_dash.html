@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parent Dashboard</title>
+    <link rel="stylesheet" href="dashboard_parent.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+    <div class="dashboard">
+        <!-- Desktop Sidebar -->
+        <aside class="sidebar expanded" id="desktopSidebar">
+            <div class="sidebar-content">
+                <div class="logo-area">
+                    <div class="logo-icon"><i class="fas fa-graduation-cap"></i></div>
+                    <span class="logo-text">EB Academy</span>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-header">Parent Portal</div>
+                    <nav id="desktopNav"></nav>
+                </div>
+                <div class="sidebar-footer">
+                    <div class="user-card">
+                        <div class="avatar"><i class="fas fa-user"></i></div>
+                        <div class="user-info">
+                            <h4 class="user-name">Parent Account</h4>
+                            <p>parent@ebacademy.edu</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Mobile Sidebar -->
+        <div class="mobile-sidebar" id="mobileSidebar">
+            <div class="sidebar-content">
+                <div class="logo-area">
+                    <div class="logo-icon"><i class="fas fa-graduation-cap"></i></div>
+                    <span class="logo-text">EB Academy</span>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-header">Parent Portal</div>
+                    <nav id="mobileNav"></nav>
+                </div>
+            </div>
+        </div>
+        <div class="mobile-overlay" id="mobileOverlay"></div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <header class="header">
+                <button class="menu-btn" id="menuBtn"><i class="fas fa-bars"></i></button>
+                <button class="desktop-toggle" id="toggleSidebar"><i class="fas fa-chevron-left"></i></button>
+                <div class="header-title">
+                    <p>Parent Dashboard</p>
+                    <h1 id="currentViewTitle">Overview</h1>
+                </div>
+                <div class="header-actions">
+                    <button class="icon-btn" id="themeToggle"><i class="fas fa-moon"></i></button>
+                    <button class="icon-btn" id="settingsBtn"><i class="fas fa-cog"></i></button>
+                </div>
+            </header>
+            <main id="mainContent"></main>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Settings</h3>
+                <button class="close-modal" id="closeSettings">&times;</button>
+            </div>
+            <div class="form-group">
+                <label>Theme Preference</label>
+                <select id="themeSelect">
+                    <option value="dark">Dark</option>
+                    <option value="light">Light</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Student Name</label>
+                <input type="text" id="studentNameSetting" placeholder="Student Name">
+            </div>
+            <button class="btn-primary" id="saveSettings">Save Changes</button>
+        </div>
+    </div>
+
+</body>
+<script src="dashboard_parent.js"></script>
+</html>

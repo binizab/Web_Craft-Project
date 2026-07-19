@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduTrack Pro | Live Exam & Results</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://unpkg.com/dexie/dist/dexie.js"></script>
+    <style>
+        :root {
+            --bg: #f4f7f9; --surface: #ffffff; --border: #e1e4e8;
+            --text: #24292e; --accent: #0366d6; --success: #28a745;
+            --danger: #d73a49; --warning: #f1e05a; --muted: #6a737d;
+        }
+        body { font-family: 'Poppins', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; }
+        
+        .exam-header { 
+            background: #fff; border-bottom: 2px solid var(--accent); 
+            padding: 15px 0; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .header-content { max-width: 900px; margin: auto; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; }
+        
+        .container { max-width: 850px; margin: 30px auto; padding: 0 20px; }
+        
+        .q-card { 
+            background: var(--surface); border: 1px solid var(--border); 
+            border-radius: 12px; padding: 30px; margin-bottom: 25px; 
+        }
+        .q-text { font-size: 1.1rem; font-weight: 500; margin-bottom: 20px; }
+        
+        .option-item { 
+            display: flex; align-items: center; gap: 12px; padding: 12px; 
+            border: 1px solid var(--border); border-radius: 8px; margin-bottom: 10px; cursor: pointer;
+        }
+
+        /* Result Overlay */
+        #resultView { 
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(13, 17, 23, 0.95); z-index: 1000; color: white;
+            flex-direction: column; align-items: center; justify-content: center; text-align: center;
+        }
+        .result-card { background: #161b22; padding: 50px; border-radius: 20px; border: 1px solid #30363d; max-width: 500px; }
+        .score-circle { 
+            width: 120px; height: 120px; border-radius: 50%; border: 5px solid var(--accent);
+            display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: 800; margin: 20px auto;
+        }
+
+        textarea, input[type="text"] { width: 100%; padding: 15px; border: 1px solid var(--border); border-radius: 8px; box-sizing: border-box; }
+        .btn-submit { background: var(--success); color: white; border: none; padding: 18px; border-radius: 10px; font-weight: 700; cursor: pointer; width: 100%; }
+        
+        /* Matching */
+        .drop-zone { border: 2px dashed var(--border); border-radius: 8px; padding: 10px; min-height: 40px; background: #fafbfc; margin-top: 10px;}
+        .drag-box { background: var(--accent); color: white; padding: 5px 12px; border-radius: 6px; cursor: grab; display: inline-block; margin: 5px; }
+    </style>
+</head>
+<body>
+
+<div id="resultView">
+    <div class="result-card">
+        <i data-lucide="award" size="48" color="#f1e05a"></i>
+        <h1>Exam Completed!</h1>
+        <p id="resName">Student Name</p>
+        <div class="score-circle" id="scoreCircle">0/0</div>
+        <h2 id="resPercent">0%</h2>
+        <p id="resStatus" style="font-weight: 700; font-size: 1.2rem;"></p>
+        <button class="btn-submit" style="margin-top:20px" onclick="location.href='ExamLobby.html'">Back to Lobby</button>
+    </div>
+</div>
+
+<div class="exam-header">
+    <div class="header-content">
+        <div>
+            <h2 id="examTitle" style="margin:0;">Loading...</h2>
+            <div style="color:var(--muted); font-size: 0.85rem;">Student: <span id="stuNameLabel">---</span></div>
+        </div>
+        <div id="timer" style="font-size: 1.5rem; color:var(--danger); font-weight:bold;">00:00</div>
+    </div>
+</div>
+
+<div class="container">
+    <div id="examPaper"></div>
+    <button class="btn-submit" id="mainSubmit" onclick="calculateResults()">FINISH AND VIEW RESULTS</button>
+</div>
+<script src="https://unpkg.com/dexie/dist/dexie.js"></script>
+<script>
+    const db = new Dexie("EduTrackDB");
+    db.version(1).stores({ exams: '++id, title, startTime, status' });
+
+    let currentExam = null;
+    let studentName = "";
+
+    // Update the window.onload in test.html
+window.onload = async () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const examId = urlParams.get('id');
+    
+    // 1. Retrieve authorized names from the Marklist
+    const authorizedNames = JSON.parse(localStorage.getItem('OFFICIAL_STUDENT_LIST') || '[]');
+
+    if (authorizedNames.length === 0) {
+        alert("⚠️ Error: Student list not found. Please ask the teacher to open the Marklist page first.");
+        window.location.href = 'ExamLobby.html';
+        return;
+    }
+
+    // 2. Prompt for name and Validate
+    studentName = prompt("Please enter your full name as it appears on the Marklist:");
+    
+    if (!studentName || !authorizedNames.includes(studentName.trim())) {
+        alert(`❌ Access Denied: "${studentName}" is not registered in the official Marklist.`);
+        return alert(studentName ? "Please check the spelling and try again." : "Name cannot be empty. Please refresh and enter your name.");
+    }
+
+    // 3. If valid, continue loading the exam
+    document.getElementById('stuNameLabel').innerText = studentName;
+    if (examId) {
+currentExam = await db.exams.get(parseInt(examId));
+      if (currentExam) renderExam(currentExam);
+    }
+    lucide.createIcons();
+};
+
+    function renderExam(exam) {
+        document.getElementById('examTitle').innerText = exam.title;
+        const paper = document.getElementById('examPaper');
+        let html = '';
+
+        exam.questions.forEach((q, i) => {
+            html += `<div class="q-card" data-index="${i}" data-type="${q.type}">
+                <div class="q-text"><strong>Q${i+1}.</strong> ${q.text}</div>`;
+
+            if (q.type === 'tf' || q.type === 'mcq') {
+                const options = q.type === 'tf' ? ['True', 'False'] : q.options;
+                options.forEach(opt => {
+                    html += `<label class="option-item"><input type="radio" name="ans${i}" value="${opt}"> ${opt}</label>`;
+                });
+            } else if (q.type === 'fill' || q.type === 'short') {
+                html += `<input type="text" class="text-ans" placeholder="Your answer...">`;
+            } else if (q.type === 'match') {
+                html += `<div class="drop-zone" id="drop${i}" ondrop="drop(event)" ondragover="allowDrop(event)">Drop Match Here</div>
+                         <div class="drag-box" draggable="true" ondragstart="drag(event)" id="drag${i}">${q.matchB}</div>`;
+            }
+            html += `</div>`;
+        });
+        paper.innerHTML = html;
+        startTimer(exam.duration);
+    }
+
+    async function calculateResults() {
+    if (!currentExam) return;
+    let score = 0;
+    const total = currentExam.questions.length;
+
+    // 1. Loop through questions to calculate the final score
+    currentExam.questions.forEach((q, i) => {
+        const card = document.querySelector(`[data-index="${i}"]`);
+        if (!card) return;
+
+        let studentAns = "";
+        if (q.type === 'tf' || q.type === 'mcq') {
+            const selected = card.querySelector(`input[name="ans${i}"]:checked`);
+            studentAns = selected ? selected.value : "";
+        } else if (q.type === 'fill' || q.type === 'short') {
+            studentAns = card.querySelector(`.text-ans`)?.value.trim() || "";
+        } else if (q.type === 'match') {
+            const dropped = card.querySelector('.drop-zone .drag-box');
+            studentAns = dropped ? dropped.innerText : "";
+        }
+
+        let correctKey = q.ans || q.answer || q.matchB || "";
+        if (studentAns && correctKey && studentAns.toLowerCase() === correctKey.toLowerCase()) {
+            score++;
+        }
+    });
+
+    // 2. FIXED STORAGE LOGIC: Using an Object {} instead of an Array []
+    // Get the category (test, cw, hw, pt, ex) set by the publisher
+    const category = localStorage.getItem('active_category') || 'ex';
+    
+    // Initialize as an object if it doesn't exist
+    let globalScores = JSON.parse(localStorage.getItem('EB_GLOBAL_SCORES') || '{}');
+
+    // Create an entry for the student if it's their first time
+    if (!globalScores[studentName]) {
+        globalScores[studentName] = {};
+    }
+
+    // Save the score under the specific category (e.g., globalScores["Abebe"]["ex"] = 45)
+    globalScores[studentName][category] = score;
+
+    // Save back to localStorage
+    localStorage.setItem('EB_GLOBAL_SCORES', JSON.stringify(globalScores));
+
+    // 3. Show visual feedback
+    showResultModal(score, total);
+}
+    function showResultModal(score, total) {
+        const percent = Math.round((score / total) * 100);
+        document.getElementById('resultView').style.display = 'flex';
+        document.getElementById('resName').innerText = studentName;
+        document.getElementById('scoreCircle').innerText = `${score}/${total}`;
+        document.getElementById('resPercent').innerText = `${percent}%`;
+        
+        const status = document.getElementById('resStatus');
+        if (percent >= 75) {
+            status.innerText = "PASSED";
+            status.style.color = "var(--success)";
+        } else {
+            status.innerText = "FAILED";
+            status.style.color = "var(--danger)";
+        }
+    }
+
+    function startTimer(mins) {
+        let seconds = mins * 60;
+        const display = document.getElementById('timer');
+        const timer = setInterval(() => {
+            let m = Math.floor(seconds / 60);
+            let s = seconds % 60;
+            display.innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
+            if (seconds <= 0) { clearInterval(timer); calculateResults(); }
+            seconds--;
+        }, 1000);
+    }
+
+    /* Drag Logic */
+    function allowDrop(ev) { ev.preventDefault(); }
+    function drag(ev) { ev.dataTransfer.setData("text", ev.target.id); }
+    function drop(ev) {
+        ev.preventDefault();
+        const data = ev.dataTransfer.getData("text");
+        ev.target.innerHTML = "";
+        ev.target.appendChild(document.getElementById(data));
+    }
+</script>
+</body>
+</html>

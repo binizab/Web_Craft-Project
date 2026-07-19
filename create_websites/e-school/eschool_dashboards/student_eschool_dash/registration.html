@@ -1,0 +1,1364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EB Academy | Student Registration</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root { 
+            --bg: #09090b; 
+            --card: #18181b; 
+            --accent: rgb(79, 79, 232); 
+            --text: #ffffff; 
+            --dim: #71717a; 
+            --border: #27272a; 
+            --input-bg: #000000; 
+            --primary: #1e293b; 
+            --sky: #38bdf8;
+            --card-bg: #161e2d;
+            --electric-blue: #3b82f6;
+            --glow-blue: rgba(59, 130, 246, 0.4);
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+            --glow: rgba(59, 130, 246, 0.3);
+        }
+
+        body { font-family: 'Poppins', sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 20px; display: flex; justify-content: center; }
+        .reg-container { width: 100%; max-width: 900px; }
+        .header-box { text-align: center; padding: 40px; background: linear-gradient(180deg, #1c1c1f 0%, var(--bg) 100%); border-radius: 24px; border: 1px solid var(--border); margin-bottom: 30px; }
+        .header-box h1 { font-size: 2.5rem; color: var(--accent); margin: 0; }
+        .selector { display: flex; justify-content: center; gap: 20px; margin-bottom: 30px; }
+        .type-btn { background: var(--card); border: 1px solid var(--border); color: var(--dim); padding: 15px 30px; border-radius: 12px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        .type-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(212, 175, 55, 0.05); }
+        .form-section { background: var(--card); padding: 40px; border-radius: 24px; border: 1px solid var(--border); display: none; }
+        .form-section.active { display: block; }
+        .section-title { font-size: 1.2rem; color: var(--accent); border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 25px; display: flex; align-items: center; gap: 10px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+        .photo-upload { width: 150px; height: 150px; background: var(--input-bg); border: 2px dashed var(--border); border-radius: 15px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; margin-bottom: 20px; overflow: hidden; position: relative; }
+        .photo-upload img { width: 100%; height: 100%; object-fit: cover; display: none; position: absolute; top: 0; left: 0; }
+        label { display: block; font-size: 0.85rem; color: var(--dim); margin-bottom: 8px; }
+        input, select, textarea { width: 100%; padding: 12px; background: var(--input-bg); border: 1px solid var(--border); border-radius: 8px; color: white; margin-bottom: 15px; box-sizing: border-box; }
+        .submit-btn { background: var(--accent); color: #000; padding: 18px; border: none; border-radius: 12px; width: 100%; font-size: 1.1rem; font-weight: bold; cursor: pointer; margin-top: 20px; transition: 0.2s; }
+        .submit-btn:hover { opacity: 0.9; }
+        textarea {
+            resize: vertical;
+        }
+        .overlay, .file-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(8px);
+            justify-content: center;
+            align-items: center;
+            z-index: 20;
+        }
+
+        .file-overlay { 
+            z-index: 30; 
+            backdrop-filter: blur(12px); 
+            overflow-y: auto;
+            padding: 20px 0;
+        }
+
+        .contain {
+            width: 500px;
+            background: #1e293b;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        }
+
+        .contain-large {
+            width: 600px;
+            background: #1e293b;
+            padding: 30px;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .copy-wrapper, .id-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            background: rgba(255,255,255,0.05);
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+
+        .copy-btn, .eye-btn, .btn-secondary, .btn-primary {
+            background: transparent;
+            border: 1px solid var(--sky);
+            color: var(--sky);
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.8rem;
+            transition: 0.3s;
+        }
+
+        .copy-btn svg, .eye-btn svg { fill: var(--sky); transition: 0.3s; }
+
+        .copy-btn:hover, .eye-btn:hover, .btn-secondary:hover, .btn-primary:hover {
+            background: var(--sky);
+            color: #0f172a;
+        }
+
+        .copy-btn:hover svg, .eye-btn:hover svg { fill: #0f172a; }
+
+        .close-btn { margin-top: 15px; font-size: 0.8rem; color: #64748b; cursor: pointer; text-decoration: underline; }
+        .passkey-text { letter-spacing: 2px; font-family: 'Poppins', sans-serif; }
+        h4 { text-align: left; margin: 15px 0 5px 10px; color: #38bdf8; font-size: 0.9rem; }
+
+        .container {
+            width: 500px; 
+            height: 300px; 
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            overflow: hidden;
+            border: 1px solid #ddd;
+            position: relative;
+            text-align: center;
+            color: black;
+        }
+
+        .header-logo {
+            width: 60px;
+            margin-top: 30px;
+            margin-left: -160px;
+            position: absolute;
+            transform: scale(1.2);
+        }
+
+        .student-photo {
+            width: 140px;
+            height: 180px;
+            object-fit: cover;
+            border: 3px solid var(--primary);
+            border-radius: 10px;
+            margin: 10px auto;
+            position: absolute;
+            transform: scale(1.1);
+            margin-top: -20px;
+            margin-left: 90px;
+        }
+
+        .body h3 { font-size: small; line-height: 3px; }
+        .blue { color: rgb(2, 2, 138); }
+        .separetor { color: rgb(161, 137, 3); font-weight: 900; margin-top: -25px; }
+        .row1, .row2, .row3 { display: flex; flex-direction: row; }
+
+        .print-btn-large {
+            background: var(--sky);
+            color: #0f172a;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+        }
+
+        /* FIXED PRINT LOGIC */
+        @media print {
+            @page { margin: 0; }
+            body { background: white !important; }
+            
+            /* Hide everything in the body */
+            body * { visibility: hidden; }
+
+            /* Show ONLY the fileOverlay and its children */
+            #fileOverlay, #fileOverlay * {
+                visibility: visible;
+            }
+
+            /* Position the overlay for the print page */
+            #fileOverlay {
+                display: block !important;
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                background: white !important;
+                backdrop-filter: none !important;
+                padding: 0;
+                margin: 0;
+            }
+
+            /* Center the IDs on the printed page */
+            .contain-large {
+                box-shadow: none !important;
+                background: white !important;
+                width: 100% !important;
+                border: none !important;
+                padding: 20px 0 !important;
+                gap: 50px !important;
+            }
+
+            /* Hide the text headers and UI buttons while printing */
+            .previewH3, .print-btn-large, .btn-secondary, .main-trigger, .close-btn {
+                display: none !important;
+            }
+
+            .container {
+                box-shadow: none !important;
+                border: 1px solid #000 !important;
+                margin: 0 auto !important;
+                page-break-inside: avoid;
+                display: block;
+            }
+        }
+
+        .none {
+            display: flex;
+        }
+        #out-name {
+            border-bottom: 2px solid #000;
+            offset-distance: 2px;
+            padding-left: 45px;
+            padding-right: 45px;
+    
+        }
+        #out-no {
+            border-bottom: 2px solid #000;
+            offset-distance: 2px;
+            padding-left: 50px;
+            padding-right: 50px;
+    
+        }
+        #out-year {
+            border-bottom: 2px solid #000;
+            offset-distance: 2px;
+            padding-left: 30px;
+            padding-right: 30px;
+    
+        }
+        #out-class {
+            border-bottom: 2px solid #000;
+            offset-distance: 2px;
+            padding-left: 60px;
+            padding-right: 60px;
+    
+        }
+        #out-subcity {
+            border-bottom: 2px solid #000;
+            offset-distance: 2px;
+            padding-left: 40px;
+            padding-right: 40px;
+    
+        }
+        #out-kebele {
+            border-bottom: 2px solid #000;
+            offset-distance: 2px;
+            padding-left: 40px;
+            padding-right: 40px;
+    
+        }
+        #out-house {
+            border-bottom: 2px solid #000;
+            offset-distance: 2px;
+            padding-left: 40px;
+            padding-right: 40px;
+    
+        }
+        #out-moblie {
+            border-bottom: 2px solid #000;
+            offset-distance: 2px;
+            padding-left: 40px;
+            padding-right: 40px;
+    
+        }
+        #out-telephone {
+            border-bottom: 2px solid #000;
+            offset-distance: 2px;
+            padding-left: 40px;
+            padding-right: 40px;
+    
+        }
+        #out-contact {
+            border-bottom: 2px solid #000;
+            offset-distance: 2px;
+            padding-left: 100px;
+            padding-right: 100px;
+    
+        }
+        #out-date {
+            border-bottom: 2px solid #000;
+            offset-distance: 2px;
+            padding-left: 100px;
+            padding-right: 100px;
+    
+        }
+        #out-valid {
+            border-bottom: 2px solid #000;
+            offset-distance: 2px;
+            padding-left: 100px;
+            padding-right: 100px;
+    
+        }
+        #out-sign {
+            border-bottom: 2px solid #000;
+            offset-distance: 2px;
+            padding-left: 100px;
+            padding-right: 100px;
+    
+        }
+
+        #out-sign img{
+            width: 50px;
+            height: 25px;
+            transform: rotate(-5deg);
+        }
+
+        .phone-container {
+        font-family: sans-serif;
+        margin: 10px 0;
+    }
+    .input-group {
+        display: flex;
+        align-items: center;
+        margin-top: 5px;
+    }
+    .prefix {
+        background: #000;
+        border-right: none;
+        padding: 10px 12px;
+        border-radius: 4px 0 0 4px;
+        font-weight: bold;
+        color: #555;
+        margin-top: -15px;
+    }
+    #ethio-phone {
+        padding: 10px;
+        border-radius: 0 4px 4px 0;
+        outline: none;
+        font-size: 16px;
+        width: 180px;
+        border: none;
+    }
+
+    select option {
+    padding: 10px;
+    background-color: #040404;
+    color: #f7f8fc;
+    }
+
+        .container-cloth {
+            background: var(--card-bg);
+            display: flex;
+            flex-wrap: wrap;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.7);
+            max-width: 950px;
+            width: 95%;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        /* Image Side */
+        .preview-side {
+            flex: 1;
+            min-width: 400px;
+            background: #000;
+            display: flex;
+            overflow: hidden;
+        }
+
+        #uniform-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: opacity 0.4s ease, transform 0.6s ease;
+        }
+
+        /* Content Side */
+        .content-side {
+            flex: 1;
+            padding: 40px;
+            min-width: 320px;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            margin: 0;
+            color: var(--text-main);
+        }
+
+        .price-display {
+            font-size: 1.5rem;
+            color: var(--electric-blue);
+            font-weight: bold;
+            margin: 10px 0 25px 0;
+        }
+
+        .label-title {
+            display: block;
+            text-transform: uppercase;
+            font-size: 0.7rem;
+            letter-spacing: 2px;
+            color: var(--text-dim);
+            margin-bottom: 12px;
+            font-weight: 700;
+        }
+
+        /* Gender Logic */
+        .gender-options {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+
+        .gender-btn { flex: 1; position: relative; }
+        .gender-btn input { position: absolute; opacity: 0; }
+        .gender-label {
+            display: block;
+            text-align: center;
+            padding: 14px;
+            background: var(--input-bg);
+            border: 2px solid transparent;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .gender-btn input:checked + .gender-label {
+            border-color: var(--electric-blue);
+            background: rgba(59, 130, 246, 0.1);
+            box-shadow: 0 0 20px var(--glow-blue);
+        }
+
+        /* Amount Shower (Quantity Selector) */
+        .amount-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: var(--input-bg);
+            width: fit-content;
+            padding: 5px;
+            border-radius: 12px;
+            margin-bottom: 35px;
+        }
+
+        .qty-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            border: none;
+            background: #334155;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .qty-btn:hover { background: var(--electric-blue); }
+
+        #qty-val {
+            font-size: 1.2rem;
+            font-weight: bold;
+            min-width: 30px;
+            text-align: center;
+        }
+
+        /* Size Select */
+        .select {
+            width: 100%;
+            padding: 15px;
+            background: var(--input-bg);
+            border: none;
+            color: white;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            outline: none;
+        }
+
+        .buy-btn {
+            width: 100%;
+            padding: 20px;
+            background: var(--electric-blue);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            font-size: 1rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .buy-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px var(--glow-blue);
+        }
+
+        @media (max-width: 768px) {
+            .container-cloth { flex-direction: column; }
+            .preview-side { min-width: 100%; height: 350px; }
+        }
+
+        .cart-container {
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 500px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        h1 { font-size: 1.8rem; margin: 0 0 10px 0; color: var(--electric-blue); }
+        p.desc { color: var(--text-dim); font-size: 0.9rem; margin-bottom: 25px; }
+
+        .label-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            text-transform: uppercase;
+            font-size: 0.7rem;
+            letter-spacing: 1.5px;
+            color: var(--text-dim);
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        /* Select All Styling */
+        .select-all-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            color: var(--electric-blue);
+        }
+
+        .book-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 30px;
+            max-height: 300px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        .book-item {
+            display: flex;
+            align-items: center;
+            background: rgba(15, 23, 42, 0.5);
+            padding: 15px;
+            border-radius: 12px;
+            cursor: pointer;
+            border: 1px solid transparent;
+        }
+
+        input[type="checkbox"] {
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border: 2px solid var(--electric-blue);
+            border-radius: 4px;
+            cursor: pointer;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        input[type="checkbox"]:checked { background: var(--electric-blue); }
+        input[type="checkbox"]:checked::after {
+            content: "✓";
+            color: white;
+            position: absolute;
+            left: 3px;
+            top: -3px;
+            font-size: 12px;
+        }
+
+        .book-info { flex-grow: 1; margin-left: 15px; }
+        .book-title { display: block; font-weight: 600; font-size: 0.95rem; }
+        .book-price { color: var(--electric-blue); font-size: 0.85rem; font-weight: bold; }
+
+        .footer-total {
+            border-top: 1px solid #334155;
+            padding-top: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .total-amount { font-size: 1.8rem; font-weight: 800; }
+
+        .checkout-btn {
+            width: 100%;
+            margin-top: 25px;
+            padding: 18px;
+            background: var(--electric-blue);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="reg-container">
+        <div class="header-box">
+            <p style="color:var(--accent); font-weight: bold; margin-bottom: 5px;">ADMISSION 2025/26</p>
+            <h1>EB ACADEMY</h1>
+        </div>
+
+        <div class="selector">
+            <div id="btn-new" class="type-btn active" onclick="switchType('new')">NEW STUDENT</div>
+            <div id="btn-prev" class="type-btn" onclick="switchType('prev')">RETURNING STUDENT</div>
+        </div>
+
+        <form id="newForm" class="form-section active" enctype="multipart/form-data">
+            <input type="hidden" name="student_type" value="new">
+            <div class="section-title">👤 Basic Information</div>
+            <div style="display: flex; gap: 30px; align-items: flex-start; flex-wrap: wrap;">
+                <div class="photo-upload" onclick="document.getElementById('fileInput').click()">
+                    <span id="uploadTxt">Upload Photo</span>
+                    <img id="preview" src="#">
+                    <input type="file" name="student_photo" id="fileInput" hidden onchange="previewImage(event)">
+                </div>
+                <div style="flex: 1; min-width: 300px;">
+                    <div class="grid">
+                        <div><label>First Name</label><input type="text" name="first_name" id="in-fname" required></div>
+                        <div><label>Middle Name</label><input type="text" name="middle_name" id="in-mname" required></div>
+                        <div><label>Last Name</label><input type="text" name="last_name" id="in-lname" required></div>
+                        <div><label>Fayda Fin Number</label><input type="number" name="fayda_number" id="in-fayda" oninput="if (this.value.length > 3) this.value = this.value.slice(0, 3);" required></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid">
+                <div><label>Birth Certificate</label><input type="file" name="birth_cert" id="in-birthc" required></div>
+                <div><label>School Certificate</label><input type="file" name="school_cert" id="in-schoolc" required></div>
+                <div><label>Leaving Paper</label><input type="file" name="leaving_paper" id="in-leavingp" required></div>
+                <div><label>Date of Birth</label><input type="date" name="dob" id="in-dob"></div>
+            </div>
+
+            <div class="grid">
+                <div><label>Zone/Subcity</label>
+                <select name="subcity" id="in-subcity" required>
+        <option value="" disabled selected>Select Subcity</option>
+        <option value="Addis Ketema">Addis Ketema</option>
+        <option value="Akaki Kality">Akaki Kality</option>
+        <option value="Arada">Arada</option>
+        <option value="Bole">Bole</option>
+        <option value="Gulele">Gulele</option>
+        <option value="Kirkos">Kirkos</option>
+        <option value="Kolfe Keranio">Kolfe Keranio</option>
+        <option value="Lideta">Lideta</option>
+        <option value="Nifas Silk Lafto">Nifas Silk Lafto</option>
+        <option value="Lemi Kura">Lemi Kura</option>
+        <option value="Yeka">Yeka</option>
+        <option value="Sululta">Sululta</option>
+    </select>
+</div>
+                <div><label>Kebele/Woreda</label><input type="number" name="kebele" oninput="if (this.value.length > 2) this.value = this.value.slice(0, 2);" id="in-kebele" required></div>
+                <div><label>House number</label><input type="number" oninput="if (this.value.length > 3) this.value = this.value.slice(0, 3);" name="house_no" id="in-housen" required></div>
+<div class="phone-container">
+    <label for="in-telephone" style="margin-top: -10px;">Telephone Number</label>
+    <div class="input-group">
+        <span class="prefix">+251</span>
+        <input type="tel" 
+               class="ethio-phone" 
+               id="in-telephone"
+               name="telephone_number"  
+               placeholder="911..."
+               pattern="[7,9]\d{8}" 
+               maxlength="9" 
+               oninput="validatePhone(this)" 
+               required>
+    </div>
+</div>
+
+<div>
+    <label for="in-contact">Contact Person</label>
+    <input type="text" name="contact_person" id="in-contact" required>
+</div>
+
+<div class="phone-container">
+    <label for="in-mobile" style="margin-top: -10px;">Mobile Number</label>
+    <div class="input-group">
+        <span class="prefix">+251</span>
+        <input type="tel" 
+               class="ethio-phone"
+               id="in-mobile" 
+               name="mobile_number"  
+               placeholder="911..."
+               pattern="[7,9]\d{8}" 
+               maxlength="9" 
+               oninput="validatePhone(this)" 
+               required>
+    </div>
+</div>
+            <div><label>Student Height (cm)</label><input type="number" oninput="if (this.value.length > 3) this.value = this.value.slice(0, 3);" name="height" id="in-height"></div>
+            </div>
+
+            <div class="grid">
+                <div><label>Gender</label><select name="gender" id="in-gender"><option>Male</option><option>Female</option></select></div>
+                <div>
+                    <label>Grade Applying For</label>
+                    <select name="grade" id="in-grade" onchange="renderBooks()" required>
+                        <option value="" disabled selected>Select Grade</option>
+                        <option value="1">Grade 1</option>
+                        <option value="2">Grade 2</option>
+                        <option value="3">Grade 3</option>
+                        <option value="4">Grade 4</option>
+                        <option value="5">Grade 5</option>
+                        <option value="6">Grade 6</option>
+                        <option value="7">Grade 7</option>
+                        <option value="8">Grade 8</option>
+                        <option value="9">Grade 9</option>
+                        <option value="10">Grade 10</option>
+                        <option value="11">Grade 11</option>
+                        <option value="12">Grade 12</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="section-title">🏠 Parent Details</div>
+            <div class="grid">
+                <div><label>Mother's Full Name</label><input type="text" name="mother_name" id="in-mothern"></div>
+                <div><label>Mother's Phone</label><div class="input-group">
+        <span class="prefix">+251</span>
+        <input type="tel" 
+               class="ethio-phone"
+               id="in-motherp" 
+               name="mother_number"  
+               placeholder="911..."
+               pattern="[7,9]\d{8}" 
+               maxlength="9" 
+               oninput="validatePhone(this)" 
+               required>
+    </div></div>
+                <div><label>Father's Full Name</label><input type="text" name="father_name" id="in-fathern"></div>
+                <div><label>Father's Phone</label><div class="input-group">
+        <span class="prefix">+251</span>
+        <input type="tel" 
+               class="ethio-phone"
+               id="in-fatherp" 
+               name="father_number"  
+               placeholder="911..."
+               pattern="[7,9]\d{8}" 
+               maxlength="9" 
+               oninput="validatePhone(this)" 
+               required>
+    </div></div>
+            </div>
+            <textarea name="medical_history" placeholder="Medical conditions or allergies..." id="in-condition"></textarea>
+            <button type="submit" class="submit-btn">Complete Enrollment</button>
+        </form>
+
+        <form id="prevForm" class="form-section">
+            <input type="hidden" name="student_type" value="returning">
+            <div class="section-title">🔄 Returning Student Search</div>
+            <p style="color: var(--dim); margin-bottom: 20px;">Please enter your full name as registered in the previous year to continue.</p>
+            
+            <label>Student Full Name</label>
+<input type="text" name="returning_full_name" placeholder="Enter your full name..." required>
+
+<label>Previous Passkey</label>
+<input type="text" name="returning_passkey" placeholder="Enter your previous passkey..." required>
+
+
+            <button type="submit" class="submit-btn">Verify and Continue</button>
+
+            <div class="overlay" id="blurOverlay">
+        <div class="contain" id="mainContainer">
+            <h1 style="margin-bottom: 5px;">WELCOME</h1>
+            
+            <h4>Print your id card</h4>
+            <div class="id-wrapper">
+                <span style="font-size: 0.85rem;">This is your school ID card</span>
+                <div style="display: flex; gap: 5px;">
+                    <button class="btn-secondary" onclick="toggleFiles()">View</button>
+                    <button class="btn-primary" onclick="window.print()">Print</button>
+                </div>
+            </div>
+
+            <h4>Copy your username and passkey</h4>
+            <div class="copy-wrapper">
+                <span id="userName">Zabloon Biniam Malede</span>
+                <button class="copy-btn" onclick="copyText('userName', this)">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="14" width="14" viewBox="0 0 448 512"><path d="M384 336H192c-8.8 0-16-7.2-16-16V64c0-8.8 7.2-16 16-16h140.1L384 99.9V336zm0-288H192c-35.3 0-64 28.7-64 64V320c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V112c0-35.3-28.7-64-64-64zM64 128c-35.3 0-64 28.7-64 64V448c0 35.3 28.7 64 64 64H256c35.3 0 64-28.7 64-64V416H272v32c0 8.8-7.2 16-16 16H64c-8.8 0-16-7.2-16-16V192c0-8.8 7.2-16 16-16H96V128H64z"/></svg>
+                    <span>Copy</span>
+                </button>
+            </div>
+
+            <div class="copy-wrapper">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span id="text2" class="passkey-text">••••••••••••</span>
+                    <button class="eye-btn" onclick="togglePassView('text2', this)">
+                        <svg id="eyeIcon" xmlns="http://www.w3.org/2000/svg" height="14" width="16" viewBox="0 0 576 512"><path d="M288 32c-80.8 0-145.5 32-203.9 80.7C31.2 160.1 0 212.1 0 256s31.2 95.9 84.1 143.3C142.5 448 207.2 480 288 480s145.5-32 203.9-80.7c52.9-47.4 84.1-99.4 84.1-143.3s-31.2-95.9-84.1-143.3C433.5 64 368.8 32 288 32zM144 256a144 144 0 1 1 288 0 144 144 0 1 1 -288 0zm144-64a64 64 0 1 0 0 128 64 64 0 1 0 0-128z"/></svg>
+                    </button>
+                </div>
+                <button class="copy-btn" onclick="copyText('text2', this, true)">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="14" width="14" viewBox="0 0 448 512"><path d="M384 336H192c-8.8 0-16-7.2-16-16V64c0-8.8 7.2-16 16-16h140.1L384 99.9V336zm0-288H192c-35.3 0-64 28.7-64 64V320c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V112c0-35.3-28.7-64-64-64zM64 128c-35.3 0-64 28.7-64 64V448c0 35.3 28.7 64 64 64H256c35.3 0 64-28.7 64-64V416H272v32c0 8.8-7.2 16-16 16H64c-8.8 0-16-7.2-16-16V192c0-8.8 7.2-16 16-16H96V128H64z"/></svg>
+                    <span>Copy</span>
+                </button>
+            </div>
+
+            <div class="copy-wrapper">
+                <div style="display: flex; align-items: center; gap: 0;">
+                    <span class="passkey-text">Buy books.</span>
+                    <button class="copy-btn" onclick="openBook()">Buy</button>
+            </div>
+            </div>
+            <div class="copy-wrapper">
+                <div style="display: flex; align-items: center; gap: 0;">
+                    <span id="text2" class="passkey-text">Buy Uniform.</span>
+                    <button class="copy-btn" onclick="openUniform()">Buy</button>
+            </div>
+
+        </div>
+
+            <div class="close-btn" onclick="toggleContainer()">Close Dashboard</div>
+    
+
+    <div class="file-overlay" id="fileOverlay">
+        <div class="contain-large" style="border: 2px solid var(--accent);">
+            <h3 style="color: white; margin: 0;" class="previewH3">Student ID Card Preview</h3>
+            
+            <div class="container front">
+                <img src="Screenshot 2026-01-09 232109.png" alt="" class="header-logo">
+                <h1 style="color: red; font-size: larger;">EB ACADEMY</h1>
+                <h3 style="text-align: center; color: blue; font-size: small; width: 200px; margin-left: 150px; line-height: 13px; margin-top: -10px;">ኤል-ቤቴል ሕፃናት - መሰናዶ ትምህርት ቤት ኅ/የተ/የ/ማ El-Bethel Kindergarten - Preparatory School P.L.C</h3>
+                <h3 style="font-size: smaller; margin-top: -15px; color: black;">011-111-08-82    011-646-33</h3>
+                <div class="separetor">____________________________________________________________________</div>
+                <img src="WIN_20260131_20_25_05_Pro.jpg" alt="" class="student-photo">
+                <h2 style="line-height: 5px; margin-left: -230px; color: red; font-size: small;">የተማሪ መታወቂያ ካርድ</h2>
+                <h2 style="line-height: 5px; margin-left: -230px; color: red; font-size: small; text-decoration: underline;">STUDENT ID CARD</h2>
+                <h3 style="line-height: 5px; color: rgb(2, 2, 138); margin-left: -370px; font-size: small; margin-top: 20px;">የተማሪው ስም</h3>
+                <h3 style="line-height: 5px; margin-left: -168px; font-size: small;  color: black;">Name <span id="out-name">Erose Biniam Malede</span></h3>
+                <h3 style="line-height: 5px; color: rgb(2, 2, 138); margin-left: -330px; font-size: small;">ክፍል</h3>
+                <h3 style="line-height: 5px; margin-left: -200px; font-size: small;  color: black;">Class <span id="out-class">6</span></h3>
+                <h3 style="line-height: 5px; color: rgb(2, 2, 138); margin-left: -330px; font-size: small; ">የት/ዘመን</h3>
+                <h3 style="line-height: 5px; color: rgb(2, 2, 138); margin-left: 180px; font-size: small; position: absolute; margin-top: -18px;">ተራ.ቁ.</h3>
+                <h3 style="line-height: 5px; font-size: small; margin-left: -120px;  color: black;">Year <span id="out-year">2018</span> No. <span id="out-no"> </span></h3>
+            </div>
+
+            <div class="container back">
+                <div class="title">
+                    <h2 style="line-height: 5px; text-align: center; color: red; font-size: 16px; margin-top: 20px;">የተማሪው አድራሻ</h2>
+                    <h2 style="line-height: 5px;text-align: center; color: red; font-size: 16px; text-decoration: underline;">STUDENT ADDRESS</h2>
+                </div>
+                <div class="body">
+                    <div class="row1">
+                        <div class="subcity">
+                            <h3 class="blue" style="margin-left: 15px;">ክ/ከተማ <span id="out-subcity">Gulele</span></h3>
+                            <h3 style="margin-left: -100px;  color: black;">Subcity</h3>
+                        </div>
+                        <div class="kebele">
+                            <h3 class="blue">ቀበሌ/ወረዳ <span id="out-kebele">07</span></h3>
+                            <h3 style="margin-left: -70px;  color: black;">Kebele/Woreda</h3>
+                        </div>
+                        <div class="house">
+                            <h3 class="blue">የቤ.ቁ <span id="out-house">045</span></h3>
+                            <h3 style="margin-left: -70px;  color: black;">House No.</h3>
+                        </div>
+                    </div>
+                    <div class="row2">
+                        <div class="phone">
+                            <h3 class="blue" style="margin-left: 20px;">ስልክ ቁጥር (የቤት) <span id="out-telephone">0911980382</span></h3>
+                            <h3 style="margin-left: -50px;  color: black;">Telephone Number (residence)</h3>
+                        </div>
+                        <div class="mobile">
+                            <h3 class="blue">ሞባይል <span id="out-moblie">0913077445</span></h3>
+                            <h3 style="margin-left: -100px;  color: black;">Mobile</h3>
+                        </div>
+                    </div>
+                    <div class="date">
+                        <h3 class="blue" style="text-align: left; margin-left: 20px;">የተሰጠበት ቀን <span id="out-date">27/05/2018</span></h3>
+                        <h3 style="text-align: left; margin-left: 20px;  color: black;">Date Issued</h3>
+                    </div>
+                    <div class="contact">
+                        <h3 class="blue" style="text-align: left; margin-left: 20px;">በአደጋ ጊዜ ተጠሪ <span id="out-contact">Biniam Malede</span></h3>
+                        <h3 style="text-align: left; margin-left: 20px;  color: black;">Contact Person</h3>
+                    </div>
+                    <div class="unit">
+                        <h3 class="blue" style="text-align: left; margin-left: 20px;">የሚያገለግልበት ጊዜ <span id="out-valid">1 Year</span></h3>
+                        <h3 style="text-align: left; margin-left: 20px;  color: black;">Valid Unit</h3>
+                    </div>
+                    <div class="sign">
+                        <h3 class="blue" style="margin-left: 150px;">የት/ቤቱ/ር/መ ፊርማ <span id="out-sign"> </span></h3>
+                        <h3 style="color: black;">Principal's Signature</h3>
+                    </div>
+                </div>
+            </div>
+
+            <button class="print-btn-large" onclick="window.print()">Print ID Card Now</button>
+            <button class="btn-secondary" style="width: 100%; justify-content: center;" onclick="toggleFiles()">Return to Dashboard</button>
+        </div>
+    </div>
+    
+    <div class="container-cloth" id="clothContainer" style="display: none; position: absolute; margin-top: -500px; margin-left: -200px;">
+        <div class="preview-side">
+            <img id="uniform-img" src="Screenshot 2026-02-11 193846.png" alt="Uniform View">
+        </div>
+
+        <div class="content-side">
+            <h1>Eb-Academy Uniform</h1>
+            <div class="price-display">ETB<span id="total-price">89</span>.00</div>
+
+            <span class="label-title">Select Gender</span>
+            <div class="gender-options">
+                <div class="gender-btn">
+                    <input type="radio" id="m" name="gen" checked onclick="updateUI('male')">
+                    <label for="m" class="gender-label">Male</label>
+                </div>
+                <div class="gender-btn">
+                    <input type="radio" id="f" name="gen" onclick="updateUI('female')">
+                    <label for="f" class="gender-label">Female</label>
+                </div>
+            </div>
+
+            <span class="label-title">Select Size</span>
+<select id="size-select" onchange="updateTotal()" class="select">
+    <option value="0">Small</option>
+    <option value="100" selected>Medium</option>
+    <option value="200">Large</option>
+    <option value="300">XL</option>
+</select>
+
+            <span class="label-title">Shirt Amount</span>
+<div class="amount-container">
+    <button class="qty-btn" onclick="changeQty('shirt', -1)">-</button>
+    <span id="qty-shirt">1</span>
+    <button class="qty-btn" onclick="changeQty('shirt', 1)">+</button>
+</div>
+
+<span class="label-title" id="trouser-label">Trouser Amount</span>
+<div class="amount-container">
+    <button class="qty-btn" onclick="changeQty('trouser', -1)">-</button>
+    <span id="qty-trouser">1</span>
+    <button class="qty-btn" onclick="changeQty('trouser', 1)">+</button>
+</div>
+
+<span class="label-title">Sweater Amount</span>
+<div class="amount-container">
+    <button class="qty-btn" onclick="changeQty('sweater', -1)">-</button>
+    <span id="qty-sweater">1</span>
+    <button class="qty-btn" onclick="changeQty('sweater', 1)">+</button>
+</div>
+
+            <button class="buy-btn">Add to Cart</button>
+        </div>
+    </div>
+
+    <div class="cart-container" id="cartContainer" style="display: none; position: absolute; margin-top: -300px; margin-left: -100px;">
+        <h1>Book Collector</h1>  
+
+        <div class="label-title">
+            <span>Available Books</span>
+            <label class="select-all-wrapper" id="select-all-container" style="display: none;">
+                <input type="checkbox" id="select-all-checkbox" onclick="toggleAll(this)"> 
+                Select All
+            </label>
+        </div>
+        
+        <div id="book-list-container" class="book-list">
+            <p style="color: var(--text-dim); font-size: 0.8rem;">Please select a grade above...</p>
+        </div>
+
+        <div class="footer-total">
+            <span class="total-label">Total Amount</span>
+            <span class="total-amount">ETB <span id="display-amount">0</span></span>
+        </div>
+
+        <button class="checkout-btn" onclick="checkout()">Add to Cart</button>
+    </div>
+
+        </form>
+    </div>
+</body>
+    <script>
+       // State Management
+let REAL_PASSKEY = "••••••••••••"; 
+let isPassVisible = false;
+
+// 1. Form Switching (New vs Returning)
+function switchType(type) {
+    document.querySelectorAll('.type-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('.form-section').forEach(form => form.classList.remove('active'));
+    
+    document.getElementById(`btn-${type}`).classList.add('active');
+    document.getElementById(`${type}Form`).classList.add('active');
+}
+
+// 2. Real-time ID Card Sync
+function syncAllData() {
+    // Name Concatenation
+    const fname = document.getElementById('in-fname').value;
+    const mname = document.getElementById('in-mname').value;
+    const lname = document.getElementById('in-lname').value;
+    const fullName = `${fname} ${mname} ${lname}`.trim();
+    
+    document.getElementById('out-name').innerText = fullName || "___________________";
+    document.getElementById('userName').innerText = fullName || "Student Name";
+
+    // Mapping Form IDs to ID Card Display Spans
+    const fieldMap = {
+        'in-grade': 'out-class',
+        'in-subcity': 'out-subcity',
+        'in-kebele': 'out-kebele',
+        'in-housen': 'out-house',
+        'in-mobile': 'out-moblie',
+        'in-telephone': 'out-telephone',
+        'in-contact': 'out-contact'
+    };
+
+    const now = new Date();
+const day = String(now.getDate()).padStart(2, '0');
+const month = String(now.getMonth() + 1).padStart(2, '0'); // Months are 0-11
+const year = now.getFullYear();
+
+const formattedDate = `${day}/${month}/${year}`;
+document.getElementById('out-date').innerText = formattedDate;
+document.getElementById('out-year').innerText = year - 7;
+
+
+
+    for (let inputId in fieldMap) {
+        const val = document.getElementById(inputId).value;
+        const display = document.getElementById(fieldMap[inputId]);
+        if (display) display.innerText = val || "___________________";
+    }
+
+    // Static/Auto Fields
+    document.getElementById('out-year').innerText = "2025/26";
+    document.getElementById('out-date').innerText = new Date().toLocaleDateString();
+}
+
+// 3. Photo Preview
+function previewImage(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        document.getElementById('preview').src = e.target.result;
+        document.getElementById('preview').style.display = "block";
+        document.getElementById('uploadTxt').style.display = "none";
+        
+        // Update ID Card Photo
+        document.querySelector('.student-photo').src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+}
+
+// 4. Form Submission (AJAX)
+document.getElementById('newForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const formData = new FormData(this);
+
+    fetch('submit_student.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.status === 'success') {
+            REAL_PASSKEY = data.passkey;
+            document.getElementById('text2').innerText = isPassVisible ? REAL_PASSKEY : "••••••••••••";
+            document.getElementById('blurOverlay').style.display = 'flex';
+        } else {
+            alert("Error: " + data.message);
+        }
+    })
+    .catch(err => alert("Server error. Check database connection."));
+});
+
+// 5. UI Utilities
+function toggleContainer() {
+    document.getElementById('blurOverlay').style.display = "none";
+}
+
+function openUniform() {
+    document.getElementById('clothContainer').style.display = "block";
+}
+
+function openBook() {
+    document.getElementById('cartContainer').style.display = "block";
+}
+
+function toggleFiles() {
+    const overlay = document.getElementById('fileOverlay');
+    overlay.style.display = (overlay.style.display === "flex") ? "none" : "flex";
+}
+
+function togglePassView(elementId, btn) {
+    isPassVisible = !isPassVisible;
+    const el = document.getElementById(elementId);
+    el.innerText = isPassVisible ? REAL_PASSKEY : "••••••••••••";
+    el.style.letterSpacing = isPassVisible ? "normal" : "2px";
+}
+
+function validatePhone(input) {
+        // Remove non-numeric characters
+        input.value = input.value.replace(/[^0-9]/g, '');
+        
+        // Visual feedback: Red if it doesn't start with 7 or 9
+        if (input.value.length > 0 && !['7', '9'].includes(input.value[0])) {
+            input.style.borderColor = 'red';
+        } else {
+            input.style.borderColor = '#ccc';
+        }
+    }
+
+function copyText(elementId, btn, isPasskey = false) {
+    const text = isPasskey ? REAL_PASSKEY : document.getElementById(elementId).innerText;
+    navigator.clipboard.writeText(text).then(() => {
+        const span = btn.querySelector('span');
+        span.innerText = "Copied!";
+        setTimeout(() => span.innerText = "Copy", 1500);
+    });
+}
+
+// Initialize Listeners
+document.querySelectorAll('#newForm input, #newForm select').forEach(el => {
+    el.addEventListener('input', syncAllData);
+});
+
+// Add this to your existing JS file or <script> tag
+
+document.getElementById('prevForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const formData = new FormData(this);
+
+    fetch('submit_returning.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.status === 'success') {
+            // 1. Update Global Passkey
+            REAL_PASSKEY = data.data.passkey;
+            
+            // 2. Populate the Dashboard/ID Card fields with DB data
+            document.getElementById('out-name').innerText = data.data.full_name;
+            document.getElementById('userName').innerText = data.data.full_name;
+            document.getElementById('out-class').innerText = data.data.grade;
+            document.getElementById('out-moblie').innerText = data.data.mobile;
+            
+            // 3. Handle the Photo (if stored as Blob/Base64)
+            if (data.data.photo) {
+                const photoSrc = `data:image/jpeg;base64,${data.data.photo}`;
+                document.querySelector('.student-photo').src = photoSrc;
+            }
+
+            // 4. Update Passkey display
+            document.getElementById('text2').innerText = isPassVisible ? REAL_PASSKEY : "••••••••••••";
+
+            // 5. Show the Overlay
+            document.getElementById('blurOverlay').style.display = 'flex';
+        } else {
+            alert(data.message);
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        alert("Search failed. Check your connection.");
+    });
+});
+
+// 1. Base Prices
+const basePrices = {
+    shirt: 89,
+    trouser: 120,
+    sweater: 150
+};
+
+// 2. Current State
+let order = {
+    shirt: 1,
+    trouser: 1,
+    sweater: 1
+};
+
+/**
+ * Handles Gender Change (Image + Label + Base Price for Trouser/Dress)
+ */
+function updateUI(gender) {
+    const img = document.getElementById('uniform-img');
+    const trouserLabel = document.getElementById('trouser-label');
+    
+    img.style.opacity = '0';
+    
+    setTimeout(() => {
+        if (gender === 'male') {
+            img.src = "Screenshot 2026-02-11 193846.png";
+            trouserLabel.innerText = "Trouser Amount";
+            basePrices.trouser = 120; 
+        } else {
+            img.src = "Screenshot 2026-02-11 194013.png";
+            trouserLabel.innerText = "Dress Amount";
+            basePrices.trouser = 145; // Dress is more expensive
+        }
+        img.style.opacity = '1';
+        updateTotal(); 
+    }, 250);
+}
+
+/**
+ * Handles Quantity buttons
+ */
+function changeQty(item, amt) {
+    order[item] += amt;
+    if (order[item] < 0) order[item] = 0;
+    
+    document.getElementById(`qty-${item}`).innerText = order[item];
+    updateTotal();
+}
+
+/**
+ * The Master Calculation Function
+ */
+function updateTotal() {
+    // Get the extra cost from the selected size
+    const sizeSelect = document.getElementById('size-select');
+    const extraPerItem = parseInt(sizeSelect.value);
+
+    // Calculate Total: (Base Price + Size Extra) * Quantity
+    const shirtTotal = (basePrices.shirt + extraPerItem) * order.shirt;
+    const trouserTotal = (basePrices.trouser + extraPerItem) * order.trouser;
+    const sweaterTotal = (basePrices.sweater + extraPerItem) * order.sweater;
+
+    const grandTotal = shirtTotal + trouserTotal + sweaterTotal;
+    
+    document.getElementById('total-price').innerText = grandTotal;
+}
+
+// Run once on load to ensure price is correct
+updateTotal();
+
+const curriculumData = {
+    "primary": [
+        { title: "Amharic", price: 150 }, { title: "English", price: 150 },
+        { title: "Mathematics", price: 150 }, { title: "Performing And Visual Art", price: 150 },
+        { title: "Health And Physical Education", price: 150 }, { title: "Environmental Science", price: 150 },
+        { title: "Moral Education", price: 150 }, { title: "Afan Oromo", price: 150 }
+    ],
+    "middle": [
+        { title: "English", price: 220 }, { title: "Mathematics", price: 220 },
+        { title: "General Science", price: 220 }, { title: "Social Studies", price: 220 },
+        { title: "Citizenship Education", price: 220 }, { title: "Career & Technical Education", price: 220 },
+        { title: "Afan Oromo", price: 150 }, { title: "Health And Physical Education", price: 150 },
+        { title: "Performing And Visual Art", price: 150 }, { title: "Information Communication Technology", price: 150 }
+    ],
+    "secondary": [
+        { title: "Mathematics", price: 280 }, { title: "Physics", price: 280 },
+        { title: "Chemistry", price: 280 }, { title: "Biology", price: 280 },
+        { title: "English", price: 280 }, { title: "Geography", price: 280 },
+        { title: "History", price: 280 }, { title: "Economics", price: 280 },
+        { title: "Information Technology", price: 280 }, { title: "Afan Oromo", price: 150 },
+        { title: "Health And Physical Education", price: 150 }, { title: "Amharic", price: 150 },
+        { title: "Citizenship Education", price: 220 }
+    ],
+    "prep_nat": [
+        { title: "Physics", price: 350 }, { title: "Chemistry", price: 350 },
+        { title: "Biology", price: 350 }, { title: "Maths (Natural)", price: 350 },
+        { title: "English", price: 350 }, { title: "Information Technology", price: 350 }
+    ],
+    "prep_soc": [
+        { title: "Economics", price: 350 }, { title: "Geography", price: 350 },
+        { title: "History", price: 350 }, { title: "Maths (Social)", price: 350 },
+        { title: "English", price: 350 }, { title: "Marketing", price: 350 }
+    ]
+};
+
+function renderBooks() {
+    const grade = document.getElementById('grade-select').value;
+    const container = document.getElementById('book-list-container');
+    const selectAllWrapper = document.getElementById('select-all-container');
+    const selectAllCheck = document.getElementById('select-all-checkbox');
+    
+    container.innerHTML = "";
+    selectAllCheck.checked = false;
+
+    if (!grade) {
+        container.innerHTML = '<p style="color: var(--text-dim); font-size: 0.8rem;">Please select a grade above...</p>';
+        selectAllWrapper.style.display = "none";
+        calculateTotal();
+        return;
+    }
+
+    let books = [];
+    const g = parseInt(grade);
+
+    // Logic to map Grade to the correct curriculum key
+    if (g >= 1 && g <= 6) {
+        books = curriculumData['primary'];
+    } else if (g >= 7 && g <= 8) {
+        books = curriculumData['middle'];
+    } else if (g >= 9 && g <= 10) {
+        books = curriculumData['secondary'];
+    } else if (g >= 11 && g <= 12) {
+        // Example logic: Grade 11/12 users might need to choose Natural/Social, 
+        // for now, let's default to Natural for Grade 11 and Social for 12 or combine them.
+        books = g === 11 ? curriculumData['prep_nat'] : curriculumData['prep_soc'];
+    }
+
+    selectAllWrapper.style.display = "flex";
+
+    books.forEach(book => {
+        const item = document.createElement('label');
+        item.className = 'book-item';
+        item.innerHTML = `
+            <input type="checkbox" class="book-check" data-price="${book.price}" onchange="updateMasterCheckbox()">
+            <div class="book-info">
+                <span class="book-title">${book.title}</span>
+                <span class="book-price">ETB ${book.price}.00</span>
+            </div>
+        `;
+        container.appendChild(item);
+    });
+
+    calculateTotal();
+}
+
+function toggleAll(master) {
+    const checkboxes = document.querySelectorAll('.book-check');
+    checkboxes.forEach(box => box.checked = master.checked);
+    calculateTotal();
+}
+
+function updateMasterCheckbox() {
+    const checkboxes = document.querySelectorAll('.book-check');
+    const master = document.getElementById('select-all-checkbox');
+    const allChecked = Array.from(checkboxes).every(box => box.checked);
+    master.checked = checkboxes.length > 0 && allChecked;
+    calculateTotal();
+}
+
+function calculateTotal() {
+    const checkboxes = document.querySelectorAll('.book-check');
+    let total = 0;
+    checkboxes.forEach(box => {
+        if (box.checked) total += parseInt(box.getAttribute('data-price'));
+    });
+    document.getElementById('display-amount').innerText = total;
+}
+
+function checkout() {
+    const total = document.getElementById('display-amount').innerText;
+    if (total === "0") alert("Please select at least one book!");
+    else alert(`Order confirmed! Total: ETB ${total}.00`);
+}
+    </script>
+</body>
+</html>

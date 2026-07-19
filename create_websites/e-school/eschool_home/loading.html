@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EB Academy | Initializing...</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-glow: rgba(79, 70, 229, 0.5);
+            --bg-dark: #0f172a;
+            --text-main: #f8fafc;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+
+        body {
+            background-color: var(--bg-dark);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            color: var(--text-main);
+        }
+
+        /* --- PRELOADER CONTAINER --- */
+        .loader-wrapper {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        .image-container {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        /* The Outer Rotating Ring */
+        .outer-ring {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 2px solid rgba(79, 70, 229, 0.1);
+            border-top: 2px solid var(--primary);
+            border-radius: 50%;
+            animation: rotate 2s linear infinite;
+        }
+
+        /* The "Classifying" Image */
+        .main-image {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            z-index: 2;
+            animation: classify 2.5s ease-in-out infinite;
+        }
+
+        /* Progress Bar Area */
+        .progress-container {
+            width: 240px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: var(--primary);
+            box-shadow: 0 0 15px var(--primary-glow);
+            /* Match the JS timing for a smooth fill */
+            transition: width 0.5s ease-out;
+        }
+
+        .status-text {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            opacity: 0.6;
+            font-weight: 400;
+            min-height: 1.2em;
+        }
+
+        /* ANIMATIONS */
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes classify {
+            0%, 100% { 
+                transform: scale(1); 
+                filter: drop-shadow(0 0 0px var(--primary-glow)) brightness(1);
+            }
+            50% { 
+                transform: scale(1.1); 
+                filter: drop-shadow(0 0 20px var(--primary-glow)) brightness(1.2);
+            }
+        }
+
+        /* Exit Animation Classes */
+        .fade-out {
+            opacity: 0;
+            transform: scale(0.9);
+            pointer-events: none;
+        }
+
+        .overload {
+            background-color: black;
+            width: 100%;
+            height: 100%;
+            opacity: 0.3;
+            z-index: -1;
+            position: absolute;
+            backdrop-filter: blur(10px);
+        }
+    </style>
+</head>
+<body>
+    <div class="overload"></div>
+    
+    <div class="loader-wrapper" id="loader">
+        <div class="image-container">
+            <div class="outer-ring"></div>
+            <img src="eb_removes.png" alt="Logo" class="main-image">
+        </div>
+
+        <div class="progress-container">
+            <div class="progress-fill" id="progress"></div>
+        </div>
+        
+        <div class="status-text" id="status">Initializing...</div>
+    </div>
+
+    <script>
+        const statusText = document.getElementById('status');
+        const progressFill = document.getElementById('progress');
+        const loader = document.getElementById('loader');
+
+        const messages = [
+            { text: "Initializing Neural Link...", progress: "25%" },
+            { text: "Syncing EB Database...", progress: "50%" },
+            { text: "Securing Portal...", progress: "80%" },
+            { text: "Welcome, Explorer", progress: "100%" }
+        ];
+
+        let i = 0;
+
+        function updateLoader() {
+            if (i < messages.length) {
+                // Update Text
+                statusText.innerText = messages[i].text;
+                // Update Progress Bar
+                progressFill.style.width = messages[i].progress;
+                
+                i++;
+                
+                // Set the delay for the next message
+                let delay = (i === messages.length) ? 1200 : 800; 
+                setTimeout(updateLoader, delay);
+            } else {
+                // Finalize: Fade out the entire loader
+                setTimeout(() => {
+                    loader.classList.add('fade-out');
+                    console.log("System Ready.");
+                    // Optional: window.location.href = "dashboard.html";
+                }, 500);
+            }
+        }
+
+        // Start the sequence
+        window.addEventListener('load', () => {
+            setTimeout(updateLoader, 500);
+        });
+    </script>
+</body>
+</html>

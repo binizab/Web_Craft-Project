@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EB Academy | Pro Studio & Hub</title>
+    <style>
+        :root {
+            --bg: #050508;
+            --sidebar: #0a0a0f;
+            --card-bg: #11111a;
+            --accent: #3b82f6;
+            --accent-glow: rgba(59, 130, 246, 0.5);
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+            --border: #1e293b;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        /* Navbar */
+        .nav-header {
+            position: fixed;
+            top: 0; width: 100%; height: 70px;
+            background: rgba(5, 5, 8, 0.8);
+            backdrop-filter: blur(12px);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 5%; box-sizing: border-box;
+            z-index: 1000; border-bottom: 1px solid var(--border);
+        }
+
+        .logo { font-weight: 800; font-size: 1.2rem; color: var(--accent); letter-spacing: 1px; }
+
+        /* Studio Section (The Sender) */
+        .studio-section {
+            margin-top: 100px;
+            padding: 0 8%;
+        }
+
+        .uploader-card {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 1.5rem;
+            border: 1px solid var(--border);
+            max-width: 800px;
+            margin: 0 auto;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+
+        .input-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto;
+            gap: 15px;
+            margin-top: 1.5rem;
+        }
+
+        input {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            padding: 12px;
+            border-radius: 8px;
+            color: white;
+            outline: none;
+        }
+
+        input:focus { border-color: var(--accent); }
+
+        .btn-publish {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 0 25px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-publish:hover { background: #2563eb; transform: translateY(-2px); }
+
+        /* Hub Section (The Receiver) */
+        .content-section { padding: 60px 8%; }
+        .row-title { font-size: 1.4rem; font-weight: bold; margin-bottom: 30px; display: flex; align-items: center; gap: 15px; }
+        .row-title::before { content: ''; width: 4px; height: 24px; background: var(--accent); border-radius: 4px; }
+
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .video-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: 0.4s cubic-bezier(0.2, 1, 0.3, 1);
+            border: 1px solid var(--border);
+            position: relative;
+        }
+
+        .video-card:hover { 
+            transform: translateY(-10px); 
+            border-color: var(--accent);
+        }
+
+        .thumb-container {
+            width: 100%; aspect-ratio: 16 / 9;
+            background-size: cover; background-position: center;
+            position: relative; background-color: #000;
+        }
+
+        .play-overlay {
+            position: absolute; inset: 0;
+            background: rgba(59, 130, 246, 0.2);
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0; transition: 0.3s;
+        }
+
+        .video-card:hover .play-overlay { opacity: 1; }
+
+        .play-icon {
+            width: 50px; height: 50px;
+            background: var(--accent);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            color: white; box-shadow: 0 0 15px var(--accent-glow);
+        }
+
+        .info { padding: 20px; }
+        .info h4 { margin: 0; font-size: 1rem; }
+        .info p { margin: 5px 0 0; font-size: 0.8rem; color: var(--text-dim); }
+
+        /* Video Player Modal */
+        #videoOverlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(2, 2, 5, 0.98);
+            z-index: 9999;
+            justify-content: center; align-items: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .player-wrapper { width: 90%; max-width: 1000px; position: relative; }
+        .close-player { position: absolute; top: -40px; right: 0; color: white; cursor: pointer; }
+        .iframe-container { width: 100%; aspect-ratio: 16 / 9; border-radius: 15px; overflow: hidden; background: #000; }
+        video, iframe { width: 100%; height: 100%; border: none; }
+    </style>
+</head>
+<body>
+
+    <header class="nav-header">
+        <div class="logo">EB ACADEMY</div>
+        <div style="color: var(--text-dim); font-size: 0.8rem;">CREATOR MODE ON</div>
+    </header>
+
+    <section class="studio-section">
+        <div class="uploader-card">
+            <h2 style="margin: 0; font-size: 1.2rem;">Post New Content</h2>
+            <div class="input-row">
+                <input type="text" id="vidTitle" placeholder="Lesson Title (e.g. Intro to Algebra)">
+                <input type="text" id="vidUrl" placeholder="YouTube Video ID (e.g. dQw4w9WgXcQ)">
+                <button class="btn-publish" onclick="publishContent()">Publish to Hub</button>
+            </div>
+            <p style="font-size: 0.75rem; color: var(--text-dim); margin-top: 10px;">
+                Tip: Use a YouTube ID to automatically generate a thumbnail.
+            </p>
+        </div>
+    </section>
+
+    <main class="content-section">
+        <div class="row-title">Academy Library</div>
+        <div class="video-grid" id="mainGrid">
+            
+            <div class="video-card" onclick="playVideo('m6G_6-Y32aE')">
+                <div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/m6G_6-Y32aE/maxresdefault.jpg');">
+                    <div class="play-overlay"><div class="play-icon">▶</div></div>
+                </div>
+                <div class="info">
+                    <h4>Mastering Quadratic Equations</h4>
+                    <p>Advanced Mathematics • Core</p>
+                </div>
+            </div>
+
+            <div class="video-card" onclick="playVideo('L-S-fN_yMvY')">
+                <div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/L-S-fN_yMvY/maxresdefault.jpg');">
+                    <div class="play-overlay"><div class="play-icon">▶</div></div>
+                </div>
+                <div class="info">
+                    <h4>The Physics of Light</h4>
+                    <p>Physics • Science</p>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <div id="videoOverlay">
+        <div class="player-wrapper">
+            <div class="close-player" onclick="stopVideo()">CLOSE [ESC]</div>
+            <div class="iframe-container" id="playerFrame"></div>
+        </div>
+    </div>
+
+    <script>
+        const mainGrid = document.getElementById('mainGrid');
+        const overlay = document.getElementById('videoOverlay');
+        const frame = document.getElementById('playerFrame');
+
+        // Logic to CONNECT Sender to Receiver
+        function publishContent() {
+            const titleInput = document.getElementById('vidTitle');
+            const urlInput = document.getElementById('vidUrl');
+            
+            if(!titleInput.value || !urlInput.value) {
+                alert("Please enter both a title and a YouTube ID.");
+                return;
+            }
+
+            // Create the new "Receiver" card
+            const newCard = document.createElement('div');
+            newCard.className = 'video-card';
+            newCard.onclick = () => playVideo(urlInput.value);
+            
+            newCard.innerHTML = `
+                <div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/${urlInput.value}/maxresdefault.jpg');">
+                    <div class="play-overlay"><div class="play-icon">▶</div></div>
+                </div>
+                <div class="info">
+                    <h4>${titleInput.value}</h4>
+                    <p>User Uploaded • New</p>
+                </div>
+            `;
+
+            // Connection: Push the data to the grid
+            mainGrid.prepend(newCard);
+
+            // Reset Inputs
+            titleInput.value = '';
+            urlInput.value = '';
+        }
+
+        function playVideo(id) {
+            frame.innerHTML = `<iframe src="https://www.youtube.com/embed/${id}?autoplay=1" allow="autoplay" allowfullscreen></iframe>`;
+            overlay.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function stopVideo() {
+            frame.innerHTML = '';
+            overlay.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        document.addEventListener('keydown', (e) => { if (e.key === "Escape") stopVideo(); });
+    </script>
+</body>
+</html>

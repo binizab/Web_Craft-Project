@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>EduCapital | Owner's Strategy Suite</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #b45309;
+            --primary-dark: #9a3c06;
+            --primary-light: #fffbeb;
+            --primary-glow: rgba(180, 83, 9, 0.15);
+            --secondary: #0f172a;
+            --secondary-light: #1e293b;
+            --accent: #6366f1;
+            --bg: #f8fafc;
+            --white: #ffffff;
+            --text: #1e293b;
+            --text-muted: #475569;
+            --danger: #991b1b;
+            --success: #15803d;
+            --warning: #b45309;
+            --border: #e2e8f0;
+            --radius-sm: 10px;
+            --radius: 14px;
+            --radius-lg: 20px;
+            --sidebar-width-expanded: 280px;
+            --sidebar-width-collapsed: 88px;
+            --transition-fast: 0.2s ease;
+            --transition-normal: 0.25s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            --shadow-sm: 0 4px 12px -6px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 8px 20px -8px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 20px 28px -12px rgba(0, 0, 0, 0.15);
+            --shadow-hover: 0 12px 24px -12px rgba(0, 0, 0, 0.2);
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            overflow-x: hidden;
+        }
+
+        .wrapper {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* ========= SIDEBAR ========= */
+        .sidebar {
+            width: var(--sidebar-width-expanded);
+            background: var(--secondary);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            transition: width var(--transition-normal);
+            overflow-x: hidden;
+            z-index: 20;
+            box-shadow: 4px 0 24px rgba(0, 0, 0, 0.08);
+            flex-shrink: 0;
+        }
+
+        .sidebar.collapsed {
+            width: var(--sidebar-width-collapsed);
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.8rem 1.2rem 1.5rem 1.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            margin-bottom: 1.5rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 800;
+            font-size: 1.6rem;
+            color: #fbbf24;
+            white-space: nowrap;
+        }
+
+        .logo i {
+            font-size: 1.8rem;
+            flex-shrink: 0;
+        }
+
+        .logo-text {
+            transition: opacity 0.2s;
+        }
+
+        .sidebar.collapsed .logo-text {
+            display: none;
+        }
+
+        .sidebar.collapsed .logo {
+            justify-content: center;
+            padding: 0;
+        }
+
+        .top-toggle-btn {
+            background: rgba(251, 191, 36, 0.15);
+            border: none;
+            border-radius: 40px;
+            width: 38px;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #fbbf24;
+            transition: var(--transition-fast);
+        }
+
+        .top-toggle-btn:hover {
+            background: #fbbf24;
+            color: var(--secondary);
+            transform: scale(1.05);
+        }
+
+        .nav {
+            flex: 1;
+            padding: 0 1rem;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 0.9rem 1.2rem;
+            text-decoration: none;
+            color: #94a3b8;
+            font-weight: 600;
+            border-radius: 12px;
+            margin-bottom: 0.5rem;
+            transition: all var(--transition-fast);
+            white-space: nowrap;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .nav-item i {
+            flex-shrink: 0;
+            width: 22px;
+            height: 22px;
+            transition: transform var(--transition-fast);
+        }
+
+        .nav-item:hover {
+            background: rgba(251, 191, 36, 0.12);
+            color: #fbbf24;
+            transform: translateX(4px);
+        }
+
+        .nav-item:hover i {
+            transform: scale(1.08);
+        }
+
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.06);
+            color: #fbbf24;
+            border-right: 3px solid #fbbf24;
+        }
+
+        .sidebar.collapsed .nav-item {
+            justify-content: center;
+            padding: 0.9rem 0;
+            gap: 0;
+        }
+
+        .sidebar.collapsed .nav-text {
+            display: none;
+        }
+
+        .sidebar-footer {
+            padding: 1.5rem 1rem 2rem 1rem;
+            margin-top: auto;
+            display: flex;
+            justify-content: center;
+            border-top: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .collapse-btn {
+            background: rgba(255,255,255,0.05);
+            border: none;
+            border-radius: 40px;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #cbd5e1;
+            transition: var(--transition-fast);
+        }
+
+        .collapse-btn:hover {
+            background: rgba(251, 191, 36, 0.2);
+            color: #fbbf24;
+            transform: scale(1.05);
+        }
+
+        /* main content */
+        .main {
+            flex: 1;
+            padding: 2.5rem 2.8rem;
+            transition: padding var(--transition-normal);
+            background: var(--bg);
+            min-width: 0;
+        }
+
+        /* header (dynamic title & subtitle) */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .header-title h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--secondary);
+            letter-spacing: -0.02em;
+        }
+
+        .header-title p {
+            color: var(--text-muted);
+            margin-top: 6px;
+            font-weight: 500;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 0.7rem 1.4rem;
+            border-radius: var(--radius-sm);
+            font-weight: 700;
+            cursor: pointer;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all var(--transition-fast);
+            font-size: 0.85rem;
+        }
+
+        .btn-dark {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .btn-dark:hover {
+            background: var(--secondary-light);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-outline {
+            background: white;
+            border: 1px solid var(--border);
+            color: var(--secondary);
+        }
+
+        .btn-outline:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            transform: translateY(-2px);
+            background: var(--primary-light);
+        }
+
+        /* page view container */
+        .page-view {
+            display: none;
+            animation: fadeSlideUp 0.3s ease;
+        }
+
+        .page-view.active-view {
+            display: block;
+        }
+
+        @keyframes fadeSlideUp {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* reusable card styles */
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .metric-card {
+            background: var(--white);
+            padding: 1.6rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
+            transition: all var(--transition-normal);
+            cursor: pointer;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-6px);
+            box-shadow: var(--shadow-hover);
+            border-color: var(--primary);
+        }
+
+        .metric-card h4 {
+            font-size: 0.7rem;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            font-weight: 700;
+        }
+
+        .metric-card .value {
+            font-size: 1.9rem;
+            font-weight: 800;
+            margin-top: 0.6rem;
+            color: var(--secondary);
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+        }
+
+        .panel {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 1.8rem;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-sm);
+            transition: all var(--transition-normal);
+        }
+
+        .panel:hover {
+            box-shadow: var(--shadow-md);
+            border-color: var(--primary-glow);
+        }
+
+        .panel-title {
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--secondary);
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th {
+            text-align: left;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #64748b;
+            padding-bottom: 1rem;
+            text-transform: uppercase;
+        }
+
+        .data-table td {
+            padding: 1rem 0;
+            border-top: 1px solid #f0f2f5;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .data-table tr {
+            transition: all var(--transition-fast);
+            cursor: pointer;
+        }
+
+        .data-table tr:hover {
+            background: rgba(180, 83, 9, 0.04);
+        }
+
+        .progress-bar {
+            height: 6px;
+            width: 90px;
+            background: #e2e8f0;
+            border-radius: 10px;
+            overflow: hidden;
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+
+        .growth-card {
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            color: white;
+            padding: 1.5rem;
+            border-radius: var(--radius-lg);
+            margin-bottom: 1.8rem;
+            transition: all var(--transition-normal);
+            cursor: pointer;
+        }
+
+        .growth-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .brief-item {
+            display: flex;
+            gap: 14px;
+            margin-bottom: 1.5rem;
+            transition: all var(--transition-fast);
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: var(--radius-sm);
+        }
+
+        .brief-item:hover {
+            background: var(--primary-light);
+            transform: translateX(4px);
+        }
+
+        /* tooltip collapsed sidebar */
+        .sidebar.collapsed .nav-item {
+            position: relative;
+        }
+
+        .sidebar.collapsed .nav-item:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            left: 70px;
+            background: #1e293b;
+            color: #fbbf24;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            white-space: nowrap;
+            z-index: 30;
+            box-shadow: var(--shadow-md);
+            pointer-events: none;
+            animation: fadeIn 0.15s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateX(-4px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        /* responsive */
+        @media (max-width: 992px) {
+            .metric-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .content-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+            .main {
+                padding: 1.8rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                height: 100vh;
+                z-index: 1000;
+                transform: translateX(0);
+                transition: transform var(--transition-normal), width var(--transition-normal);
+            }
+            .sidebar.collapsed {
+                transform: translateX(-100%);
+                width: var(--sidebar-width-expanded);
+            }
+            .sidebar:not(.collapsed) {
+                transform: translateX(0);
+            }
+            .main {
+                padding: 1.2rem;
+                width: 100%;
+            }
+            .metric-grid {
+                grid-template-columns: 1fr;
+            }
+            .mobile-menu-btn {
+                display: inline-flex;
+            }
+            .header-title h1 {
+                font-size: 1.6rem;
+            }
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: var(--secondary);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 0.6rem 1rem;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            .mobile-menu-btn {
+                display: inline-flex;
+            }
+        }
+
+        .simple-list {
+            list-style: none;
+            margin-top: 1rem;
+        }
+        .simple-list li {
+            padding: 0.8rem 0;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+    </style>
+</head>
+<body>
+<div class="wrapper">
+    <aside class="sidebar" id="sidebar">
+        <div class="logo-area">
+            <div class="logo">
+                <i data-lucide="gem"></i>
+                <span class="logo-text">Eb Academy</span>
+            </div>
+            <button class="top-toggle-btn" id="topToggleBtn" aria-label="Collapse Sidebar">
+                <i data-lucide="chevrons-left"></i>
+            </button>
+        </div>
+        <div class="nav">
+            <div class="nav-item" data-page="growth" data-tooltip="Growth & Marketing">
+                <i data-lucide="trending-up"></i>
+                <span class="nav-text">Dashboard</span>
+            </div>
+            <div class="nav-item active" data-page="financials" data-tooltip="Financials">
+                <i data-lucide="pie-chart"></i>
+                <span class="nav-text">Financials</span>
+            </div>
+            <div class="nav-item" data-page="facilities" data-tooltip="Facilities">
+                <i data-lucide="building-2"></i>
+                <span class="nav-text">News</span>
+            </div>
+            <div class="nav-item" data-page="hr" data-tooltip="HR & Payroll">
+                <i data-lucide="users"></i>
+                <span class="nav-text">Payment</span>
+            </div>
+            <div class="nav-item" data-page="compliance" data-tooltip="Compliance">
+                <i data-lucide="file-check"></i>
+                <span class="nav-text">Messanger</span>
+            </div>
+        </div>
+        <div class="sidebar-footer">
+            <button class="collapse-btn" id="bottomToggleBtn" aria-label="Toggle Sidebar">
+                <i data-lucide="chevrons-left"></i>
+            </button>
+        </div>
+    </aside>
+
+    <main class="main">
+        <button class="mobile-menu-btn" id="mobileMenuBtn">
+            <i data-lucide="menu"></i> Menu
+        </button>
+
+        <div class="header">
+            <div class="header-title">
+                <h1 id="pageTitle">Financial Dashboard</h1>
+                <p id="pageSubtitle">Q2 2026 · Real-time financial performance & KPIs</p>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-outline" id="actionBtnLeft"><i data-lucide="calendar"></i> Fiscal Year</button>
+                <button class="btn btn-dark" id="actionBtnRight"><i data-lucide="plus"></i> Add Campus</button>
+            </div>
+        </div>
+
+        <!-- ==================== PAGE VIEWS ==================== -->
+        <!-- FINANCIALS (default) -->
+        <div id="financialsView" class="page-view active-view">
+            <div class="metric-grid">
+                <div class="metric-card"><h4>Annual Revenue</h4><p class="value">$4.2M</p><p class="subtext" style="color:var(--success);">+12.5% YoY</p></div>
+                <div class="metric-card"><h4>Profit Margin</h4><p class="value">28.4%</p><p class="subtext" style="color:var(--accent);">Target: 30%</p></div>
+                <div class="metric-card"><h4>Retention Rate</h4><p class="value">94.2%</p><p class="subtext" style="color:var(--success);">Above avg</p></div>
+                <div class="metric-card"><h4>Liability Risk</h4><p class="value">Low</p><p class="subtext" style="color:var(--success);">Audits passed</p></div>
+            </div>
+            <div class="content-grid">
+                <section class="panel">
+                    <div class="panel-title"><i data-lucide="bar-chart-3" style="color:var(--primary);"></i> Campus Revenue Streams</div>
+                    <table class="data-table">
+                        <thead><tr><th>Location</th><th>Gross Revenue</th><th>Expense Ratio</th><th>Net Position</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>Central Campus</strong></td><td>$2,140,000</td><td><div class="progress-bar"><div style="width:62%; background:var(--primary);"></div></div>62%</td><td style="color:var(--success);">+$813k</td></tr>
+                            <tr><td><strong>North Wing (Prep)</strong></td><td>$1,250,000</td><td><div class="progress-bar"><div style="width:74%; background:var(--primary);"></div></div>74%</td><td style="color:var(--success);">+$325k</td></tr>
+                            <tr><td><strong>West Heights</strong></td><td>$810,000</td><td><div class="progress-bar"><div style="width:88%; background:var(--danger);"></div></div>88%</td><td style="color:#b45309;">+$97k</td></tr>
+                        </tbody>
+                    </table>
+                </section>
+                <aside>
+                    <div class="growth-card"><h4 style="font-size:0.75rem;">Expansion Pipeline</h4><p style="font-size:1.4rem; font-weight:800;">New STEM Lab</p><p>Investment: $450k · 45% complete · ROI 18% by Y2</p><div style="height:4px; background:rgba(255,255,255,0.2); margin-top:12px;"><div style="width:45%; background:#fbbf24; height:4px;"></div></div></div>
+                    <div class="panel"><h3 class="panel-title" style="font-size:1rem;">Director's Brief</h3>
+                        <div class="brief-item"><div style="background:var(--primary-light); padding:10px; border-radius:12px;"><i data-lucide="landmark" style="color:var(--primary);"></i></div><p>Board Meeting <strong>April 15th</strong> · salary adjustment</p></div>
+                        <div class="brief-item"><div style="background:#f1f5f9; padding:10px; border-radius:12px;"><i data-lucide="file-text"></i></div><p>Insurance renewal due <strong>14 days</strong></p></div>
+                    </div>
+                </aside>
+            </div>
+        </div>
+
+        <!-- GROWTH & MARKETING VIEW -->
+        <div id="growthView" class="page-view">
+            <div class="metric-grid">
+                <div class="metric-card"><h4>Student Enrollments</h4><p class="value">1,284</p><p class="subtext" style="color:var(--success);">+8.3% YoY</p></div>
+                <div class="metric-card"><h4>Marketing ROI</h4><p class="value">342%</p><p class="subtext">CPL: $187</p></div>
+                <div class="metric-card"><h4>Inquiry → Enroll</h4><p class="value">28%</p><p class="subtext">Conversion rate</p></div>
+                <div class="metric-card"><h4>Social Reach</h4><p class="value">124k</p><p class="subtext">+22% MoM</p></div>
+            </div>
+            <div class="content-grid">
+                <div class="panel"><div class="panel-title"><i data-lucide="megaphone"></i> Campaign Performance</div>
+                    <ul class="simple-list">
+                        <li><i data-lucide="trending-up" style="color:var(--success);"></i> Spring Open House · 340 attendees · +42% vs LY</li>
+                        <li><i data-lucide="mail"></i> Email Nurture · CTR 11.2% · Industry avg 7%</li>
+                        <li><i data-lucide="instagram"></i> Social Ads · ROAS 5.8x · Budget $24k</li>
+                    </ul>
+                </div>
+                <div class="panel"><div class="panel-title"><i data-lucide="users"></i> Pipeline by Source</div>
+                    <div style="margin:1rem 0;"><span>Referrals</span><div class="progress-bar" style="width:100%;"><div style="width:45%; background:var(--primary); height:6px;"></div></div>45%</div>
+                    <div><span>Digital Ads</span><div class="progress-bar" style="width:100%;"><div style="width:32%; background:var(--accent);"></div></div>32%</div>
+                    <div style="margin-top:1rem;"><span>Community Events</span><div class="progress-bar" style="width:100%;"><div style="width:23%; background:var(--success);"></div></div>23%</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FACILITIES VIEW -->
+        <div id="facilitiesView" class="page-view">
+            <div class="metric-grid">
+                <div class="metric-card"><h4>Total Sq Ft</h4><p class="value">187k</p><p class="subtext">3 campuses</p></div>
+                <div class="metric-card"><h4>Utilization</h4><p class="value">87%</p><p class="subtext">Peak hours</p></div>
+                <div class="metric-card"><h4>Maintenance</h4><p class="value">$124k</p><p class="subtext">YTD spend</p></div>
+                <div class="metric-card"><h4>CapEx Projects</h4><p class="value">3 active</p><p class="subtext">STEM Lab, HVAC, Playground</p></div>
+            </div>
+            <div class="content-grid">
+                <div class="panel"><div class="panel-title"><i data-lucide="hard-hat"></i> Active Projects</div>
+                    <ul class="simple-list">
+                        <li><strong>STEM Lab (Central)</strong> – 45% complete · $450k</li>
+                        <li><strong>HVAC Upgrade (North)</strong> – 80% complete · $210k</li>
+                        <li><strong>Playground Resurface (West)</strong> – planned Q3 · $65k</li>
+                    </ul>
+                </div>
+                <div class="panel"><div class="panel-title"><i data-lucide="clipboard-list"></i> Facility Alerts</div>
+                    <div class="brief-item"><i data-lucide="alert-triangle" style="color:var(--warning);"></i> West Heights roof inspection due May 10</div>
+                    <div class="brief-item"><i data-lucide="calendar"></i> Fire safety audit scheduled Apr 28</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- HR & PAYROLL VIEW -->
+        <div id="hrView" class="page-view">
+            <div class="metric-grid">
+                <div class="metric-card"><h4>Total Staff</h4><p class="value">187</p><p class="subtext">Full-time + part-time</p></div>
+                <div class="metric-card"><h4>Payroll (MoM)</h4><p class="value">$1.12M</p><p class="subtext">+3% vs budget</p></div>
+                <div class="metric-card"><h4>Turnover Rate</h4><p class="value">12%</p><p class="subtext">Target: <10%</p></div>
+                <div class="metric-card"><h4>Teacher Ratio</h4><p class="value">18:1</p><p class="subtext">Industry avg 20:1</p></div>
+            </div>
+            <div class="content-grid">
+                <div class="panel"><div class="panel-title"><i data-lucide="badge-dollar-sign"></i> Salary Bands</div>
+                    <table class="data-table"><tr><th>Role</th><th>Avg Salary</th><th>Openings</th></tr>
+                        <tr><td>Lead Teacher</td><td>$68k</td><td>4</td></tr>
+                        <tr><td>Admin</td><td>$82k</td><td>1</td></tr>
+                        <tr><td>Operations</td><td>$55k</td><td>2</td></tr>
+                    </table>
+                </div>
+                <div class="panel"><div class="panel-title"><i data-lucide="calendar-heart"></i> Upcoming HR Events</div>
+                    <div class="brief-item">📅 Annual reviews start May 1</div>
+                    <div class="brief-item">🎓 Teacher appreciation week (May 4–8)</div>
+                    <div class="brief-item">📝 Benefits enrollment opens June 15</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- COMPLIANCE VIEW -->
+        <div id="complianceView" class="page-view">
+            <div class="metric-grid">
+                <div class="metric-card"><h4>Audit Status</h4><p class="value">Passed</p><p class="subtext">All 3 campuses</p></div>
+                <div class="metric-card"><h4>Licenses</h4><p class="value">12/12</p><p class="subtext">Up to date</p></div>
+                <div class="metric-card"><h4>Risk Score</h4><p class="value">18</p><p class="subtext">Scale 0-100 (low)</p></div>
+                <div class="metric-card"><h4>Insurance</h4><p class="value">Active</p><p class="subtext">Renews in 14d</p></div>
+            </div>
+            <div class="content-grid">
+                <div class="panel"><div class="panel-title"><i data-lucide="shield-check"></i> Compliance Checklist</div>
+                    <ul class="simple-list">
+                        <li><i data-lucide="check-circle" style="color:var(--success);"></i> Title IX training completed</li>
+                        <li><i data-lucide="check-circle" style="color:var(--success);"></i> Background checks 100%</li>
+                        <li><i data-lucide="alert-circle" style="color:var(--warning);"></i> Fire drill pending (due Apr 30)</li>
+                        <li><i data-lucide="clock"></i> Insurance renewal · 14 days left</li>
+                    </ul>
+                </div>
+                <div class="panel"><div class="panel-title"><i data-lucide="file-text"></i> Recent Filings</div>
+                    <div>Q2 Tax filing submitted Mar 28</div>
+                    <div style="margin-top:12px;">Annual report to Dept of Ed – in review</div>
+                    <button class="btn-outline" style="margin-top:1rem; width:100%;">Download Audit Package</button>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script>
+    (function() {
+        lucide.createIcons();
+
+        const sidebar = document.getElementById('sidebar');
+        const topBtn = document.getElementById('topToggleBtn');
+        const bottomBtn = document.getElementById('bottomToggleBtn');
+        const mobileBtn = document.getElementById('mobileMenuBtn');
+        const navItems = document.querySelectorAll('.nav-item');
+        const views = {
+            financials: document.getElementById('financialsView'),
+            growth: document.getElementById('growthView'),
+            facilities: document.getElementById('facilitiesView'),
+            hr: document.getElementById('hrView'),
+            compliance: document.getElementById('complianceView')
+        };
+        const pageTitle = document.getElementById('pageTitle');
+        const pageSubtitle = document.getElementById('pageSubtitle');
+        const actionLeft = document.getElementById('actionBtnLeft');
+        const actionRight = document.getElementById('actionBtnRight');
+
+        const pageConfig = {
+            financials: { title: 'Financial Dashboard', subtitle: 'Q2 2026 · Real-time financial performance & KPIs', leftAction: 'Fiscal Year', rightAction: 'Add Campus' },
+            growth: { title: 'Growth & Marketing', subtitle: 'Enrollment trends, campaign ROI, and lead pipeline', leftAction: 'Export Report', rightAction: 'New Campaign' },
+            facilities: { title: 'Facilities Management', subtitle: 'Project tracking, utilization, and maintenance', leftAction: 'Schedule Audit', rightAction: 'Log Issue' },
+            hr: { title: 'HR & Payroll', subtitle: 'Staffing, compensation, and talent planning', leftAction: 'Payroll Summary', rightAction: 'Post Opening' },
+            compliance: { title: 'Compliance & Risk', subtitle: 'Audits, licenses, and regulatory readiness', leftAction: 'Run Audit', rightAction: 'Upload Docs' }
+        };
+
+        function switchView(viewId) {
+            Object.values(views).forEach(v => v.classList.remove('active-view'));
+            views[viewId].classList.add('active-view');
+            const cfg = pageConfig[viewId];
+            pageTitle.innerText = cfg.title;
+            pageSubtitle.innerText = cfg.subtitle;
+            actionLeft.innerHTML = `<i data-lucide="${viewId === 'financials' ? 'calendar' : 'download'}"></i> ${cfg.leftAction}`;
+            actionRight.innerHTML = `<i data-lucide="${viewId === 'financials' ? 'plus' : 'plus-circle'}"></i> ${cfg.rightAction}`;
+            lucide.createIcons();
+        }
+
+        navItems.forEach(item => {
+            item.addEventListener('click', (e) => {
+                const page = item.getAttribute('data-page');
+                if (page && views[page]) {
+                    navItems.forEach(nav => nav.classList.remove('active'));
+                    item.classList.add('active');
+                    switchView(page);
+                }
+                e.preventDefault();
+            });
+        });
+
+        // Sidebar toggle functions
+        function updateAllIcons(isCollapsed) {
+            const iconName = isCollapsed ? 'chevrons-right' : 'chevrons-left';
+            [topBtn, bottomBtn].forEach(btn => {
+                if (btn) {
+                    const icon = btn.querySelector('i');
+                    if (icon) icon.setAttribute('data-lucide', iconName);
+                }
+            });
+            lucide.createIcons();
+        }
+        function toggleSidebar() {
+            const isCollapsed = sidebar.classList.toggle('collapsed');
+            updateAllIcons(isCollapsed);
+            localStorage.setItem('edu-sidebar-collapsed', isCollapsed ? 'true' : 'false');
+        }
+        if (topBtn) topBtn.addEventListener('click', toggleSidebar);
+        if (bottomBtn) bottomBtn.addEventListener('click', toggleSidebar);
+        if (mobileBtn) {
+            mobileBtn.addEventListener('click', () => {
+                sidebar.classList.toggle('collapsed');
+                updateAllIcons(sidebar.classList.contains('collapsed'));
+            });
+        }
+        const saved = localStorage.getItem('edu-sidebar-collapsed');
+        if (saved === 'true') {
+            sidebar.classList.add('collapsed');
+            updateAllIcons(true);
+        } else {
+            updateAllIcons(false);
+        }
+
+        // tooltip attributes
+        navItems.forEach(item => {
+            if (!item.getAttribute('data-tooltip')) {
+                const text = item.querySelector('.nav-text')?.innerText;
+                if (text) item.setAttribute('data-tooltip', text);
+            }
+        });
+
+        // additional interactive alerts for demo
+        document.querySelectorAll('.metric-card, .brief-item, .growth-card, .data-table tr').forEach(el => {
+            el.addEventListener('click', (e) => {
+                if(e.target.closest('.metric-card') || e.target.closest('.brief-item') || e.target.closest('.growth-card') || e.target.closest('tr')) {
+                    alert('📊 Detailed view would open here (connected to backend). Click to explore more.');
+                }
+            });
+        });
+    })();
+</script>
+</body>
+</html>

@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Lumino | Hire Requests Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/dexie@latest/dist/dexie.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      padding: 2rem 1.5rem;
+      min-height: 100vh;
+      transition: background 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1), color 0.25s ease;
+    }
+
+    /* Light theme (default) */
+    :root {
+      --bg-primary: #f9fafc;
+      --bg-surface: #ffffff;
+      --bg-card: #ffffff;
+      --bg-table-header: #f1f5f9;
+      --text-primary: #0f172a;
+      --text-secondary: #334155;
+      --text-muted: #64748b;
+      --border-light: #e2e8f0;
+      --accent: #3b82f6;
+      --accent-hover: #2563eb;
+      --accent-soft: #eef2ff;
+      --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.03), 0 1px 2px rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 8px 20px rgba(0, 0, 0, 0.05);
+      --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.1);
+      --toast-bg: #1e293b;
+      --toast-text: #f1f5f9;
+      --icon-bg: #f1f5f9;
+      --hire-badge: #ef4444;
+      --notification-dot: #ef4444;
+      --dropdown-bg: #ffffff;
+    }
+
+    /* Dark theme */
+    body.dark {
+      --bg-primary: #0f172a;
+      --bg-surface: #1e293b;
+      --bg-card: #1e293b;
+      --bg-table-header: #0f172a;
+      --text-primary: #f1f5f9;
+      --text-secondary: #cbd5e1;
+      --text-muted: #94a3b8;
+      --border-light: #334155;
+      --accent: #60a5fa;
+      --accent-hover: #3b82f6;
+      --accent-soft: #1e293b;
+      --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.3);
+      --shadow-md: 0 8px 20px rgba(0, 0, 0, 0.4);
+      --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.5);
+      --toast-bg: #f1f5f9;
+      --toast-text: #0f172a;
+      --icon-bg: #334155;
+      --hire-badge: #f97316;
+      --dropdown-bg: #1e293b;
+    }
+
+    .dashboard-container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .title-section h1 {
+      font-weight: 600;
+      font-size: 1.8rem;
+      letter-spacing: -0.3px;
+      background: linear-gradient(135deg, var(--accent), #8b5cf6);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+      display: inline-block;
+    }
+
+    .title-section p {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-top: 0.25rem;
+    }
+
+    .actions {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .icon-btn {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-light);
+      border-radius: 60px;
+      padding: 0.6rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      box-shadow: var(--shadow-sm);
+      position: relative;
+    }
+
+    .icon-btn:hover {
+      background: var(--accent-soft);
+      transform: scale(1.02);
+      border-color: var(--accent);
+    }
+
+    /* Notification Dropdown */
+    .notification-area {
+      position: relative;
+    }
+
+    .badge {
+      position: absolute;
+      top: -6px;
+      right: -6px;
+      background: #ef4444;
+      color: white;
+      border-radius: 50px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 0.2rem 0.5rem;
+      min-width: 18px;
+      text-align: center;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+      transition: transform 0.2s ease;
+      z-index: 10;
+    }
+
+    .badge.new-requests {
+      animation: pulse 0.5s ease-in-out;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.3); }
+    }
+
+    /* Dropdown Menu */
+    .notification-dropdown {
+      position: absolute;
+      top: 55px;
+      right: 0;
+      width: 380px;
+      max-height: 500px;
+      background: var(--dropdown-bg);
+      border: 1px solid var(--border-light);
+      border-radius: 20px;
+      box-shadow: var(--shadow-lg);
+      z-index: 1000;
+      overflow: hidden;
+      animation: dropdownSlide 0.3s ease;
+      display: none;
+    }
+
+    .notification-dropdown.show {
+      display: block;
+    }
+
+    @keyframes dropdownSlide {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .dropdown-header {
+      padding: 1rem 1.2rem;
+      background: var(--bg-table-header);
+      border-bottom: 1px solid var(--border-light);
+      font-weight: 600;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .dropdown-header h4 {
+      font-size: 0.95rem;
+    }
+
+    .mark-all-read {
+      font-size: 0.7rem;
+      color: var(--accent);
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 8px;
+      transition: background 0.2s;
+    }
+
+    .mark-all-read:hover {
+      background: var(--accent-soft);
+    }
+
+    .notifications-list {
+      max-height: 380px;
+      overflow-y: auto;
+    }
+
+    .notification-item {
+      padding: 1rem 1.2rem;
+      border-bottom: 1px solid var(--border-light);
+      cursor: pointer;
+      transition: background 0.2s;
+      position: relative;
+    }
+
+    .notification-item:hover {
+      background: var(--accent-soft);
+    }
+
+    .notification-item.unread {
+      background: color-mix(in oklab, var(--accent) 8%, transparent);
+      border-left: 3px solid var(--accent);
+    }
+
+    .notification-item.unread:hover {
+      background: color-mix(in oklab, var(--accent) 12%, transparent);
+    }
+
+    .notification-title {
+      font-weight: 600;
+      font-size: 0.85rem;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .notification-company {
+      color: var(--accent);
+    }
+
+    .notification-message {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+      line-height: 1.4;
+    }
+
+    .notification-time {
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .unread-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--accent);
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .dropdown-empty {
+      padding: 2rem;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+
+    /* Table wrapper */
+    .table-wrapper {
+      background: var(--bg-surface);
+      border-radius: 28px;
+      box-shadow: var(--shadow-md);
+      overflow-x: auto;
+      backdrop-filter: blur(0px);
+      border: 1px solid var(--border-light);
+      transition: all 0.25s;
+    }
+
+    .hire-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      padding: 0 0.5rem;
+    }
+
+    .hire-header h2 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .hire-badge-count {
+      background: var(--hire-badge);
+      color: white;
+      border-radius: 40px;
+      padding: 0.2rem 0.7rem;
+      font-size: 0.7rem;
+      font-weight: 600;
+    }
+
+    .hire-requests-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+
+    .hire-requests-table th {
+      text-align: left;
+      padding: 1rem 1rem;
+      background-color: var(--bg-table-header);
+      font-weight: 600;
+      color: var(--text-secondary);
+      border-bottom: 1px solid var(--border-light);
+      font-size: 0.85rem;
+    }
+
+    .hire-requests-table td {
+      padding: 0.9rem 1rem;
+      border-bottom: 1px solid var(--border-light);
+      color: var(--text-primary);
+      vertical-align: middle;
+    }
+
+    .hire-requests-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .hire-requests-table tr:hover td {
+      background-color: var(--accent-soft);
+      transition: background 0.2s;
+    }
+
+    .status-chip {
+      display: inline-flex;
+      padding: 0.2rem 0.7rem;
+      border-radius: 40px;
+      font-size: 0.7rem;
+      font-weight: 500;
+    }
+
+    .status-new {
+      background: #fef3c7;
+      color: #b45309;
+    }
+
+    body.dark .status-new {
+      background: #422006;
+      color: #fcd34d;
+    }
+
+    .status-reviewed {
+      background: #dcfce7;
+      color: #15803d;
+    }
+
+    body.dark .status-reviewed {
+      background: #14532d;
+      color: #86efac;
+    }
+
+    .row-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .row-action-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text-muted);
+      transition: all 0.2s;
+      padding: 6px;
+      border-radius: 8px;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .row-action-btn:hover {
+      color: var(--accent);
+      background: var(--accent-soft);
+      transform: scale(1.05);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 4rem;
+      color: var(--text-muted);
+    }
+
+    .empty-state svg {
+      width: 64px;
+      height: 64px;
+      margin-bottom: 1rem;
+      opacity: 0.5;
+    }
+
+    /* Toast notification */
+    .toast-message {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      background: var(--toast-bg);
+      color: var(--toast-text);
+      padding: 1rem 1.5rem;
+      border-radius: 48px;
+      font-weight: 500;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.2);
+      backdrop-filter: blur(2px);
+      z-index: 1000;
+      animation: slideInUp 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+      border-left: 4px solid var(--accent);
+    }
+
+    .toast-message.hide-toast {
+      animation: slideOutDown 0.3s ease forwards;
+    }
+
+    @keyframes slideInUp {
+      from {
+        opacity: 0;
+        transform: translateY(40px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes slideOutDown {
+      to {
+        opacity: 0;
+        transform: translateY(50px);
+        visibility: hidden;
+      }
+    }
+
+    .icon-svg {
+      width: 1.2rem;
+      height: 1.2rem;
+      display: inline-block;
+      stroke-width: 2;
+      stroke: currentColor;
+      fill: none;
+    }
+
+    .refresh-indicator {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .refresh-indicator .dot {
+      width: 8px;
+      height: 8px;
+      background: #10b981;
+      border-radius: 50%;
+      animation: blink 1.5s infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    @media (max-width: 720px) {
+      body {
+        padding: 1.2rem;
+      }
+      .title-section h1 {
+        font-size: 1.4rem;
+      }
+      .notification-dropdown {
+        width: 320px;
+        right: -20px;
+      }
+      .hire-requests-table th,
+      .hire-requests-table td {
+        padding: 0.6rem 0.5rem;
+        font-size: 0.75rem;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="dashboard-container">
+  <div class="header-bar">
+    <div class="title-section">
+      <h1>🎯 Hire Request Dashboard</h1>
+      <p>Real-time tracking of incoming job inquiries from your portfolio</p>
+    </div>
+    <div class="actions">
+      <!-- Notification bell with dropdown -->
+      <div class="notification-area" id="notificationArea">
+        <button class="icon-btn" id="notificationBellBtn" aria-label="Show notifications">
+          <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+            <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+          </svg>
+        </button>
+        <span class="badge" id="notificationBadge">0</span>
+        
+        <!-- Dropdown Menu -->
+        <div class="notification-dropdown" id="notificationDropdown">
+          <div class="dropdown-header">
+            <h4>🔔 Notifications</h4>
+            <button class="mark-all-read" id="markAllReadBtn">Mark all as read</button>
+          </div>
+          <div class="notifications-list" id="notificationsList">
+            <div class="dropdown-empty">No new notifications</div>
+          </div>
+        </div>
+      </div>
+      <!-- Theme toggle -->
+      <button class="icon-btn" id="themeToggleBtn" aria-label="Dark/Light mode">
+        <svg class="icon-svg" id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Hire Requests Section -->
+  <div class="hire-header">
+    <h2>
+      <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+        <circle cx="12" cy="7" r="4" />
+      </svg>
+      All Hire Requests
+      <span id="hireCountBadge" class="hire-badge-count">0</span>
+    </h2>
+    <div class="refresh-indicator">
+      <span class="dot"></span>
+      <span>Live updates</span>
+    </div>
+  </div>
+
+  <div class="table-wrapper">
+    <table class="hire-requests-table">
+      <thead>
+        <tr>
+          <th>Company</th>
+          <th>Contact</th>
+          <th>Role</th>
+          <th>Salary</th>
+          <th>Start Date</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="hireRequestsTbody">
+        <tr><td colspan="7" class="empty-state">
+          <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+            <circle cx="12" cy="7" r="4" />
+          </svg>
+          <div>📭 No hire requests yet</div>
+          <div style="font-size: 0.8rem; margin-top: 8px;">Submit one from your portfolio page</div>
+        </td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  // Initialize Dexie
+  const db = new Dexie("PortfolioMakerCoreDB");
+  db.version(1).stores({
+    portfolios: "++id, fullName, createdAt, updatedAt",
+    hireRequests: "++id, company, contact, email, role, salary, startDate, message, status, createdAt, isRead"
+  });
+
+  // State variables
+  let currentRequests = [];
+  let unreadCount = 0;
+  let lastCheckedCount = 0;
+  let refreshInterval;
+  let notificationSound = null;
+
+  // Helper functions
+  function escapeHtml(str) {
+    if (!str) return '';
+    return String(str).replace(/[&<>]/g, function(m) {
+      if (m === '&') return '&amp;';
+      if (m === '<') return '&lt;';
+      if (m === '>') return '&gt;';
+      return m;
+    });
+  }
+
+  function formatTimeAgo(date) {
+    const seconds = Math.floor((new Date() - new Date(date)) / 1000);
+    if (seconds < 60) return 'Just now';
+    const minutes = Math.floor(seconds / 60);
+    if (minutes < 60) return `${minutes}m ago`;
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours}h ago`;
+    const days = Math.floor(hours / 24);
+    return `${days}d ago`;
+  }
+
+  function showToast(message, isNewRequest = false) {
+    const existingToast = document.querySelector('.toast-message');
+    if (existingToast) {
+      existingToast.classList.add('hide-toast');
+      setTimeout(() => existingToast.remove(), 300);
+    }
+    
+    const toast = document.createElement('div');
+    toast.className = 'toast-message';
+    
+    if (isNewRequest) {
+      toast.style.borderLeftColor = '#ef4444';
+      toast.style.animation = 'slideInUp 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1)';
+      toast.innerHTML = `
+        <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: #ef4444;">
+          <circle cx="12" cy="12" r="10" />
+          <line x1="12" y1="8" x2="12" y2="12" />
+          <line x1="12" y1="16" x2="12.01" y2="16" />
+        </svg>
+        <span>${escapeHtml(message)}</span>
+      `;
+    } else {
+      toast.innerHTML = `
+        <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+          <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+        </svg>
+        <span>${escapeHtml(message)}</span>
+      `;
+    }
+    
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+      if (toast && toast.parentNode) {
+        toast.classList.add('hide-toast');
+        setTimeout(() => toast.remove(), 300);
+      }
+    }, 5000);
+  }
+
+  // Update notification badge
+  function updateNotificationBadge(count) {
+    const badge = document.getElementById('notificationBadge');
+    if (badge) {
+      if (count > 0) {
+        badge.textContent = count > 99 ? '99+' : count;
+        badge.style.display = 'block';
+        badge.classList.add('new-requests');
+        setTimeout(() => badge.classList.remove('new-requests'), 500);
+      } else {
+        badge.textContent = '0';
+        badge.style.opacity = '0.5';
+      }
+    }
+  }
+
+  // Render dropdown notifications
+  function renderNotifications(requests) {
+    const notificationsList = document.getElementById('notificationsList');
+    if (!notificationsList) return;
+    
+    const unreadRequests = requests.filter(r => !r.isRead && r.status === 'new');
+    unreadCount = unreadRequests.length;
+    updateNotificationBadge(unreadCount);
+    
+    if (unreadRequests.length === 0 && requests.filter(r => r.status === 'new').length === 0) {
+      notificationsList.innerHTML = '<div class="dropdown-empty">✨ No new notifications</div>';
+      return;
+    }
+    
+    // Show only unread or recent notifications (last 10)
+    const notificationsToShow = unreadRequests.length > 0 ? unreadRequests : requests.slice(0, 5);
+    
+    notificationsList.innerHTML = notificationsToShow.map(req => `
+      <div class="notification-item ${!req.isRead && req.status === 'new' ? 'unread' : ''}" data-id="${req.id}">
+        <div class="notification-title">
+          <span class="notification-company">🏢 ${escapeHtml(req.company)}</span>
+          ${!req.isRead && req.status === 'new' ? '<span class="unread-dot"></span>' : ''}
+        </div>
+        <div class="notification-message">
+          ${escapeHtml(req.contact)} wants to hire you for <strong>${escapeHtml(req.role)}</strong>
+        </div>
+        <div class="notification-time">
+          <span>${formatTimeAgo(req.createdAt)}</span>
+          <span>💰 ${escapeHtml(req.salary || 'Negotiable')}</span>
+        </div>
+      </div>
+    `).join('');
+    
+    // Add click handlers to notification items
+    document.querySelectorAll('.notification-item').forEach(item => {
+      item.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const id = parseInt(item.getAttribute('data-id'));
+        await markRequestAsRead(id);
+        // Close dropdown after click
+        document.getElementById('notificationDropdown').classList.remove('show');
+        // Scroll to and highlight the request in the table
+        const row = document.querySelector(`.hire-requests-table tr[data-id="${id}"]`);
+        if (row) {
+          row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          row.style.backgroundColor = 'var(--accent-soft)';
+          setTimeout(() => {
+            row.style.backgroundColor = '';
+          }, 2000);
+        }
+      });
+    });
+  }
+
+  // Mark a request as read
+  async function markRequestAsRead(id) {
+    const request = currentRequests.find(r => r.id === id);
+    if (request && !request.isRead) {
+      await db.hireRequests.update(id, { isRead: true });
+      await checkForNewRequests();
+      showToast(`📬 Marked ${request.company} as read`);
+    }
+  }
+
+  // Mark all as read
+  async function markAllAsRead() {
+    const unreadRequests = currentRequests.filter(r => !r.isRead && r.status === 'new');
+    if (unreadRequests.length === 0) {
+      showToast('No unread notifications');
+      return;
+    }
+    
+    for (const req of unreadRequests) {
+      await db.hireRequests.update(req.id, { isRead: true });
+    }
+    await checkForNewRequests();
+    showToast(`✓ Marked ${unreadRequests.length} notification${unreadRequests.length > 1 ? 's' : ''} as read`);
+  }
+
+  // Check for new requests and show notifications
+  async function checkForNewRequests() {
+    try {
+      const requests = await db.hireRequests.orderBy('createdAt').reverse().toArray();
+      const currentCount = requests.length;
+      
+      // Ensure all requests have isRead field
+      let needsUpdate = false;
+      for (const req of requests) {
+        if (req.isRead === undefined) {
+          await db.hireRequests.update(req.id, { isRead: req.status !== 'new' });
+          needsUpdate = true;
+        }
+      }
+      if (needsUpdate) {
+        const updatedRequests = await db.hireRequests.orderBy('createdAt').reverse().toArray();
+        await renderHireRequests(updatedRequests);
+        renderNotifications(updatedRequests);
+        lastCheckedCount = updatedRequests.length;
+        return;
+      }
+      
+      // Check if there are new requests
+      if (currentCount > lastCheckedCount && lastCheckedCount !== 0) {
+        const newCount = currentCount - lastCheckedCount;
+        const newestRequest = requests[0];
+        
+        // Show toast notification
+        showToast(`🎉 New hire request from ${newestRequest.company}! ${newCount} new request${newCount > 1 ? 's' : ''}`, true);
+        
+        // Play a subtle beep/notification sound if supported
+        try {
+          const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+          const oscillator = audioContext.createOscillator();
+          const gainNode = audioContext.createGain();
+          oscillator.connect(gainNode);
+          gainNode.connect(audioContext.destination);
+          oscillator.frequency.value = 880;
+          gainNode.gain.value = 0.2;
+          oscillator.start();
+          gainNode.gain.exponentialRampToValueAtTime(0.00001, audioContext.currentTime + 0.5);
+          oscillator.stop(audioContext.currentTime + 0.5);
+          setTimeout(() => audioContext.close(), 600);
+        } catch (e) {
+          console.log('Audio not supported');
+        }
+      }
+      
+      lastCheckedCount = currentCount;
+      await renderHireRequests(requests);
+      renderNotifications(requests);
+      
+    } catch (err) {
+      console.error('Error checking requests:', err);
+    }
+  }
+
+  // Render hire requests table
+  async function renderHireRequests(requests = null) {
+    const tbody = document.getElementById('hireRequestsTbody');
+    if (!tbody) return;
+    
+    try {
+      if (!requests) {
+        requests = await db.hireRequests.orderBy('createdAt').reverse().toArray();
+      }
+      currentRequests = requests;
+      
+      const count = requests.length;
+      const countBadge = document.getElementById('hireCountBadge');
+      if (countBadge) countBadge.textContent = count;
+      
+      if (requests.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="empty-state">
+          <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+            <circle cx="12" cy="7" r="4" />
+          </svg>
+          <div>📭 No hire requests yet</div>
+          <div style="font-size: 0.8rem; margin-top: 8px;">Submit one from your portfolio page</div>
+        </td></tr>`;
+        return;
+      }
+      
+      let html = '';
+      requests.forEach(req => {
+        const statusClass = req.status === 'new' ? 'status-new' : 'status-reviewed';
+        const statusLabel = req.status === 'new' ? '🆕 New' : '✅ Reviewed';
+        const createdAt = new Date(req.createdAt).toLocaleString();
+        const isHighlight = req.status === 'new' && !req.isRead;
+        
+        html += `
+          <tr data-id="${req.id}" style="${isHighlight ? 'border-left: 3px solid var(--accent);' : ''}">
+            <td><strong>${escapeHtml(req.company)}</strong><br><span style="font-size:0.7rem;color:var(--text-muted)">${createdAt}</span></td>
+            <td>
+              <strong>${escapeHtml(req.contact)}</strong><br>
+              <span style="font-size:0.7rem;color:var(--text-muted)">${escapeHtml(req.email)}</span>
+            </td>
+            <td>${escapeHtml(req.role)}</td>
+            <td>${escapeHtml(req.salary || '—')}</td>
+            <td>${escapeHtml(req.startDate || 'ASAP')}</td>
+            <td><span class="status-chip ${statusClass}">${statusLabel}</span></td>
+            <td>
+              <div class="row-actions">
+                <button class="row-action-btn mark-reviewed" data-id="${req.id}" title="Mark as reviewed">
+                  <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 6L9 17l-5-5"/></svg>
+                </button>
+                <button class="row-action-btn view-details" data-id="${req.id}" data-company="${escapeHtml(req.company)}" data-message="${escapeHtml(req.message || 'No message provided')}" title="View details">
+                  <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"/><path d="M22 12c0 5.52-4.48 10-10 10S2 17.52 2 12 6.48 2 12 2s10 4.48 10 10z"/></svg>
+                </button>
+                <button class="row-action-btn delete-request" data-id="${req.id}" title="Delete">
+                  <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      });
+      tbody.innerHTML = html;
+      
+      // Attach events
+      document.querySelectorAll('.mark-reviewed').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+          e.stopPropagation();
+          const id = parseInt(btn.getAttribute('data-id'));
+          await db.hireRequests.update(id, { status: 'reviewed' });
+          showToast('✅ Request marked as reviewed');
+          await checkForNewRequests();
+        });
+      });
+      
+      document.querySelectorAll('.delete-request').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+          e.stopPropagation();
+          const id = parseInt(btn.getAttribute('data-id'));
+          await db.hireRequests.delete(id);
+          showToast('🗑️ Request removed');
+          await checkForNewRequests();
+        });
+      });
+      
+      document.querySelectorAll('.view-details').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+          e.stopPropagation();
+          const company = btn.getAttribute('data-company');
+          const message = btn.getAttribute('data-message');
+          showToast(`📋 ${company}: ${message.substring(0, 100)}${message.length > 100 ? '...' : ''}`);
+        });
+      });
+      
+    } catch (err) {
+      console.error(err);
+      tbody.innerHTML = '<tr><td colspan="7" class="empty-state">Error loading requests</td></tr>';
+    }
+  }
+
+  // Toggle dropdown
+  function toggleDropdown() {
+    const dropdown = document.getElementById('notificationDropdown');
+    dropdown.classList.toggle('show');
+    
+    // Close dropdown when clicking outside
+    if (dropdown.classList.contains('show')) {
+      setTimeout(() => {
+        document.addEventListener('click', closeDropdownOnClickOutside);
+      }, 10);
+    } else {
+      document.removeEventListener('click', closeDropdownOnClickOutside);
+    }
+  }
+  
+  function closeDropdownOnClickOutside(e) {
+    const area = document.getElementById('notificationArea');
+    const dropdown = document.getElementById('notificationDropdown');
+    if (area && !area.contains(e.target)) {
+      dropdown.classList.remove('show');
+      document.removeEventListener('click', closeDropdownOnClickOutside);
+    }
+  }
+
+  // Theme toggle
+  function toggleTheme() {
+    const isDark = document.body.classList.contains('dark');
+    const themeIconEl = document.getElementById('themeIcon');
+    if (isDark) {
+      document.body.classList.remove('dark');
+      if (themeIconEl) themeIconEl.innerHTML = '<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />';
+      showToast("☀️ Light mode");
+    } else {
+      document.body.classList.add('dark');
+      if (themeIconEl) themeIconEl.innerHTML = '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>';
+      showToast("🌙 Dark mode");
+    }
+    localStorage.setItem('dashboardTheme', document.body.classList.contains('dark') ? 'dark' : 'light');
+  }
+
+  function loadTheme() {
+    const savedTheme = localStorage.getItem('dashboardTheme');
+    const themeIconEl = document.getElementById('themeIcon');
+    if (savedTheme === 'dark') {
+      document.body.classList.add('dark');
+      if (themeIconEl) themeIconEl.innerHTML = '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>';
+    } else {
+      if (themeIconEl) themeIconEl.innerHTML = '<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />';
+    }
+  }
+
+  // Initialize
+  async function init() {
+    loadTheme();
+    
+    // Add isRead field to existing records if needed
+    const requests = await db.hireRequests.toArray();
+    for (const req of requests) {
+      if (req.isRead === undefined) {
+        await db.hireRequests.update(req.id, { isRead: req.status !== 'new' });
+      }
+    }
+    
+    const updatedRequests = await db.hireRequests.orderBy('createdAt').reverse().toArray();
+    lastCheckedCount = updatedRequests.length;
+    await renderHireRequests(updatedRequests);
+    renderNotifications(updatedRequests);
+    
+    // Set up real-time checking (every 2 seconds)
+    refreshInterval = setInterval(() => {
+      checkForNewRequests();
+    }, 2000);
+    
+    // Event listeners
+    const themeToggleBtn = document.getElementById('themeToggleBtn');
+    const notificationBellBtn = document.getElementById('notificationBellBtn');
+    const markAllReadBtn = document.getElementById('markAllReadBtn');
+    
+    if (themeToggleBtn) themeToggleBtn.addEventListener('click', toggleTheme);
+    if (notificationBellBtn) notificationBellBtn.addEventListener('click', toggleDropdown);
+    if (markAllReadBtn) markAllReadBtn.addEventListener('click', markAllAsRead);
+    
+    // Welcome toast
+    setTimeout(() => {
+      showToast("👋 Dashboard ready! New hire requests will appear here instantly.");
+    }, 500);
+  }
+
+  // Cleanup on page unload
+  window.addEventListener('beforeunload', () => {
+    if (refreshInterval) clearInterval(refreshInterval);
+  });
+
+  init();
+</script>
+</body>
+</html>

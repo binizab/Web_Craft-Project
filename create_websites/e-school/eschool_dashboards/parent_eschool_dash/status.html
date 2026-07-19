@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>EB Academy | Night Mode Portal</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #0a0f1c;
+            --card: #1e293b;
+            --card-light: #2d3a4e;
+            --primary: #c084fc;
+            --primary-dark: #a855f7;
+            --accent: #fbbf24;
+            --success: #22c55e;
+            --success-dark: #16a34a;
+            --warning: #ef4444;
+            --info: #38bdf8;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border: #334155;
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+            --shadow-lg: 0 20px 40px -12px rgba(0, 0, 0, 0.5);
+            --transition: all 0.25s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+        }
+
+        body {
+            font-family: 'Poppins', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #0a0f1c 0%, #0f172a 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 24px;
+        }
+
+        .dashboard {
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+
+        /* Header Section */
+        .header-section {
+            text-align: center;
+            margin-bottom: 32px;
+            animation: fadeInDown 0.5s ease;
+        }
+
+        .header-section h1 {
+            font-size: clamp(1.8rem, 5vw, 2.5rem);
+            font-weight: 700;
+            background: linear-gradient(135deg, #ffffff, var(--primary));
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-top: 8px;
+        }
+
+        /* Main Grid */
+        .portal-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        /* Cards */
+        .card {
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 28px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            border-color: var(--primary);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .card-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(15, 23, 42, 0.5);
+        }
+
+        .card-header i {
+            color: var(--primary);
+        }
+
+        .card-header h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .card-content {
+            padding: 24px;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 16px;
+        }
+
+        .stat-item {
+            background: rgba(15, 23, 42, 0.6);
+            border-radius: 20px;
+            padding: 16px;
+            text-align: center;
+            transition: var(--transition);
+            border: 1px solid var(--border);
+        }
+
+        .stat-item:hover {
+            border-color: var(--success);
+            transform: scale(1.02);
+        }
+
+        .stat-icon {
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .stat-value {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-top: 6px;
+            color: var(--text-primary);
+        }
+
+        .stat-badge {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-top: 6px;
+        }
+
+        .badge-excellent { background: var(--success); color: #0f172a; }
+        .badge-good { background: var(--accent); color: #0f172a; }
+        .badge-warning { background: var(--warning); color: white; }
+
+        /* Progress Bars */
+        .progress-section {
+            margin-top: 20px;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            margin-bottom: 6px;
+            color: var(--text-secondary);
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        .fill-success { background: linear-gradient(90deg, var(--success), #4ade80); }
+        .fill-primary { background: linear-gradient(90deg, var(--primary), #c084fc); }
+        .fill-accent { background: linear-gradient(90deg, var(--accent), #fcd34d); }
+
+        /* Note Bubble */
+        .note-bubble {
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 24px;
+            padding: 20px;
+            border-left: 4px solid var(--primary);
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: var(--text-secondary);
+        }
+
+        /* Action Area */
+        .action-area {
+            background: rgba(30, 41, 59, 0.6);
+            border-radius: 28px;
+            padding: 24px;
+            margin-top: 24px;
+            border: 1px solid var(--border);
+        }
+
+        .btn {
+            padding: 14px 28px;
+            border-radius: 60px;
+            border: none;
+            font-weight: 600;
+            font-family: 'Poppins', sans-serif;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--success), var(--success-dark));
+            color: #0f172a;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: #0f172a;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.05);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .parent-reply {
+            margin-top: 20px;
+            display: none;
+            animation: fadeInUp 0.4s ease;
+        }
+
+        textarea {
+            width: 100%;
+            background: #0f172a;
+            border: 1px solid var(--border);
+            color: white;
+            border-radius: 20px;
+            padding: 14px 16px;
+            font-family: 'Poppins', sans-serif;
+            resize: vertical;
+            margin-bottom: 12px;
+            font-size: 0.85rem;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        hr {
+            border-color: var(--border);
+            margin: 16px 0;
+        }
+
+        /* Animations */
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #1e293b;
+            color: #f1f5f9;
+            padding: 12px 20px;
+            border-radius: 40px;
+            border-left: 4px solid var(--success);
+            font-size: 0.85rem;
+            font-weight: 500;
+            z-index: 1000;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            backdrop-filter: blur(8px);
+            animation: slideInRight 0.3s ease;
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* Responsive */
+        @media (max-width: 860px) {
+            .portal-grid {
+                grid-template-columns: 1fr;
+            }
+            body {
+                padding: 16px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            .card-header {
+                padding: 16px;
+            }
+            .card-content {
+                padding: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="dashboard">
+    <!-- Header -->
+    <div class="header-section">
+        <h1>
+            🎓 EB Academy Portal
+        </h1>
+        <div class="subtitle">
+            🌙 Night Mode · Real-time Student Dashboard
+        </div>
+    </div>
+
+    <!-- Main Grid -->
+    <div class="portal-grid">
+        <!-- Left Column: Performance Stats -->
+        <div class="card">
+            <div class="card-header">
+                📊
+                <h3>Performance Overview</h3>
+            </div>
+            <div class="card-content">
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-icon">📖</div>
+                        <div class="stat-label">Academic Standing</div>
+                        <div class="stat-value" id="academicVal">Top Tier</div>
+                        <span class="stat-badge badge-excellent" id="academicBadge">A+</span>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-icon">⭐</div>
+                        <div class="stat-label">Conduct Score</div>
+                        <div class="stat-value">98/100</div>
+                        <span class="stat-badge badge-excellent">Excellent</span>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-icon">📊</div>
+                        <div class="stat-label">Completion Rate</div>
+                        <div class="stat-value" id="completionRate">94%</div>
+                        <div class="progress-bar" style="margin-top: 8px;">
+                            <div class="progress-fill fill-success" id="completionFill" style="width: 94%"></div>
+                        </div>
+                    </div>
+                </div>
+                <hr>
+                <div class="progress-section">
+                    <div class="progress-label">
+                        <span>📚 Assignments Submitted</span>
+                        <span>12/14</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill fill-primary" style="width: 86%"></div>
+                    </div>
+                </div>
+                <div class="progress-section">
+                    <div class="progress-label">
+                        <span>🎯 Attendance Rate</span>
+                        <span id="attendancePercent">92%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill fill-accent" id="attendanceFill" style="width: 92%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Daily Activities & Notes -->
+        <div class="card">
+            <div class="card-header">
+                📅
+                <h3>Today's Activities</h3>
+            </div>
+            <div class="card-content">
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-icon">🥗</div>
+                        <div class="stat-label">Lunch Status</div>
+                        <div class="stat-value">Completed ✅</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-icon">🏃</div>
+                        <div class="stat-label">Physical Ed.</div>
+                        <div class="stat-value">Active</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-icon">🎨</div>
+                        <div class="stat-label">Creative Arts</div>
+                        <div class="stat-value">Project Due Fri</div>
+                    </div>
+                </div>
+                <hr>
+                <div class="note-bubble" id="outNote">
+                    💬 Daily summary: Student demonstrated excellent participation in Mathematics and completed all assignments.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Second Row: Upcoming + Achievements -->
+    <div class="portal-grid">
+        <div class="card">
+            <div class="card-header">
+                🔔
+                <h3>Upcoming Deadlines</h3>
+            </div>
+            <div class="card-content">
+                <div class="stat-item" style="margin-bottom: 12px;">
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>📐 Math Exam</span>
+                        <span style="color: var(--warning);">2 days left</span>
+                    </div>
+                    <div class="progress-bar" style="margin-top: 8px;">
+                        <div class="progress-fill fill-primary" style="width: 70%"></div>
+                    </div>
+                </div>
+                <div class="stat-item" style="margin-bottom: 12px;">
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>🔬 Science Project</span>
+                        <span style="color: var(--accent);">5 days left</span>
+                    </div>
+                    <div class="progress-bar" style="margin-top: 8px;">
+                        <div class="progress-fill fill-accent" style="width: 45%"></div>
+                    </div>
+                </div>
+                <div class="stat-item">
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>📖 Literature Essay</span>
+                        <span style="color: var(--success);">Tomorrow</span>
+                    </div>
+                    <div class="progress-bar" style="margin-top: 8px;">
+                        <div class="progress-fill fill-success" style="width: 90%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                🏆
+                <h3>Achievements & Recognition</h3>
+            </div>
+            <div class="card-content">
+                <div class="stat-item" style="display: flex; align-items: center; gap: 12px;">
+                    <div style="font-size: 1.8rem;">🏅</div>
+                    <div><strong>Perfect Attendance</strong><br><small>Last 3 weeks</small></div>
+                </div>
+                <div class="stat-item" style="display: flex; align-items: center; gap: 12px; margin-top: 8px;">
+                    <div style="font-size: 1.8rem;">🏆</div>
+                    <div><strong>Math Olympiad</strong><br><small>Top 10% Regionally</small></div>
+                </div>
+                <div class="stat-item" style="display: flex; align-items: center; gap: 12px; margin-top: 8px;">
+                    <div style="font-size: 1.8rem;">👥</div>
+                    <div><strong>Peer Mentorship</strong><br><small>Leadership Program</small></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Area: Parent Confirmation -->
+    <div class="action-area">
+        <div id="initialAction">
+            <button class="btn btn-primary" onclick="handleConfirm()">
+                ✅ Acknowledge & Confirm Report
+            </button>
+        </div>
+        
+        <div id="parentReply" class="parent-reply">
+            <div style="background: rgba(34, 197, 94, 0.1); border-radius: 16px; padding: 12px; margin-bottom: 16px;">
+                <p style="color: var(--success); font-weight: 600;">
+                    ✓ Report Confirmed by Parent/Guardian
+                </p>
+            </div>
+            <label style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 6px; display: block;">
+                💬 Reply to Teacher (Optional)
+            </label>
+            <textarea id="pMessage" rows="3" placeholder="Write your message to the teacher..."></textarea>
+            <button class="btn btn-secondary" onclick="sendParentMessage()">
+                📤 Send Message to Teacher
+            </button>
+            <p style="font-size: 0.7rem; margin-top: 12px; color: var(--text-muted); text-align: center;">
+                🔒 Encrypted parent-teacher communication
+            </p>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Student Data
+    const studentData = {
+        name: "Alex Johnson",
+        academicLevel: "Top Tier",
+        academicGrade: "A+",
+        completionPercent: 94,
+        attendancePercent: 92,
+        dailyNote: "🌟 Outstanding performance in all subjects. Teacher's note: Alex showed great curiosity and teamwork during group projects."
+    };
+
+    // Update dashboard with data
+    function updateDashboard() {
+        const academicVal = document.getElementById('academicVal');
+        const completionRate = document.getElementById('completionRate');
+        const completionFill = document.getElementById('completionFill');
+        const attendancePercent = document.getElementById('attendancePercent');
+        const attendanceFill = document.getElementById('attendanceFill');
+        const outNote = document.getElementById('outNote');
+        
+        if (academicVal) academicVal.innerHTML = studentData.academicLevel;
+        if (completionRate) completionRate.innerHTML = studentData.completionPercent + '%';
+        if (completionFill) completionFill.style.width = studentData.completionPercent + '%';
+        if (attendancePercent) attendancePercent.innerHTML = studentData.attendancePercent + '%';
+        if (attendanceFill) attendanceFill.style.width = studentData.attendancePercent + '%';
+        if (outNote) outNote.innerHTML = `💬 ${studentData.dailyNote}`;
+    }
+
+    // Toast notification
+    function showToast(message, isSuccess = true) {
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+        toast.innerHTML = `${isSuccess ? '✅' : '⚠️'} ${message}`;
+        document.body.appendChild(toast);
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
+
+    // Handle confirm button
+    function handleConfirm() {
+        const initialDiv = document.getElementById('initialAction');
+        const parentReplyDiv = document.getElementById('parentReply');
+        
+        if (initialDiv && parentReplyDiv) {
+            initialDiv.style.display = 'none';
+            parentReplyDiv.style.display = 'block';
+            showToast('Report confirmed! You can now message the teacher.', true);
+        }
+    }
+
+    // Send parent message
+    function sendParentMessage() {
+        const messageInput = document.getElementById('pMessage');
+        const message = messageInput.value.trim();
+        
+        if (message) {
+            showToast(`Message sent to Teacher: "${message.substring(0, 50)}${message.length > 50 ? '...' : ''}"`, true);
+            messageInput.value = '';
+            
+            // Change button text temporarily
+            const btn = event.target;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '✓ Sent!';
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+            }, 2000);
+        } else {
+            showToast('Please write a message before sending', false);
+        }
+    }
+
+    // Initialize everything when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        updateDashboard();
+        
+        // Add student name to subtitle
+        const subtitle = document.querySelector('.subtitle');
+        if (subtitle) {
+            subtitle.innerHTML = `👤 Student: ${studentData.name} · Parent Portal Active`;
+        }
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CareLink | School Health Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --primary: #0d9488; /* Teal */
+            --primary-light: #f0fdfa;
+            --bg-body: #f8fafc;
+            --white: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --danger: #be123c;
+            --warning: #d97706;
+            --border: #e2e8f0;
+            --radius: 1rem;
+            --shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            min-height: 100vh;
+        }
+
+        /* --- Sidebar --- */
+        .sidebar {
+            background: var(--white);
+            border-right: 1px solid var(--border);
+            padding: 2rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: var(--primary);
+            font-weight: 800;
+            font-size: 1.4rem;
+            margin-bottom: 3rem;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.85rem 1rem;
+            text-decoration: none;
+            color: var(--text-muted);
+            font-weight: 600;
+            border-radius: 12px;
+            margin-bottom: 0.5rem;
+            transition: 0.2s;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        /* --- Main Content --- */
+        .main { padding: 2.5rem; }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .search-bar {
+            background: var(--white);
+            border: 1px solid var(--border);
+            padding: 0.6rem 1rem;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            width: 300px;
+        }
+
+        .search-bar input { border: none; outline: none; width: 100%; font-family: inherit; }
+
+        /* --- Stats --- */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--white);
+            padding: 1.25rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border-left: 4px solid var(--primary);
+        }
+
+        .stat-card.alert { border-left-color: var(--danger); }
+
+        .stat-card h3 { font-size: 1.75rem; font-weight: 800; }
+        .stat-card p { font-size: 0.8rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; }
+
+        /* --- Grid Layout --- */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1.8fr 1.2fr;
+            gap: 2rem;
+        }
+
+        .panel {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        /* --- Student List --- */
+        .student-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .student-row:last-child { border-bottom: none; }
+
+        .tag {
+            padding: 0.25rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: 800;
+        }
+
+        .tag-med { background: #fee2e2; color: #991b1b; } /* Medication needed */
+        .tag-obs { background: #fef3c7; color: #92400e; } /* Observation */
+
+        /* --- Medications Sidebar --- */
+        .med-item {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.25rem;
+            padding: 0.5rem;
+        }
+
+        .time-badge {
+            background: var(--text-main);
+            color: white;
+            padding: 0.4rem;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            height: fit-content;
+        }
+
+        @media (max-width: 1024px) {
+            .container { grid-template-columns: 1fr; }
+            .sidebar { display: none; }
+            .stats { grid-template-columns: repeat(2, 1fr); }
+            .dashboard-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <aside class="sidebar">
+            <div class="brand">
+                <i data-lucide="heart-pulse"></i>
+                <span>CareLink</span>
+            </div>
+
+            <nav>
+                <a href="#" class="nav-item active"><i data-lucide="layout"></i> Daily Overview</a>
+                <a href="#" class="nav-item"><i data-lucide="users"></i> Student Files</a>
+                <a href="#" class="nav-item"><i data-lucide="pill"></i> Medications</a>
+                <a href="#" class="nav-item"><i data-lucide="file-text"></i> Incident Logs</a>
+                <a href="#" class="nav-item"><i data-lucide="bell" style="color: var(--danger)"></i> Critical Alerts</a>
+            </nav>
+        </aside>
+
+        <main class="main">
+            <header>
+                <div>
+                    <h1 style="font-weight: 800;">Clinic Dashboard</h1>
+                    <p style="color: var(--text-muted);">Welcome back, <strong>Nurse Thompson</strong></p>
+                </div>
+                <div class="search-bar">
+                    <i data-lucide="search" size="18"></i>
+                    <input type="text" placeholder="Search students...">
+                </div>
+            </header>
+
+            <div class="stats">
+                <div class="stat-card">
+                    <p>Visiting Today</p>
+                    <h3>12</h3>
+                </div>
+                <div class="stat-card">
+                    <p>Meds Pending</p>
+                    <h3>05</h3>
+                </div>
+                <div class="stat-card alert">
+                    <p>Critical Allergies</p>
+                    <h3>42</h3>
+                </div>
+                <div class="stat-card">
+                    <p>Current Occupancy</p>
+                    <h3>02/04</h3>
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <section class="panel">
+                    <div class="panel-header">
+                        <h2 style="font-size: 1.1rem; font-weight: 800;">Clinic Waiting Room</h2>
+                        <button style="background: var(--primary); color: white; border: none; padding: 0.5rem 1rem; border-radius: 8px; font-weight: 700; cursor: pointer;">+ New Intake</button>
+                    </div>
+
+                    <div class="student-row">
+                        <div style="display: flex; gap: 1rem; align-items: center;">
+                            <div style="width: 40px; height: 40px; background: #e2e8f0; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700;">JD</div>
+                            <div>
+                                <p style="font-weight: 700;">Julianna Davis</p>
+                                <p style="font-size: 0.8rem; color: var(--text-muted);">Grade 4 • Room 202</p>
+                            </div>
+                        </div>
+                        <span class="tag tag-med">MEDICATION</span>
+                        <i data-lucide="chevron-right" color="var(--text-muted)"></i>
+                    </div>
+
+                    <div class="student-row">
+                        <div style="display: flex; gap: 1rem; align-items: center;">
+                            <div style="width: 40px; height: 40px; background: #e2e8f0; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700;">BT</div>
+                            <div>
+                                <p style="font-weight: 700;">Ben Tinsley</p>
+                                <p style="font-size: 0.8rem; color: var(--text-muted);">Grade 10 • Room 405</p>
+                            </div>
+                        </div>
+                        <span class="tag tag-obs">OBSERVATION</span>
+                        <i data-lucide="chevron-right" color="var(--text-muted)"></i>
+                    </div>
+                </section>
+
+                <section class="panel">
+                    <h2 style="font-size: 1.1rem; font-weight: 800; margin-bottom: 1.5rem;">Scheduled Doses</h2>
+                    
+                    <div class="med-item">
+                        <div class="time-badge">11:30</div>
+                        <div>
+                            <p style="font-weight: 700; font-size: 0.9rem;">Sarah Jenkins</p>
+                            <p style="font-size: 0.8rem; color: var(--text-muted);">Inhaler • 2 Puffs</p>
+                        </div>
+                    </div>
+
+                    <div class="med-item">
+                        <div class="time-badge">12:00</div>
+                        <div>
+                            <p style="font-weight: 700; font-size: 0.9rem;">Leo Rodriguez</p>
+                            <p style="font-size: 0.8rem; color: var(--text-muted);">Insulin Check</p>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 2rem; padding: 1rem; background: #fff1f2; border-radius: 12px; border: 1px solid #fecdd3;">
+                        <h4 style="color: #9f1239; font-size: 0.85rem; display: flex; align-items: center; gap: 0.5rem;">
+                            <i data-lucide="alert-circle" size="16"></i> Supply Notice
+                        </h4>
+                        <p style="font-size: 0.75rem; color: #9f1239; margin-top: 0.25rem;">EpiPen Stock in Cabinet B expires in 4 days.</p>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>

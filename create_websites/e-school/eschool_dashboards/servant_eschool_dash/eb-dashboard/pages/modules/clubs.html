@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>EB Academy | Student Unified Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/dexie@3.2.4/dist/dexie.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        :root {
+            --bg: #09090b;
+            --sidebar: #0c0c10;
+            --card: #18181b;
+            --accent: #5965f0;
+            --accent-glow: rgba(212, 175, 55, 0.2);
+            --text: #ffffff;
+            --dim: #a1a1aa;
+            --border: #27272a;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --disabled: #3f3f46;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            width: 300px;
+            background: var(--sidebar);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            padding: 32px 20px;
+            z-index: 100;
+            backdrop-filter: blur(4px);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 48px;
+            padding-left: 8px;
+        }
+        .logo i {
+            color: var(--accent);
+            width: 32px;
+            height: 32px;
+        }
+        .logo h2 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #fff, var(--accent));
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+
+        .nav-group {
+            flex: 1;
+        }
+        .nav-label {
+            font-size: 0.7rem;
+            color: var(--dim);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin: 24px 0 12px 12px;
+            font-weight: 600;
+        }
+        .nav-label:first-of-type {
+            margin-top: 0;
+        }
+        
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 18px;
+            border-radius: 16px;
+            color: var(--dim);
+            text-decoration: none;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            position: relative;
+            font-weight: 500;
+        }
+        .nav-item:hover:not(.locked) {
+            background: rgba(212, 175, 55, 0.08);
+            color: white;
+            transform: translateX(4px);
+        }
+        .nav-item.active {
+            background: var(--accent);
+            color: #0a0a0c;
+            font-weight: 700;
+            box-shadow: 0 8px 20px rgba(212, 175, 55, 0.25);
+        }
+        .nav-item.active i {
+            color: #0a0a0c;
+        }
+        
+        /* Locked styling */
+        .nav-item.locked {
+            opacity: 0.45;
+            cursor: not-allowed;
+            filter: grayscale(0.2);
+            background: rgba(255,255,255,0.02);
+            border-left: 2px solid var(--border);
+        }
+        .lock-badge {
+            position: absolute;
+            right: 16px;
+            font-size: 0.65rem;
+            background: #1f1f2a;
+            padding: 3px 8px;
+            border-radius: 20px;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+            color: var(--dim);
+        }
+        .nav-item.locked .lock-badge {
+            background: #2a2a35;
+        }
+        
+        /* Main panel */
+        .main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: radial-gradient(circle at 10% 20%, #12121a, var(--bg));
+            overflow: hidden;
+        }
+        header {
+            padding: 24px 40px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+            background: rgba(9, 9, 11, 0.4);
+            backdrop-filter: blur(8px);
+        }
+        .header-title h2 {
+            font-size: 1.7rem;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+        }
+        .approved-badge-container {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .club-chip {
+            background: rgba(16, 185, 129, 0.12);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            padding: 6px 16px;
+            border-radius: 40px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--success);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .container {
+            padding: 32px 40px;
+            overflow-y: auto;
+            flex: 1;
+        }
+        
+        /* Cards & forms */
+        .glass-card {
+            background: rgba(24, 24, 27, 0.8);
+            backdrop-filter: blur(4px);
+            border: 1px solid var(--border);
+            border-radius: 28px;
+            padding: 36px;
+            box-shadow: 0 25px 40px -12px rgba(0,0,0,0.6);
+            transition: 0.2s;
+            max-width: 850px;
+        }
+        .input-box {
+            margin-bottom: 28px;
+        }
+        label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 800;
+            color: var(--accent);
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 14px 18px;
+            background: #0f0f12;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            color: white;
+            font-size: 0.95rem;
+            transition: 0.2s;
+            outline: none;
+        }
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+        .submit-btn {
+            width: 100%;
+            padding: 16px;
+            background: var(--accent);
+            border: none;
+            border-radius: 40px;
+            color: #0a0a0c;
+            font-weight: 800;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-top: 12px;
+            letter-spacing: 0.3px;
+        }
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.05);
+            box-shadow: 0 10px 20px -5px rgba(212, 175, 55, 0.4);
+        }
+        
+        /* Status list */
+        .status-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .status-row {
+            background: rgba(24, 24, 27, 0.7);
+            border: 1px solid var(--border);
+            padding: 20px 24px;
+            border-radius: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: 0.2s;
+        }
+        .status-info {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .status-time {
+            font-size: 0.7rem;
+            color: var(--dim);
+        }
+        .status-type {
+            font-weight: 700;
+            font-size: 1rem;
+        }
+        .status-club {
+            font-size: 0.8rem;
+            color: var(--accent);
+            margin-left: 8px;
+        }
+        .pill {
+            padding: 6px 16px;
+            border-radius: 50px;
+            font-size: 0.7rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .pending {
+            background: rgba(212, 175, 55, 0.15);
+            color: var(--accent);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+        }
+        .approved {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--success);
+            border: 1px solid rgba(16, 185, 129, 0.4);
+        }
+        .rejected {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--danger);
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        /* User card */
+        .user-card {
+            background: rgba(255,255,255,0.03);
+            border-radius: 20px;
+            padding: 18px;
+            border: 1px solid var(--border);
+            margin-top: 20px;
+        }
+        .user-card p {
+            font-size: 0.7rem;
+            color: var(--dim);
+        }
+        .user-card h4 {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-top: 6px;
+        }
+        
+        @media (max-width: 800px) {
+            .sidebar { width: 260px; padding: 20px 12px; }
+            .container { padding: 20px; }
+            header { padding: 18px 24px; }
+        }
+    </style>
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="logo">
+            <i data-lucide="graduation-cap"></i>
+            <h2>EB PORTAL</h2>
+        </div>
+        
+        <div class="nav-group">
+            <span class="nav-label">Identity</span>
+            <div class="nav-item active" id="n-reg" onclick="switchView('reg')">
+                <i data-lucide="user-plus"></i> Registration
+            </div>
+            
+            <span class="nav-label">Club Activities</span>
+            <div class="nav-item locked" id="n-media" onclick="switchView('media')">
+                <i data-lucide="mic-2"></i> Media Script 
+                <span class="lock-badge">LOCKED</span>
+            </div>
+            <div class="nav-item locked" id="n-prop" onclick="switchView('prop')">
+                <i data-lucide="file-text"></i> Proposals 
+                <span class="lock-badge">LOCKED</span>
+            </div>
+            
+            <span class="nav-label">Records</span>
+            <div class="nav-item" id="n-status" onclick="switchView('status')">
+                <i data-lucide="clipboard-list"></i> Activity Feed
+            </div>
+        </div>
+
+        <div class="user-card">
+            <p>LOGGED IN AS</p>
+            <h4 id="userDisplay">Not registered</h4>
+            <p style="margin-top: 12px; font-size:0.65rem;">✔️ Club membership unlocks tools</p>
+        </div>
+    </aside>
+
+    <main class="main">
+        <header>
+            <div class="header-title">
+                <h2 id="viewTitle">Student Registration</h2>
+            </div>
+            <div class="approved-badge-container" id="approvedClubsList"></div>
+        </header>
+
+        <div class="container">
+            <!-- Registration View -->
+            <section id="v-reg">
+                <div class="glass-card">
+                    <h3 style="font-size: 1.7rem; margin-bottom: 12px;">🏛️ Join a Club</h3>
+                    <p style="color:var(--dim); margin-bottom: 32px;">Register and request membership. Upon approval, Media & Proposal tabs unlock instantly.</p>
+                    <div class="input-box">
+                        <label>Full Name</label>
+                        <input type="text" id="regName" placeholder="e.g., James Mwangi">
+                    </div>
+                    <div class="input-box">
+                        <label>Select Club</label>
+                        <select id="regClub">
+                            <option>Coding Academy</option>
+                            <option>Mini-Media Hub</option>
+                            <option>Robotics Society</option>
+                            <option>Chess Strategy</option>
+                            <option>Business & Innovation</option>
+                        </select>
+                    </div>
+                    <button class="submit-btn" onclick="requestJoin()">
+                        <i data-lucide="send" style="width:18px; display: inline-block; margin-right: 8px;"></i> Submit Join Request
+                    </button>
+                </div>
+            </section>
+
+            <!-- Media Script Submission -->
+            <section id="v-media" class="hidden">
+                <div class="glass-card">
+                    <h3 style="margin-bottom: 8px;">🎙️ Mini-Media Script</h3>
+                    <p style="color: var(--dim); margin-bottom: 28px;">Write broadcast scripts for your approved club.</p>
+                    <div class="input-box">
+                        <label>Club (Approved)</label>
+                        <select id="mediaClubSelect"></select>
+                    </div>
+                    <div class="input-box">
+                        <label>Broadcast Title</label>
+                        <input type="text" id="mTitle" placeholder="e.g., Morning Tech Pulse">
+                    </div>
+                    <div class="input-box">
+                        <label>Script Content</label>
+                        <textarea id="mContent" rows="7" placeholder="Write your script, interview questions, or news segment..."></textarea>
+                    </div>
+                    <button class="submit-btn" onclick="submitWork('Media Script')">✍️ Submit to Studio</button>
+                </div>
+            </section>
+
+            <!-- Proposals View -->
+            <section id="v-prop" class="hidden">
+                <div class="glass-card">
+                    <h3>📄 Project / Budget Proposal</h3>
+                    <p style="color: var(--dim); margin-bottom: 28px;">Submit resource requests or club initiatives for stakeholder review.</p>
+                    <div class="input-box">
+                        <label>Club (Approved)</label>
+                        <select id="propClubSelect"></select>
+                    </div>
+                    <div class="input-box">
+                        <label>Proposal Details</label>
+                        <textarea id="pContent" rows="8" placeholder="Describe your project, required budget, timeline, and expected impact..."></textarea>
+                    </div>
+                    <button class="submit-btn" onclick="submitWork('Proposal')">📎 Submit Proposal</button>
+                </div>
+            </section>
+
+            <!-- Status Feed -->
+            <section id="v-status" class="hidden">
+                <h3 style="margin-bottom: 24px;">📋 My Requests & Submissions</h3>
+                <div id="statusList" class="status-list"></div>
+                <div style="margin-top: 24px; background: rgba(0,0,0,0.3); border-radius: 20px; padding: 16px; text-align: center; font-size:0.8rem; color: var(--dim);">
+                    💡 Stakeholder can approve/reject from Dexie console — demo rights: use browser devtools to update status to 'approved'
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script>
+        // Initialize Dexie with detailed schema
+        const db = new Dexie("EB_Academy_Unified");
+        db.version(1).stores({
+            actions: '++id, student, type, club, content, title, status, timestamp'
+        });
+
+        let currentApprovedClubs = [];
+        let currentStudent = localStorage.getItem('eb_user') || '';
+
+        // Helper: update UI based on approved clubs
+        async function syncPermissions() {
+            if (!currentStudent) {
+                document.getElementById('userDisplay').innerText = 'Not registered';
+                document.getElementById('approvedClubsList').innerHTML = '';
+                // lock tabs fully
+                lockTabs(true);
+                return;
+            }
+            document.getElementById('userDisplay').innerText = currentStudent;
+            
+            // get all club join requests that are approved for this student
+            const allJoins = await db.actions.where('student').equals(currentStudent).and(a => a.type === 'Club Join').toArray();
+            const approvedJoins = allJoins.filter(a => a.status === 'approved');
+            currentApprovedClubs = [...new Set(approvedJoins.map(a => a.club))];
+            
+            const mediaTab = document.getElementById('n-media');
+            const propTab = document.getElementById('n-prop');
+            
+            if (currentApprovedClubs.length > 0) {
+                mediaTab.classList.remove('locked');
+                propTab.classList.remove('locked');
+                // change badge text
+                const mediaBadge = mediaTab.querySelector('.lock-badge');
+                const propBadge = propTab.querySelector('.lock-badge');
+                if (mediaBadge) mediaBadge.innerText = "✓ OPEN";
+                if (propBadge) propBadge.innerText = "✓ OPEN";
+                
+                // populate dropdowns for media & proposals
+                const clubOptions = currentApprovedClubs.map(c => `<option value="${c}">${c}</option>`).join('');
+                document.getElementById('mediaClubSelect').innerHTML = clubOptions;
+                document.getElementById('propClubSelect').innerHTML = clubOptions;
+                
+                // render approved chips in header
+                const container = document.getElementById('approvedClubsList');
+                container.innerHTML = currentApprovedClubs.map(club => `
+                    <div class="club-chip">
+                        <i data-lucide="badge-check" style="width: 14px; height:14px;"></i>
+                        ${club}
+                    </div>
+                `).join('');
+                lucide.createIcons();
+            } else {
+                lockTabs(false);
+                document.getElementById('approvedClubsList').innerHTML = `<div class="club-chip" style="background:rgba(239,68,68,0.1); color:var(--danger); border-color:var(--danger);">⛔ No approved clubs yet</div>`;
+                // clear dropdowns
+                document.getElementById('mediaClubSelect').innerHTML = '<option disabled>Join a club first</option>';
+                document.getElementById('propClubSelect').innerHTML = '<option disabled>Approval required</option>';
+            }
+        }
+        
+        function lockTabs(hardLock = false) {
+            const mediaTab = document.getElementById('n-media');
+            const propTab = document.getElementById('n-prop');
+            if (!hardLock && currentApprovedClubs.length === 0) {
+                mediaTab.classList.add('locked');
+                propTab.classList.add('locked');
+                if (mediaTab.querySelector('.lock-badge')) mediaTab.querySelector('.lock-badge').innerText = "LOCKED";
+                if (propTab.querySelector('.lock-badge')) propTab.querySelector('.lock-badge').innerText = "LOCKED";
+            } else if (hardLock) {
+                mediaTab.classList.add('locked');
+                propTab.classList.add('locked');
+                if (mediaTab.querySelector('.lock-badge')) mediaTab.querySelector('.lock-badge').innerText = "LOCKED";
+                if (propTab.querySelector('.lock-badge')) propTab.querySelector('.lock-badge').innerText = "LOCKED";
+            }
+        }
+        
+        // Switch views with permission checks
+        function switchView(id) {
+            // if trying to access media or prop without approved clubs, block
+            if ((id === 'media' || id === 'prop') && currentApprovedClubs.length === 0 && currentStudent) {
+                alert("⚠️ You need at least one approved club membership. Submit a join request and wait for approval.");
+                return;
+            }
+            if (!currentStudent && id !== 'reg') {
+                alert("Please complete registration first.");
+                switchView('reg');
+                return;
+            }
+            
+            const sections = ['reg', 'media', 'prop', 'status'];
+            sections.forEach(sec => {
+                document.getElementById(`v-${sec}`).classList.add('hidden');
+                document.getElementById(`n-${sec}`).classList.remove('active');
+            });
+            document.getElementById(`v-${id}`).classList.remove('hidden');
+            document.getElementById(`n-${id}`).classList.add('active');
+            
+            let titleText = "";
+            if (id === 'reg') titleText = "Student Registration";
+            else if (id === 'media') titleText = "Media Script Studio";
+            else if (id === 'prop') titleText = "Proposal Hub";
+            else titleText = "Activity Feed";
+            document.getElementById('viewTitle').innerText = titleText;
+            
+            if (id === 'status') refreshStatusFeed();
+        }
+        
+        // Register join request
+        async function requestJoin() {
+            const name = document.getElementById('regName').value.trim();
+            const club = document.getElementById('regClub').value;
+            if (!name) {
+                alert("Please enter your full name.");
+                return;
+            }
+            currentStudent = name;
+            localStorage.setItem('eb_user', name);
+            document.getElementById('userDisplay').innerText = name;
+            
+            // Check if already has pending or approved join for same club
+            const existing = await db.actions.where('student').equals(name).and(a => a.type === 'Club Join' && a.club === club).first();
+            if (existing) {
+                alert(`You already have a ${existing.status} request for ${club}.`);
+                return;
+            }
+            
+            await db.actions.add({
+                student: name,
+                type: 'Club Join',
+                club: club,
+                content: `Membership request for ${club}`,
+                title: 'Club Membership',
+                status: 'pending',
+                timestamp: new Date().toISOString()
+            });
+            
+            alert(`✅ Request sent to join ${club}. A stakeholder must approve it to unlock Media/Proposal tabs.`);
+            await syncPermissions();
+            switchView('status');
+            refreshStatusFeed();
+        }
+        
+        // Submit work (media script or proposal)
+        async function submitWork(workType) {
+            if (!currentStudent) {
+                alert("Please register first.");
+                return;
+            }
+            let club = '';
+            let content = '';
+            let title = '';
+            
+            if (workType === 'Media Script') {
+                club = document.getElementById('mediaClubSelect').value;
+                title = document.getElementById('mTitle').value.trim();
+                content = document.getElementById('mContent').value.trim();
+                if (!title) return alert("Please enter a broadcast title.");
+                if (!content) return alert("Script content cannot be empty.");
+            } else {
+                club = document.getElementById('propClubSelect').value;
+                content = document.getElementById('pContent').value.trim();
+                if (!content) return alert("Proposal content required.");
+                title = "Proposal Document";
+            }
+            
+            if (!club) {
+                alert("No approved club selected. Wait for membership approval.");
+                return;
+            }
+            
+            await db.actions.add({
+                student: currentStudent,
+                type: workType,
+                club: club,
+                title: title,
+                content: content,
+                status: 'pending',
+                timestamp: new Date().toISOString()
+            });
+            
+            alert(`${workType} submitted successfully! Stakeholder review pending.`);
+            if (workType === 'Media Script') {
+                document.getElementById('mTitle').value = '';
+                document.getElementById('mContent').value = '';
+            } else {
+                document.getElementById('pContent').value = '';
+            }
+            refreshStatusFeed();
+            switchView('status');
+        }
+        
+        // refresh status feed with live data
+        async function refreshStatusFeed() {
+            if (!currentStudent) {
+                document.getElementById('statusList').innerHTML = '<div class="glass-card">Please register to see your activity.</div>';
+                return;
+            }
+            const actions = await db.actions.where('student').equals(currentStudent).reverse().sortBy('timestamp');
+            if (actions.length === 0) {
+                document.getElementById('statusList').innerHTML = '<div class="status-row" style="justify-content:center;">✨ No submissions yet. Join a club or submit work!</div>';
+                return;
+            }
+            const html = actions.map(act => {
+                let displayTitle = act.title || (act.type === 'Club Join' ? 'Membership Request' : act.type);
+                if (act.type === 'Media Script') displayTitle = `🎬 Media: ${act.title}`;
+                if (act.type === 'Proposal') displayTitle = `📌 Proposal: ${act.title}`;
+                return `
+                    <div class="status-row">
+                        <div class="status-info">
+                            <div class="status-time">${new Date(act.timestamp).toLocaleString()}</div>
+                            <div class="status-type">
+                                ${displayTitle} 
+                                <span class="status-club">@ ${act.club}</span>
+                            </div>
+                            <div style="font-size:0.75rem; color:var(--dim); max-width:400px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                                ${act.content ? (act.content.substring(0, 80) + (act.content.length > 80 ? '...' : '')) : ''}
+                            </div>
+                        </div>
+                        <span class="pill ${act.status}">${act.status}</span>
+                    </div>
+                `;
+            }).join('');
+            document.getElementById('statusList').innerHTML = html;
+        }
+        
+        // Utility to simulate stakeholder approval via console (but we also keep live)
+        window.stakeholderTools = {
+            approveJoin: async (studentName, clubName) => {
+                const joinReq = await db.actions.where('student').equals(studentName).and(a => a.type === 'Club Join' && a.club === clubName && a.status === 'pending').first();
+                if (joinReq) {
+                    await db.actions.update(joinReq.id, { status: 'approved' });
+                    alert(`Approved ${studentName} for ${clubName}`);
+                    await syncPermissions();
+                    if (currentStudent === studentName) refreshStatusFeed();
+                } else { alert("No pending request found"); }
+            },
+            approveSubmission: async (id) => {
+                await db.actions.update(id, { status: 'approved' });
+                await syncPermissions();
+                if (currentStudent) refreshStatusFeed();
+            }
+        };
+        
+        // periodic sync for permissions and realtime updates (like if stakeholder approves from another session)
+        setInterval(async () => {
+            if (currentStudent) {
+                await syncPermissions();
+                if (document.getElementById('v-status') && !document.getElementById('v-status').classList.contains('hidden')) {
+                    refreshStatusFeed();
+                }
+            }
+        }, 2000);
+        
+        // initial load, check localStorage
+        window.onload = async () => {
+            lucide.createIcons();
+            const stored = localStorage.getItem('eb_user');
+            if (stored) {
+                currentStudent = stored;
+                document.getElementById('regName').value = stored;
+                await syncPermissions();
+                // default active registration but if they have approved clubs maybe redirect?
+                const regSection = document.getElementById('v-reg');
+                if (regSection) switchView('reg');
+            } else {
+                lockTabs(true);
+                await syncPermissions();
+            }
+            // Demo preload: create sample data to show example (optional)
+            // Add demo instructions right in status
+            console.log("✅ EB Portal Live | Use stakeholderTools.approveJoin('StudentName','ClubName') to approve");
+        };
+        
+        // global refs for inline onclick
+        window.switchView = switchView;
+        window.requestJoin = requestJoin;
+        window.submitWork = submitWork;
+        window.refreshStatusFeed = refreshStatusFeed;
+    </script>
+</body>
+</html>

@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Receiver Page</title>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+    background: #f4f6f9;
+}
+
+h1, h2 {
+    text-align: center;
+}
+
+.section {
+    margin: 30px 0;
+    padding: 20px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.gallery {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: center;
+}
+
+.img-card {
+    width: 150px;
+    text-align: center;
+}
+
+.img-card img {
+    width: 100%;
+    border-radius: 8px;
+}
+
+.user-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 15px;
+}
+
+.person-card {
+    background: #fff;
+    border-radius: 10px;
+    padding: 10px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.person-card img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.branch {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.debug {
+    white-space: pre-wrap;
+    font-size: 12px;
+    background: #000;
+    color: #0f0;
+    padding: 15px;
+    border-radius: 10px;
+    max-height: 300px;
+    overflow: auto;
+}
+</style>
+
+</head>
+<body>
+
+<h1 id="mainHeader">Loading...</h1>
+
+<!-- BASIC DATA -->
+<div class="section">
+    <h2>Basic Information</h2>
+    <div id="basicData"></div>
+</div>
+
+<!-- FILES -->
+<div class="section">
+    <h2>Uploaded Files</h2>
+    <div id="files"></div>
+</div>
+
+<!-- GALLERY -->
+<div class="section">
+    <h2>Gallery</h2>
+    <div class="gallery" id="imageGallery"></div>
+</div>
+
+<!-- MAPPED -->
+<div class="section">
+    <h2>Mapped Canvas</h2>
+    <img id="displayFront" width="250">
+    <img id="displayBack" width="250">
+</div>
+
+<!-- CARDS -->
+<div class="section">
+    <h2>User Cards</h2>
+    <div class="user-cards" id="cardContainer"></div>
+</div>
+
+<!-- BRANCHES -->
+<div class="section">
+    <h2>Branches (Map Data)</h2>
+    <div id="branches"></div>
+</div>
+
+<!-- DEBUG -->
+<div class="section">
+    <h2>Raw Data (Debug)</h2>
+    <div class="debug" id="debug"></div>
+</div>
+
+<script>
+const data = JSON.parse(localStorage.getItem('sharedData'));
+
+if (!data) {
+    document.body.innerHTML = "<h1>No data received</h1>";
+}
+
+// ================= HEADER =================
+document.getElementById("mainHeader").innerText =
+    data["form-name"] || "No Name";
+
+// ================= BASIC =================
+const basicDiv = document.getElementById("basicData");
+
+Object.keys(data).forEach(key => {
+    if (!key.startsWith("form-")) return;
+
+    if (typeof data[key] === "string" && !data[key].startsWith("data:")) {
+        const p = document.createElement("p");
+        p.innerHTML = `<strong>${key}:</strong> ${data[key]}`;
+        basicDiv.appendChild(p);
+    }
+});
+
+// ================= FILES =================
+const fileDiv = document.getElementById("files");
+
+Object.keys(data).forEach(key => {
+    if (typeof data[key] === "string" && data[key].startsWith("data:")) {
+        const el = document.createElement("div");
+
+        if (data[key].startsWith("data:image")) {
+            el.innerHTML = `<img src="${data[key]}" width="150">`;
+        } else {
+            el.innerHTML = `<a href="${data[key]}" download="${key}">Download ${key}</a>`;
+        }
+
+        fileDiv.appendChild(el);
+    }
+});
+
+// ================= GALLERY =================
+const gallery = document.getElementById("imageGallery");
+
+(data.images || []).forEach(img => {
+    if (!img.src) return;
+
+    const div = document.createElement("div");
+    div.className = "img-card";
+
+    div.innerHTML = `
+        <img src="${img.src}">
+        <p>${img.label}</p>
+    `;
+
+    gallery.appendChild(div);
+});
+
+// ================= CANVAS =================
+if (data.mapFront)
+    document.getElementById("displayFront").src = data.mapFront;
+
+if (data.mapBack)
+    document.getElementById("displayBack").src = data.mapBack;
+
+// ================= CARDS =================
+const cardContainer = document.getElementById("cardContainer");
+
+(data.cards || []).forEach(c => {
+    const card = document.createElement("div");
+    card.className = "person-card";
+
+    card.innerHTML = `
+        <img src="${c.img || 'https://via.placeholder.com/80'}">
+        <h4>${c.name}</h4>
+        <small>${c.role}</small>
+        <p>${c.quote}</p>
+    `;
+
+    cardContainer.appendChild(card);
+});
+
+// ================= BRANCHES =================
+const branchDiv = document.getElementById("branches");
+
+(data.branches || []).forEach(b => {
+    const div = document.createElement("div");
+    div.className = "branch";
+
+    div.innerHTML = `
+        <strong>${b.name}</strong><br>
+        📍 ${b.location}
+    `;
+
+    branchDiv.appendChild(div);
+});
+
+// ================= DEBUG =================
+document.getElementById("debug").innerText =
+    JSON.stringify(data, null, 2);
+
+</script>
+
+</body>
+</html>

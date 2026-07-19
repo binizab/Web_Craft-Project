@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>CulinaPro | Dynamic Kitchen Intelligence</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #6366f1;
+            --primary-light: #eef2ff;
+            --primary-dark: #4f46e5;
+            --secondary: #0f172a;
+            --bg-body: #f1f5f9;
+            --white: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --danger: #e11d48;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --radius-xl: 1rem;
+            --radius-2xl: 1.5rem;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+            --shadow-md: 0 10px 25px -5px rgba(0,0,0,0.05);
+            --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            overflow-x: hidden;
+        }
+
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* ========= SIDEBAR (COLLAPSIBLE) ========= */
+        .sidebar {
+            width: 280px;
+            background: var(--white);
+            border-right: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            padding: 2rem 1rem;
+            position: fixed;
+            height: 100vh;
+            z-index: 1000;
+            transition: width 0.3s ease, padding 0.2s;
+            overflow-x: hidden;
+        }
+
+        /* Collapsed state (icon-only) */
+        .sidebar.collapsed {
+            width: 85px;
+            padding: 2rem 0.5rem;
+        }
+
+        .sidebar.collapsed .logo-text,
+        .sidebar.collapsed .nav-label,
+        .sidebar.collapsed .nav-item span:not(.icon-only) {
+            display: none;
+        }
+
+        .sidebar.collapsed .nav-item {
+            justify-content: center;
+            padding: 0.85rem 0;
+        }
+
+        .sidebar.collapsed .logo-area {
+            justify-content: center;
+            padding-left: 0;
+        }
+
+        .sidebar.collapsed .logo-icon {
+            margin-right: 0;
+        }
+
+        .sidebar.collapsed .nav-label {
+            display: none;
+        }
+
+        /* Main content margin adjustment */
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 2rem 2rem;
+            transition: margin-left 0.3s ease;
+            width: calc(100% - 280px);
+        }
+
+        .sidebar.collapsed + .main-content {
+            margin-left: 85px;
+            width: calc(100% - 85px);
+        }
+
+        /* Logo */
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 2.5rem;
+            padding-left: 0.5rem;
+        }
+
+        .logo-icon {
+            background: var(--primary);
+            color: white;
+            padding: 0.6rem;
+            border-radius: 12px;
+            display: flex;
+            box-shadow: 0 8px 15px rgba(99, 102, 241, 0.2);
+        }
+
+        .logo-text {
+            font-size: 1.4rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, #1e293b, #4f46e5);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+
+        .nav-section {
+            flex-grow: 1;
+        }
+
+        .nav-label {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            font-weight: 800;
+            color: #94a3b8;
+            letter-spacing: 0.1em;
+            margin: 1.5rem 0 0.75rem 0.75rem;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.85rem 1rem;
+            text-decoration: none;
+            color: var(--text-muted);
+            font-weight: 600;
+            border-radius: 14px;
+            transition: var(--transition);
+            cursor: pointer;
+            margin-bottom: 0.25rem;
+            white-space: nowrap;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .nav-item.active {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 8px 14px rgba(99, 102, 241, 0.25);
+        }
+
+        /* Sidebar toggle button (shrink/expand) */
+        .sidebar-toggle-btn {
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: auto;
+            color: var(--text-muted);
+        }
+
+        .sidebar-toggle-btn:hover {
+            background: var(--primary-light);
+            color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .sidebar.collapsed .sidebar-toggle-btn span {
+            display: none;
+        }
+
+        .sidebar.collapsed .sidebar-toggle-btn {
+            justify-content: center;
+        }
+
+        /* Main view containers */
+        .view-container {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .view-container.active-view {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px);}
+            to { opacity: 1; transform: translateY(0);}
+        }
+
+        /* Stats grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--white);
+            padding: 1.5rem;
+            border-radius: var(--radius-2xl);
+            border: 1px solid rgba(0,0,0,0.04);
+            transition: var(--transition);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .icon-box {
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 14px;
+            margin-bottom: 1rem;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 800;
+        }
+
+        .stat-label {
+            font-size: 0.7rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+
+        .two-col-grid {
+            display: grid;
+            grid-template-columns: 1.6fr 1fr;
+            gap: 2rem;
+        }
+
+        .content-panel {
+            background: var(--white);
+            border-radius: 2rem;
+            padding: 1.8rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid #f0f2f5;
+        }
+
+        .queue-item {
+            background: #f8fafc;
+            border-radius: 1.5rem;
+            padding: 1rem 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            transition: var(--transition);
+        }
+
+        .tag {
+            font-size: 0.65rem;
+            font-weight: 800;
+            padding: 0.25rem 0.6rem;
+            border-radius: 6px;
+        }
+        .tag-danger { background: #fee2e2; color: #ef4444; }
+        .tag-warning { background: #fef3c7; color: #b45309; }
+        .bg-indigo { background: #e0e7ff; color: #4338ca; }
+        .bg-amber { background: #fef3c7; color: #b45309; }
+        .bg-rose { background: #ffe4e6; color: #be123c; }
+        .bg-emerald { background: #d1fae5; color: #065f46; }
+
+        /* Node tree styles */
+        .node-tree-container ul {
+            list-style: none;
+            margin-left: 1rem;
+            padding-left: 0.5rem;
+            border-left: 2px solid #e2e8f0;
+        }
+        .node-content {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.5rem 0.75rem;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: 0.1s;
+        }
+        .node-content:hover {
+            background: var(--primary-light);
+        }
+        .node-title {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        .expand-icon {
+            margin-left: auto;
+            cursor: pointer;
+        }
+        .inventory-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.8rem 0;
+            border-bottom: 1px solid #eef2ff;
+        }
+
+        @media (max-width: 1024px) {
+            .main-content { padding: 1.2rem; }
+            .two-col-grid { grid-template-columns: 1fr; }
+            .sidebar { transform: translateX(0); width: 260px; }
+            .sidebar.collapsed { width: 85px; }
+            .sidebar.collapsed + .main-content { margin-left: 85px; }
+            body.mobile-open .sidebar { transform: translateX(0); }
+        }
+    </style>
+</head>
+<body>
+<div class="app-container">
+    <aside class="sidebar" id="sidebar">
+        <div class="logo-area">
+            <div class="logo-icon"><i data-lucide="chef-hat"></i></div>
+            <span class="logo-text">CulinaPro</span>
+        </div>
+        <nav class="nav-section">
+            <p class="nav-label">Main Hub</p>
+            <div class="nav-item" data-tab="dashboard"><i data-lucide="layout-grid"></i> <span>Dashboard</span></div>
+            <div class="nav-item" data-tab="menus"><i data-lucide="utensils"></i> <span>Menus (Food)</span></div>
+            <div class="nav-item" data-tab="inventory"><i data-lucide="package"></i> <span>Inventory</span></div>
+            <p class="nav-label">Safety</p>
+            <div class="nav-item" data-tab="allergy"><i data-lucide="shield-alert"></i> <span>Allergy Monitor</span></div>
+        </nav>
+        <button class="sidebar-toggle-btn" id="collapseSidebarBtn">
+            <i data-lucide="chevrons-left"></i> <span>Collapse</span>
+        </button>
+    </aside>
+
+    <main class="main-content" id="mainContent">
+        <!-- DYNAMIC VIEWS: each tab will render different main content -->
+        <div id="dashboardView" class="view-container">
+            <div class="stats-grid">
+                <div class="stat-card"><div class="icon-box bg-indigo"><i data-lucide="shopping-bag"></i></div><p class="stat-label">Daily Orders</p><h3 class="stat-value">1,284</h3></div>
+                <div class="stat-card"><div class="icon-box bg-amber"><i data-lucide="clock"></i></div><p class="stat-label">Avg Wait</p><h3 class="stat-value">4.2m</h3></div>
+                <div class="stat-card"><div class="icon-box bg-rose"><i data-lucide="alert-circle"></i></div><p class="stat-label">Allergy Alerts</p><h3 class="stat-value">03</h3></div>
+            </div>
+            <div class="two-col-grid">
+                <section class="content-panel">
+                    <h2 style="margin-bottom: 1.5rem; font-weight: 800;">Live Prep Queue</h2>
+                    <div class="queue-item"><div><div style="font-weight:900;">#42</div><h4>Avocado Toast + Egg</h4><p class="tag tag-danger">No Nuts</p></div><button class="complete-btn"><i data-lucide="check"></i></button></div>
+                    <div class="queue-item"><div><div style="font-weight:900;">#43</div><h4>Mediterranean Power Bowl</h4><p>Sarah K.</p></div><button class="complete-btn"><i data-lucide="check"></i></button></div>
+                    <div class="queue-item"><div><div style="font-weight:900;">#44</div><h4>Classic Cheeseburger</h4><p>James L.</p></div><button class="complete-btn"><i data-lucide="check"></i></button></div>
+                </section>
+                <aside class="content-panel" style="background: var(--secondary); color: white;">
+                    <h3>Kitchen Health</h3>
+                    <div style="font-size: 2rem; font-weight:800;">19.4°C</div>
+                    <span style="color:var(--success);">● OPTIMAL</span>
+                    <div style="height:4px; background:#334155; margin-top:1rem;"><div style="width:70%; height:100%; background:var(--primary); border-radius:10px;"></div></div>
+                </aside>
+            </div>
+        </div>
+
+        <!-- MENUS VIEW (Food Tab) - full custom content -->
+        <div id="menusView" class="view-container">
+            <div class="stats-grid">
+                <div class="stat-card"><div class="icon-box bg-indigo"><i data-lucide="utensils"></i></div><p class="stat-label">Active Menus</p><h3 class="stat-value">12</h3></div>
+                <div class="stat-card"><div class="icon-box bg-emerald"><i data-lucide="star"></i></div><p class="stat-label">Chef's Specials</p><h3 class="stat-value">4</h3></div>
+                <div class="stat-card"><div class="icon-box bg-amber"><i data-lucide="trending-up"></i></div><p class="stat-label">Top Rated</p><h3 class="stat-value">Med Bowl</h3></div>
+            </div>
+            <div class="content-panel">
+                <h2 style="margin-bottom:1rem;">🍽️ Menu Engineering</h2>
+                <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:1rem;">
+                    <div style="background:#f8fafc; border-radius:1.5rem; padding:1rem;"><h3>🥑 Breakfast</h3><p>Avocado Toast, Pancakes, Yogurt Bowl</p><span class="tag tag-warning">Popular</span></div>
+                    <div style="background:#f8fafc; border-radius:1.5rem; padding:1rem;"><h3>🥗 Lunch</h3><p>Mediterranean Bowl, Chicken Sandwich</p><span class="tag">High protein</span></div>
+                    <div style="background:#f8fafc; border-radius:1.5rem; padding:1rem;"><h3>🍝 Dinner</h3><p>Truffle Pasta, Salmon, Beef Bourguignon</p><span class="tag tag-danger">Premium</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- INVENTORY VIEW -->
+        <div id="inventoryView" class="view-container">
+            <div class="stats-grid">
+                <div class="stat-card"><div class="icon-box bg-indigo"><i data-lucide="package"></i></div><p class="stat-label">Total SKUs</p><h3 class="stat-value">86</h3></div>
+                <div class="stat-card"><div class="icon-box bg-rose"><i data-lucide="alert-triangle"></i></div><p class="stat-label">Low Stock</p><h3 class="stat-value">4</h3></div>
+                <div class="stat-card"><div class="icon-box bg-emerald"><i data-lucide="dollar-sign"></i></div><p class="stat-label">Value</p><h3 class="stat-value">$3.2k</h3></div>
+            </div>
+            <div class="content-panel">
+                <h2 style="margin-bottom:1rem;">📦 Inventory Levels</h2>
+                <div class="inventory-row"><span>🥛 Organic Milk (2%)</span><span><strong>12 gal</strong> <span style="color:green;">● OK</span></span></div>
+                <div class="inventory-row"><span>🥑 Avocados</span><span><strong>32 pcs</strong> <span style="color:orange;">● Low</span></span></div>
+                <div class="inventory-row"><span>🍗 Chicken Breast</span><span><strong>15 lbs</strong> <span style="color:green;">● Good</span></span></div>
+                <div class="inventory-row"><span>🌿 Spinach</span><span><strong>6 bags</strong> <span style="color:red;">● Critical</span></span></div>
+                <button style="margin-top:1rem; background:var(--primary); color:white; border:none; padding:0.6rem 1rem; border-radius:1rem;">Restock Alerts</button>
+            </div>
+        </div>
+
+        <!-- ALLERGY VIEW -->
+        <div id="allergyView" class="view-container">
+            <div class="stats-grid">
+                <div class="stat-card"><div class="icon-box bg-rose"><i data-lucide="alert-circle"></i></div><p class="stat-label">Active Alerts</p><h3 class="stat-value">3</h3></div>
+                <div class="stat-card"><div class="icon-box bg-amber"><i data-lucide="clipboard-list"></i></div><p class="stat-label">Precautions</p><h3 class="stat-value">6</h3></div>
+                <div class="stat-card"><div class="icon-box bg-indigo"><i data-lucide="bell-ring"></i></div><p class="stat-label">Today's Flags</p><h3 class="stat-value">2</h3></div>
+            </div>
+            <div class="content-panel">
+                <h2 style="margin-bottom:1rem;">⚠️ Allergy Safety Protocol</h2>
+                <div class="queue-item"><div><h4>🥜 Peanut Alert</h4><p>Student: Marcus V. – No Nuts</p></div><span class="tag tag-danger">High risk</span></div>
+                <div class="queue-item"><div><h4>🌾 Gluten Sensitivity</h4><p>Order #42 requires GF bread</p></div><span class="tag tag-warning">Separate prep</span></div>
+                <div class="queue-item"><div><h4>🥛 Dairy-Free</h4><p>Use vegan cheese alternative</p></div><span>✅</span></div>
+                <p style="margin-top:1rem; background:#eef2ff; padding:1rem; border-radius:1rem;">🔔 Epinephrine kit at station #3, all staff trained.</p>
+            </div>
+        </div>
+
+        <!-- Node Preview Panel (right side, persists but content changes per tab) -->
+        <div style="margin-top: 2rem;" class="content-panel" id="nodePreviewPanel">
+            <div style="display:flex; gap:0.5rem; margin-bottom:1rem;"><i data-lucide="git-branch"></i><h3>Node Explorer (child preview)</h3></div>
+            <div id="dynamicTreeRoot">Loading hierarchy...</div>
+        </div>
+    </main>
+</div>
+
+<script>
+    // =============== TREE DATA STRUCTURES ===============
+    const menusTree = {
+        name: "📖 Food Hierarchy",
+        children: [
+            { name: "🍳 Breakfast", children: [{ name: "Avocado Toast", details: "Egg, Chili" }, { name: "Pancakes", details: "Berries, Syrup" }, { name: "Yogurt Bowl", details: "Granola" }] },
+            { name: "🥗 Lunch", children: [{ name: "Mediterranean Bowl", details: "Falafel, Hummus" }, { name: "Chicken Sandwich", details: "Aioli" }, { name: "Quinoa Salad", details: "Feta" }] },
+            { name: "🍝 Dinner", children: [{ name: "Truffle Pasta", details: "Parmesan" }, { name: "Salmon", details: "Lemon Butter" }, { name: "Beef Bourguignon", details: "Red Wine" }] }
+        ]
+    };
+    const inventoryTree = {
+        name: "📦 Stock Nodes",
+        children: [
+            { name: "🥛 Dairy", children: [{ name: "Milk", details: "12 gal" }, { name: "Eggs", details: "240 pcs" }] },
+            { name: "🌿 Produce", children: [{ name: "Avocados", details: "32 units" }, { name: "Spinach", details: "6 bags" }] },
+            { name: "🍗 Protein", children: [{ name: "Chicken", details: "15 lbs" }, { name: "Beef", details: "22 lbs" }] }
+        ]
+    };
+    const allergyTree = {
+        name: "⚠️ Allergen Nodes",
+        children: [
+            { name: "🥜 Nuts", children: [{ name: "Cross-contact", details: "Separate utensils" }, { name: "Epinephrine", details: "Station #3" }] },
+            { name: "🌾 Gluten", children: [{ name: "GF zone", details: "Dedicated toaster" }] },
+            { name: "🥛 Dairy", children: [{ name: "Vegan cheese", details: "Available" }] }
+        ]
+    };
+    const dashboardTree = {
+        name: "🏠 Kitchen Metrics",
+        children: [
+            { name: "📈 Performance", children: [{ name: "Wait time avg", details: "4.2 min" }, { name: "Order accuracy", details: "98.5%" }] },
+            { name: "🔔 Alerts", children: [{ name: "Allergy flags", details: "3 active" }, { name: "Low stock", details: "4 items" }] }
+        ]
+    };
+
+    function buildTreeNodes(nodeData, level = 0) {
+        const hasChildren = nodeData.children && nodeData.children.length;
+        const li = document.createElement('li');
+        li.className = 'tree-node';
+        const nodeDiv = document.createElement('div');
+        nodeDiv.className = 'node-content';
+        let expandIconSpan = null;
+        if (hasChildren) {
+            expandIconSpan = document.createElement('span');
+            expandIconSpan.className = 'expand-icon';
+            expandIconSpan.innerHTML = '<i data-lucide="chevron-right" style="width: 16px;"></i>';
+        }
+        const iconSpan = document.createElement('span');
+        iconSpan.innerHTML = hasChildren ? '<i data-lucide="folder-tree"></i>' : '<i data-lucide="file-text"></i>';
+        const titleSpan = document.createElement('span');
+        titleSpan.className = 'node-title';
+        titleSpan.innerText = nodeData.name;
+        const badgeSpan = document.createElement('span');
+        if (nodeData.details) {
+            badgeSpan.className = 'node-badge';
+            badgeSpan.style.fontSize = '0.7rem';
+            badgeSpan.style.background = '#eef2ff';
+            badgeSpan.style.padding = '0.1rem 0.5rem';
+            badgeSpan.style.borderRadius = '20px';
+            badgeSpan.innerText = nodeData.details;
+        }
+        nodeDiv.appendChild(iconSpan);
+        nodeDiv.appendChild(titleSpan);
+        if (badgeSpan.innerText) nodeDiv.appendChild(badgeSpan);
+        if (expandIconSpan) nodeDiv.appendChild(expandIconSpan);
+        li.appendChild(nodeDiv);
+        if (hasChildren) {
+            const childUl = document.createElement('ul');
+            nodeData.children.forEach(child => childUl.appendChild(buildTreeNodes(child, level + 1)));
+            li.appendChild(childUl);
+            if (level === 0) {
+                childUl.style.display = 'block';
+                if (expandIconSpan) expandIconSpan.innerHTML = '<i data-lucide="chevron-down" style="width: 16px;"></i>';
+            } else {
+                childUl.style.display = 'none';
+            }
+            if (expandIconSpan) {
+                expandIconSpan.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const ulElem = li.querySelector('ul');
+                    if (ulElem) {
+                        const isVisible = ulElem.style.display !== 'none';
+                        ulElem.style.display = isVisible ? 'none' : 'block';
+                        const iconEl = expandIconSpan.querySelector('i');
+                        if (iconEl) {
+                            iconEl.setAttribute('data-lucide', isVisible ? 'chevron-right' : 'chevron-down');
+                            lucide.createIcons({ icons: iconEl });
+                        }
+                    }
+                });
+            }
+        }
+        return li;
+    }
+
+    function renderNodeTreeForTab(tabId) {
+        let data;
+        if (tabId === 'menus') data = menusTree;
+        else if (tabId === 'inventory') data = inventoryTree;
+        else if (tabId === 'allergy') data = allergyTree;
+        else data = dashboardTree;
+        const container = document.getElementById('dynamicTreeRoot');
+        if (!container) return;
+        container.innerHTML = '';
+        const headingSpan = document.createElement('div');
+        headingSpan.style.marginBottom = '0.75rem';
+        headingSpan.style.fontWeight = '600';
+        headingSpan.style.fontSize = '0.8rem';
+        headingSpan.style.color = 'var(--primary)';
+        headingSpan.innerHTML = `<i data-lucide="git-branch"></i> ${data.name} (click to explore)`;
+        container.appendChild(headingSpan);
+        const rootUl = document.createElement('ul');
+        rootUl.style.paddingLeft = '0';
+        const rootNode = { name: data.name, children: data.children };
+        const rootLi = buildTreeNodes(rootNode, 0);
+        rootUl.appendChild(rootLi);
+        container.appendChild(rootUl);
+        lucide.createIcons({ root: container });
+    }
+
+    // ========== TAB MANAGEMENT & FULL CONTENT CHANGE ==========
+    const views = {
+        dashboard: document.getElementById('dashboardView'),
+        menus: document.getElementById('menusView'),
+        inventory: document.getElementById('inventoryView'),
+        allergy: document.getElementById('allergyView')
+    };
+    let currentTab = 'dashboard';
+
+    function setActiveTab(tabId) {
+        // hide all views
+        Object.values(views).forEach(view => { if(view) view.classList.remove('active-view'); });
+        if (views[tabId]) views[tabId].classList.add('active-view');
+        // update nav active styles
+        document.querySelectorAll('.nav-item').forEach(item => {
+            const tab = item.getAttribute('data-tab');
+            if (tab === tabId) item.classList.add('active');
+            else item.classList.remove('active');
+        });
+        currentTab = tabId;
+        renderNodeTreeForTab(tabId);
+        // re-init any lucide icons inside new views
+        setTimeout(() => lucide.createIcons(), 50);
+    }
+
+    // attach nav click handlers
+    document.querySelectorAll('.nav-item').forEach(item => {
+        item.addEventListener('click', (e) => {
+            const tab = item.getAttribute('data-tab');
+            if (tab) setActiveTab(tab);
+            // optional: on mobile close sidebar after click if needed
+            if (window.innerWidth <= 768 && sidebar.classList.contains('collapsed') === false) {
+                // not necessary, just ux
+            }
+        });
+    });
+
+    // ========== SIDEBAR SHRINKER (icon-only mode) ==========
+    const sidebar = document.getElementById('sidebar');
+    const collapseBtn = document.getElementById('collapseSidebarBtn');
+    let isCollapsed = false;
+
+    function toggleSidebarCollapse() {
+        isCollapsed = !isCollapsed;
+        if (isCollapsed) {
+            sidebar.classList.add('collapsed');
+            collapseBtn.innerHTML = '<i data-lucide="chevrons-right"></i> <span>Expand</span>';
+        } else {
+            sidebar.classList.remove('collapsed');
+            collapseBtn.innerHTML = '<i data-lucide="chevrons-left"></i> <span>Collapse</span>';
+        }
+        lucide.createIcons();
+        // adjust main content margin via CSS transition handled
+    }
+    collapseBtn.addEventListener('click', toggleSidebarCollapse);
+
+    // Complete order buttons (demo)
+    document.querySelectorAll('.complete-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const queueItem = btn.closest('.queue-item');
+            if(queueItem) queueItem.style.opacity = '0.5';
+            setTimeout(() => alert('Order completed (demo)'), 100);
+        });
+    });
+
+    // Initialize dashboard active and node tree
+    setActiveTab('dashboard');
+    lucide.createIcons();
+    // ensure sidebar not collapsed on load
+    if (sidebar.classList.contains('collapsed')) sidebar.classList.remove('collapsed');
+    // attach new order button
+    const newOrderBtn = document.querySelector('button:has(i[data-lucide="plus"])') || document.querySelector('.header-wrapper button');
+    if(newOrderBtn) newOrderBtn.addEventListener('click', () => alert('New order dialog (demo)'));
+
+    // adjust for any dynamically added buttons in menus/inventory/allergy
+    document.querySelectorAll('#inventoryView button, #allergyView button').forEach(btn => {
+        btn.addEventListener('click', () => alert('Feature ready in pro version'));
+    });
+</script>
+</body>
+</html>

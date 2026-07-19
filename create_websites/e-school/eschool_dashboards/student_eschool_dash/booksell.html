@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stellar Pro | Store Hub</title>
+    <style>
+        :root {
+            --bg-deep: #0b0f1a;
+            --card-bg: #161e2d;
+            --electric-blue: #3b82f6;
+            --glow-blue: rgba(59, 130, 246, 0.4);
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+            --input-bg: #1e293b;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        /* Hub Styles */
+        #main-hub {
+            text-align: center;
+            max-width: 600px;
+            animation: fadeIn 0.8s ease;
+        }
+
+        .hub-title {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, #fff, var(--electric-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hub-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 40px;
+        }
+
+        .hub-card {
+            background: var(--card-bg);
+            padding: 40px 20px;
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .hub-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--electric-blue);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+
+        .hub-card i { font-size: 2rem; display: block; margin-bottom: 15px; }
+
+        /* Shared Container Styles */
+        .hidden { display: none !important; }
+        
+        .container-cloth, .cart-container {
+            animation: slideUp 0.5s ease-out;
+        }
+
+        /* --- UNIFORM STYLES --- */
+        .container-cloth {
+            background: var(--card-bg);
+            display: flex;
+            flex-wrap: wrap;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.7);
+            max-width: 950px;
+            width: 95%;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .preview-side { flex: 1; min-width: 400px; background: #000; display: flex; overflow: hidden; }
+        #uniform-img { width: 100%; height: 100%; object-fit: cover; transition: opacity 0.4s ease; }
+        .content-side { flex: 1; padding: 40px; min-width: 320px; }
+        
+        /* --- BOOK STYLES --- */
+        .cart-container {
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 24px;
+            width: 100%;
+            max-width: 500px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        /* Form Elements Shared */
+        .label-title { display: block; text-transform: uppercase; font-size: 0.7rem; letter-spacing: 2px; color: var(--text-dim); margin-bottom: 12px; font-weight: 700; }
+        select, .gender-label { width: 100%; padding: 15px; background: var(--input-bg); border: none; color: white; border-radius: 12px; outline: none; box-sizing: border-box; }
+        
+        .price-display, .total-amount { font-size: 1.8rem; color: var(--electric-blue); font-weight: 800; margin: 10px 0 25px 0; }
+        
+        .qty-btn { width: 40px; height: 40px; border-radius: 8px; border: none; background: #334155; color: white; cursor: pointer; }
+        .amount-container { display: flex; align-items: center; gap: 15px; background: var(--input-bg); width: fit-content; padding: 5px; border-radius: 12px; margin-bottom: 20px; }
+
+        .book-list { display: flex; flex-direction: column; gap: 10px; margin: 20px 0; max-height: 250px; overflow-y: auto; }
+        .book-item { display: flex; align-items: center; background: rgba(15, 23, 42, 0.5); padding: 12px; border-radius: 12px; cursor: pointer; }
+
+        .action-btn {
+            width: 100%; padding: 20px; background: var(--electric-blue); color: white; border: none; border-radius: 15px;
+            font-weight: 800; text-transform: uppercase; cursor: pointer; transition: 0.3s;
+        }
+        .action-btn:hover { transform: translateY(-3px); box-shadow: 0 10px 25px var(--glow-blue); }
+
+        .back-link { color: var(--text-dim); cursor: pointer; display: block; margin-bottom: 20px; font-size: 0.8rem; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        @media (max-width: 768px) {
+            .container-cloth { flex-direction: column; }
+            .preview-side { min-width: 100%; height: 300px; }
+            .hub-options { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="main-hub">
+        <h1 class="hub-title">Eb-Academy Portal</h1>
+        <p style="color: var(--text-dim)">Welcome to the student store. Please select a category to begin.</p>
+        
+        <div class="hub-options">
+            <div class="hub-card" onclick="showSection('uniform')">
+                <span>👕</span>
+                <h3>Buy Uniform</h3>
+                <p style="font-size: 0.8rem; color: var(--text-dim)">Full sets, shirts, and sweaters</p>
+            </div>
+            <div class="hub-card" onclick="showSection('books')">
+                <span>📚</span>
+                <h3>Buy Books</h3>
+                <p style="font-size: 0.8rem; color: var(--text-dim)">Official Ethiopian Curriculum</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="uniform-container" class="container-cloth hidden">
+        <div class="preview-side">
+            <img id="uniform-img" src="Screenshot 2026-02-11 193846.png" alt="Uniform View">
+        </div>
+        <div class="content-side">
+            <span class="back-link" onclick="goHome()">← Back to Hub</span>
+            <h1>Eb-Academy Uniform</h1>
+            <div class="price-display">ETB <span id="u-total">89</span>.00</div>
+
+            <span class="label-title">Select Gender</span>
+            <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                <button class="gender-label" id="btn-m" style="border: 2px solid var(--electric-blue)" onclick="updateGender('male')">Male</button>
+                <button class="gender-label" id="btn-f" onclick="updateGender('female')">Female</button>
+            </div>
+
+            <span class="label-title">Size</span>
+            <select id="size-select" onchange="updateUniformTotal()" style="margin-bottom: 20px;">
+                <option value="0">Small</option>
+                <option value="100" selected>Medium</option>
+                <option value="200">Large</option>
+                <option value="300">XL</option>
+            </select>
+
+            <span class="label-title">Shirt Amount</span>
+            <div class="amount-container">
+                <button class="qty-btn" onclick="changeQty('shirt', -1)">-</button>
+                <span id="qty-shirt" style="min-width: 30px; text-align: center">1</span>
+                <button class="qty-btn" onclick="changeQty('shirt', 1)">+</button>
+            </div>
+
+            <span class="label-title" id="trouser-label">Trouser Amount</span>
+            <div class="amount-container">
+                <button class="qty-btn" onclick="changeQty('trouser', -1)">-</button>
+                <span id="qty-trouser" style="min-width: 30px; text-align: center">1</span>
+                <button class="qty-btn" onclick="changeQty('trouser', 1)">+</button>
+            </div>
+
+            <button class="action-btn" onclick="alert('Uniform added to cart!')">Add to Cart</button>
+        </div>
+    </div>
+
+    <div id="book-container" class="cart-container hidden">
+        <span class="back-link" onclick="goHome()">← Back to Hub</span>
+        <h1>Book Collector</h1>
+        <p style="color: var(--text-dim); margin-bottom: 20px">Select your grade for the curriculum.</p>
+
+        <span class="label-title">Select Grade</span>
+        <select id="grade-select" onchange="renderBooks()">
+            <option value="" disabled selected>Select Grade</option>
+            <option value="1">Grade 1-6</option>
+            <option value="7">Grade 7-8</option>
+            <option value="9">Grade 9-10</option>
+            <option value="11">Grade 11 (Natural)</option>
+            <option value="12">Grade 12 (Social)</option>
+        </select>
+
+        <div id="book-list-container" class="book-list"></div>
+
+        <div style="border-top: 1px solid #334155; padding-top: 20px; display: flex; justify-content: space-between; align-items: center;">
+            <span class="label-title">Total</span>
+            <span class="total-amount">ETB <span id="b-total">0</span></span>
+        </div>
+
+        <button class="action-btn" style="margin-top: 20px;" onclick="checkoutBooks()">Confirm Books</button>
+    </div>
+
+    <script>
+        // --- NAVIGATION LOGIC ---
+        function showSection(type) {
+            document.getElementById('main-hub').classList.add('hidden');
+            if(type === 'uniform') {
+                document.getElementById('uniform-container').classList.remove('hidden');
+            } else {
+                document.getElementById('book-container').classList.remove('hidden');
+            }
+        }
+
+        function goHome() {
+            document.getElementById('uniform-container').classList.add('hidden');
+            document.getElementById('book-container').classList.add('hidden');
+            document.getElementById('main-hub').classList.remove('hidden');
+        }
+
+        // --- UNIFORM LOGIC ---
+        let u_base = { shirt: 89, trouser: 120 };
+        let u_qty = { shirt: 1, trouser: 1 };
+
+        function updateGender(gen) {
+            const img = document.getElementById('uniform-img');
+            const tLab = document.getElementById('trouser-label');
+            const bm = document.getElementById('btn-m');
+            const bf = document.getElementById('btn-f');
+
+            if(gen === 'male') {
+                img.src = "Screenshot 2026-02-11 193846.png";
+                tLab.innerText = "Trouser Amount";
+                u_base.trouser = 120;
+                bm.style.borderColor = 'var(--electric-blue)';
+                bf.style.borderColor = 'transparent';
+            } else {
+                img.src = "Screenshot 2026-02-11 194013.png";
+                tLab.innerText = "Dress Amount";
+                u_base.trouser = 145;
+                bf.style.borderColor = 'var(--electric-blue)';
+                bm.style.borderColor = 'transparent';
+            }
+            updateUniformTotal();
+        }
+
+        function changeQty(item, amt) {
+            u_qty[item] = Math.max(0, u_qty[item] + amt);
+            document.getElementById(`qty-${item}`).innerText = u_qty[item];
+            updateUniformTotal();
+        }
+
+        function updateUniformTotal() {
+            let extra = parseInt(document.getElementById('size-select').value);
+            let total = ((u_base.shirt + extra) * u_qty.shirt) + ((u_base.trouser + extra) * u_qty.trouser);
+            document.getElementById('u-total').innerText = total;
+        }
+
+        // --- BOOK LOGIC ---
+        const curriculum = {
+            "1": [{t: "Maths", p: 150}, {t: "English", p: 150}, {t: "Amharic", p: 150}],
+            "7": [{t: "General Science", p: 220}, {t: "Social Studies", p: 220}, {t: "Maths", p: 220}],
+            "9": [{t: "Physics", p: 280}, {t: "Chemistry", p: 280}, {t: "Biology", p: 280}],
+            "11": [{t: "Natural Maths", p: 350}, {t: "Physics", p: 350}],
+            "12": [{t: "Social Maths", p: 350}, {t: "Economics", p: 350}]
+        };
+
+        function renderBooks() {
+            const grade = document.getElementById('grade-select').value;
+            const container = document.getElementById('book-list-container');
+            container.innerHTML = "";
+            
+            curriculum[grade].forEach((book, idx) => {
+                const item = document.createElement('label');
+                item.className = 'book-item';
+                item.innerHTML = `
+                    <input type="checkbox" class="b-chk" data-price="${book.p}" onchange="calcBookTotal()">
+                    <div style="margin-left:15px">
+                        <div style="font-weight:bold">${book.t}</div>
+                        <div style="font-size:0.7rem; color:var(--electric-blue)">ETB ${book.p}</div>
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+            calcBookTotal();
+        }
+
+        function calcBookTotal() {
+            let total = 0;
+            document.querySelectorAll('.b-chk').forEach(chk => {
+                if(chk.checked) total += parseInt(chk.dataset.price);
+            });
+            document.getElementById('b-total').innerText = total;
+        }
+
+        function checkoutBooks() {
+            const total = document.getElementById('b-total').innerText;
+            alert(total > 0 ? `Books confirmed! Total: ETB ${total}` : "Select a book first!");
+        }
+    </script>
+</body>
+</html>

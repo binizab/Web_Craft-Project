@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="eschool_home.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+    
+    <nav id="navbar">
+    <a href="#" class="logo">
+        <div class="logo-icon"><img src="" alt="" id="logo_img" class="home-logo"></div>
+        <span><span style="color: #47a9ff" id="hero_schoolName">EB</span> ACADEMY</span>
+    </a>
+
+    
+<div class="menu-nav">
+    <ul class="nav-links" id="navLinks">
+        <li><a href="#home" class="current">Home</a></li>
+        <li><a href="#about">About Us</a></li>
+        <li><a href="#services">Services</a></li>
+        <li><a href="#gallery">Gallery</a></li>
+        <li><a href="#testimonials">Testimonials</a></li>
+        <li><a href="#contact">Contact</a></li>
+    </ul>
+</div>
+    <div class="nav-actions" style="display: flex; align-items: center; gap: 15px;">
+        <div class="desktop-cta main" id="loggedOutUI">
+            <button onclick="toggleSignInModal(true)">Sign In</button>
+        </div>
+
+        <div class="profile-container hidden" id="loggedInUI">
+            <div class="profile-trigger" id="profileTrigger">
+                <img src="https://ui-avatars.com/api/?name=User&background=009fee&color=fff" id="userAvatar" alt="Profile">
+                <span id="userName">Student</span>
+                <i data-lucide="chevron-down"></i>
+            </div>
+            <div class="profile-dropdown" id="profileDropdown">
+                <div class="dropdown-header">
+                    <p id="userEmail" style="font-size: 12px; color: var(--secondary-text); padding: 10px 15px; border-bottom: 1px solid var(--border);">user@example.com</p>
+                </div>
+                <button class="dropdown-item" onclick="handleLogout()">
+                    <i data-lucide="log-out"></i> Sign Out
+                </button>
+            </div>
+        </div>
+    </div>
+    <button class="mobile-menu-btn" id="mobileMenuBtn">
+        <i data-lucide="menu" id="menuBtnIcon"></i>
+    </button>
+</nav>
+
+<div id="errorToast" class="error-toast">
+    <i data-lucide="alert-circle"></i>
+    <span id="errorMessage">An error occurred</span>
+</div>
+
+<div class="modal-overlay" id="signInModal">
+    <div class="modal-card">
+        <button class="modal-close" onclick="toggleSignInModal(false)"><i data-lucide="x"></i></button>
+        
+        <div id="signInContainer">
+            <div class="modal-header">
+                <div class="logo-icon" style="margin: 0 auto 15px;">E</div>
+                <h2 class="section-title" style="font-size: 2rem;"><div class="text-gradient">Welcome</div> Back</h2>
+            </div>
+            <form id="signInForm" class="modal-form">
+                <div class="input-group">
+                    <i data-lucide="mail" style="color: var(--primary); margin-left: 10px; position: absolute;"></i>
+                    <input type="email" id="loginEmail" placeholder="Email" required>
+                </div>
+                <div class="input-group">
+                    <i data-lucide="lock" style="color: var(--primary); margin-left: 10px; position: absolute;"></i>
+                    <input type="password" id="loginPassword" placeholder="Password" required>
+                </div>
+                <button type="submit" class="submit-btn" style="width: 100%; justify-content: center; margin-top: 10px;">
+                    Sign In
+                </button>
+            </form>
+            <p style="text-align: center; margin-top: 20px; font-size: 14px; color: var(--secondary-text);">
+                Don't have an account? <a href="#" onclick="switchAuthMode('signup')" style="color: var(--primary); font-weight: 600; text-decoration: none;">Sign Up</a>
+            </p>
+        </div>
+
+        <div id="signUpContainer" class="hidden">
+            <div class="modal-header">
+                <div class="logo-icon" style="margin: 0 auto 15px;">E</div>
+                <h2 class="section-title" style="font-size: 2rem;"><div class="text-gradient">Join</div> EB Academy</h2>
+            </div>
+            <form id="signUpForm" class="modal-form">
+                <div class="input-group">
+                    <i data-lucide="user" style="color: var(--primary); margin-left: 10px; position: absolute;"></i>
+                    <input type="text" id="regName" placeholder="Full Name" required>
+                </div>
+                <div class="input-group">
+                    <i data-lucide="mail" style="color: var(--primary); margin-left: 10px; position: absolute;"></i>
+                    <input type="email" id="regEmail" placeholder="Email Address" required>
+                </div>
+                <div class="input-group">
+                    <i data-lucide="lock" style="color: var(--primary); margin-left: 10px; position: absolute;"></i>
+                    <input type="password" id="regPassword" placeholder="Create Password" required>
+                </div>
+                <button type="submit" class="submit-btn" style="width: 100%; justify-content: center; margin-top: 10px;">
+                    Create Account
+                </button>
+            </form>
+            <p style="text-align: center; margin-top: 20px; font-size: 14px; color: var(--secondary-text);">
+                Already have an account? <a href="#" onclick="switchAuthMode('signin')" style="color: var(--primary); font-weight: 600; text-decoration: none;">Sign In</a>
+            </p>
+        </div>
+    </div>
+</div>
+    
+    
+
+<div class="mobile-overlay" id="mobile-overlay">
+        <ul class="mobile-nav-list">
+            <li class="mobile-nav-item" style="transition-delay: 0.1s;"><a href="#home" class="mobile-link active">Home</a></li>
+            <li class="mobile-nav-item" style="transition-delay: 0.15s;"><a href="#about" class="mobile-link">About Us</a></li>
+            <li class="mobile-nav-item" style="transition-delay: 0.2s;"><a href="#services" class="mobile-link">Services</a></li>
+            <li class="mobile-nav-item" style="transition-delay: 0.25s;"><a href="#gallery" class="mobile-link">Gallery</a></li>
+            <li class="mobile-nav-item" style="transition-delay: 0.3s;"><a href="#testimonials" class="mobile-link">Testimonials</a></li>
+            <li class="mobile-nav-item" style="transition-delay: 0.35s;"><a href="#contact" class="mobile-link">Contact</a></li>
+        </ul>
+        <div class="desktop-cta" id="loggedOutUI">
+        <button onclick="toggleSignInModal(true)">Get Started</button>
+    </div>
+    </div>
+
+    <div class="settings-container">
+        <div class="dropdown-menu" id="dropMenu">
+            <ul class="menu-list" id="mainList">
+                <li class="menu-item" onclick="openSubMenu('themeList')">
+                    <span>Theme</span>
+                    <div class="menu-label-group">
+                        <span class="current-val" id="activeThemeLabel">Light</span>
+                        <i data-lucide="chevron-right" size="16"></i>
+                    </div>
+                </li>
+                <li class="menu-item" onclick="openSubMenu('langList')">
+                    <span>Language</span>
+                    <div class="menu-label-group">
+                        <span class="current-val" id="activeLangLabel">English</span>
+                        <i data-lucide="chevron-right" size="16"></i>
+                    </div>
+                </li>
+            </ul>
+
+            <ul class="menu-list hidden" id="themeList">
+                <li class="menu-item back-header" onclick="goBack()"><i data-lucide="chevron-left" size="16"></i> Back</li>
+                <li class="menu-item selected" onclick="changeTheme('Light', this)">Light <span class="checkmark">✓</span></li>
+                <li class="menu-item" onclick="changeTheme('Dark', this)">Dark <span class="checkmark">✓</span></li>
+            </ul>
+
+            <ul class="menu-list hidden" id="langList">
+                <li class="menu-item back-header" onclick="goBack()"><i data-lucide="chevron-left" size="16"></i> Back</li>
+                <li class="menu-item selected" onclick="selectLang('English', this)">English <span class="checkmark">✓</span></li>
+                <li class="menu-item" onclick="selectLang('Spanish', this)">Spanish <span class="checkmark">✓</span></li>
+            </ul>
+        </div>
+
+        <button class="main-btn" id="gearBtn">
+            <i data-lucide="settings"></i>
+        </button>
+    </div>
+
+    <header id="home" class="hero-container">
+        <div id="parallax-bg" class="hero-bg-wrapper">
+            <img src="home_eb_image.jpg" alt="EB Academy campus" class="hero-bg-img" id="hero-image">
+        </div>
+
+        <div class="overlay overlay-vertical"></div>
+        <div class="overlay overlay-horizontal"></div>
+
+        <div class="blur-circle blur-1"></div>
+        <div class="blur-circle blur-2"></div>
+
+        <div class="badge-float badge-pos-1">
+            <div class="glass-card">
+                <i data-lucide="graduation-cap" style="color: var(--primary);"></i>
+                <span>1500+ Students</span>
+            </div>
+        </div>
+        <div class="badge-float badge-pos-2">
+            <div class="glass-card">
+                <i data-lucide="book-open" style="color: var(--primary);"></i>
+                <span>31+ Years</span>
+            </div>
+        </div>
+        <div class="badge-float badge-pos-3">
+            <div class="glass-card">
+                <i data-lucide="users" style="color: var(--primary);"></i>
+                <span>7 Branches</span>
+            </div>
+        </div>
+
+        <div class="hero-content">
+            
+
+            <h1 class="hero-title">
+                <span class="text-white">The Future of</span>
+                <span class="text-gradient">Learning.</span>
+            </h1>
+
+            <p class="hero-description">
+                Welcome to Eb Academy, where we inspire students to reach for the stars 
+                through rigorous academics, innovative extracurriculars, and a nurturing 
+                community that empowers every learner to excel.
+            </p>
+
+            <div class="hero-btns">
+                <a href="#about" class="btn btn-primary">
+                    <i data-lucide="graduation-cap"></i>
+                    Explore <span id="hero_schoolName_button">EB</span> Academy
+                </a>
+                <a href="#gallery" class="btn btn-outline">View Gallery</a>
+            </div>
+        </div>
+
+
+        <div class="scroll-indicator">
+            <a href="#about">
+                <span>SCROLL</span>
+                <i data-lucide="chevron-down" class="bounce"></i>
+            </a>
+        </div>
+    </header>
+<section class="stats-container">
+        <div class="stats-wrapper">
+            <div class="stats-grid">
+                <div class="stat-item group">
+                    <div class="icon-box">
+                        <i data-lucide="award"></i>
+                    </div>
+                    <h3 class="stat-number" data-target="31" data-suffix="+">0+</h3>
+                    <p class="stat-label">Years of Legacy</p>
+                    <p class="stat-desc">Decades of educational excellence</p>
+                </div>
+
+                <div class="stat-item group">
+                    <div class="icon-box">
+                        <i data-lucide="users"></i>
+                    </div>
+                    <h3 class="stat-number" data-target="1500" data-suffix="+">0+</h3>
+                    <p class="stat-label">Active Students</p>
+                    <p class="stat-desc">Growing community every year</p>
+                </div>
+
+                <div class="stat-item group">
+                    <div class="icon-box">
+                        <i data-lucide="map-pin"></i>
+                    </div>
+                    <h3 class="stat-number" data-target="7" data-suffix="">0</h3>
+                    <p class="stat-label">Branches</p>
+                    <p class="stat-desc">Across Addis Ababa</p>
+                </div>
+
+                <div class="stat-item group">
+                    <div class="icon-box">
+                        <i data-lucide="trophy"></i>
+                    </div>
+                    <h3 class="stat-number" data-target="45" data-suffix="">0</h3>
+                    <p class="stat-label">Student Clubs</p>
+                    <p class="stat-desc">Extracurricular activities</p>
+                </div>
+            </div>
+
+            <div class="stats-footer">
+                <div class="footer-left">
+                    <i data-lucide="trending-up"></i>
+                    <span>Growing stronger every year</span>
+                </div>
+                <div class="footer-right">
+                    <div class="progress-track">
+                        <div class="progress-bar" style="width: 85%;"></div>
+                    </div>
+                    <span class="satisfaction-text">98% Satisfaction</span>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section id="about" class="section-padding overflow-hidden">
+        <div class="container">
+            <div class="section-header reveal">
+                <span class="badge">About Us</span>
+                <h2 class="section-title">
+                    Building the <span class="text-gradient">Future</span> of Education
+                </h2>
+                <div class="title-underline"></div>
+                <p class="section-subtitle">
+                    For over three decades, EB Academy has been nurturing minds and shaping futures 
+                    across Addis Ababa, building a legacy of excellence in education.
+                </p>
+            </div>
+
+            <div class="grid-layout mb-24">
+                <div class="reveal-left">
+                    <div class="card about-main-card">
+                        <div class="watermark"></div>
+
+                        <div class="content-relative">
+                            <div class="e-logo">E</div>
+
+                            <h3 class="card-heading">EB Academy</h3>
+
+                            <p class="description-text">
+                                EB Academy is a premier learning hub designed for ambitious individuals. We bridge the gap 
+                                between traditional learning and the fast-paced demands of the modern industry. Our holistic 
+                                approach ensures students develop both academically and personally. Our curriculum is built by experts to ensure that every graduate possesses the confidence 
+                                and technical prowess to excel in their chosen field. With seven branches across Addis Ababa, 
+                                we bring quality education closer to every family. From pre-primary to high school, our programs are designed to inspire curiosity, foster 
+                                critical thinking, and build character. Every student at EB Academy is encouraged to discover 
+                                their unique potential.
+                            </p>
+
+                            <div class="highlights-grid">
+                                <div class="highlight-item">
+                                    <p class="highlight-val">Pre-K</p>
+                                    <p class="highlight-label">to 12th Grade</p>
+                                </div>
+                                <div class="highlight-item">
+                                    <p class="highlight-val"><span>200</span>+</p>
+                                    <p class="highlight-label">Expert Teachers</p>
+                                </div>
+                            </div>
+
+                            <a href="#services" class="link-arrow">
+                                Explore Our Services <i data-lucide="arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pillars-grid reveal-right">
+                    <div class="pillar-card group" style="--color: linear-gradient(#3b82f6, #22d3ee)">
+                        <div class="pillar-icon-box"><i data-lucide="eye"></i></div>
+                        <h3>Vision</h3>
+                        <p>To lead the digital frontier by empowering the next generation of tech-savvy professionals ready to shape tomorrow.</p>
+                    </div>
+                    <div class="pillar-card group" style="--color: linear-gradient(#10b981, #2dd4bf)">
+                        <div class="pillar-icon-box"><i data-lucide="target"></i></div>
+                        <h3>Mission</h3>
+                        <p>Delivering practical training that transforms students into leaders.</p>
+                    </div>
+                    <div class="pillar-card group margin" style="--color: linear-gradient(#8b5cf6, #c084fc); margin-top: 50px;">
+                        <div class="pillar-icon-box"><i data-lucide="award"></i></div>
+                        <h3>Values</h3>
+                        <p>Unwavering integrity and excellence in every single detail.</p>
+                    </div>
+                    <div class="pillar-card group margin" style="--color: linear-gradient(#f59e0b, #fbbf24); margin-top:50px;">
+                        <div class="pillar-icon-box"><i data-lucide="lightbulb"></i></div>
+                        <h3>Innovation</h3>
+                        <p>Embracing cutting-edge technology and modern teaching methods.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pillars-bottom reveal">
+                <div class="pillar-card-horizontal" style="--color: linear-gradient(#f43f5e, #fb7185)">
+                    <div class="pillar-icon-box"><i data-lucide="heart" style="width: 100px;"></i></div>
+                    <div>
+                        <h3>Community</h3>
+                        <p>Fostering a warm, inclusive environment for every student.</p>
+                    </div>
+                </div>
+                <div class="pillar-card-horizontal" style="--color: linear-gradient(#6366f1, #3b82f6)">
+                    <div class="pillar-icon-box"><i data-lucide="star" style="width: 100px;"></i></div>
+                    <div>
+                        <h3>Excellence</h3>
+                        <p>Setting the highest standards in academics and character.</p>
+                    </div>
+                </div>
+                <div class="pillar-card-horizontal" style="--color: linear-gradient(#6366f1, #3b82f6)">
+                    <div class="pillar-icon-box" style="--color: linear-gradient(#f59e0b, #fbbf24);"><i data-lucide="lightbulb" style="width: 90px;"></i></div>
+                    <div>
+                        <h3>Innovation</h3>
+                        <p>Setting the highest standards in academics and character.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section id="programs" class="section-padding overflow-hidden">
+        <div class="container">
+            <div class="section-header reveal">
+                <span class="badge">Programs</span>
+                <h2 class="section-title">
+                    Our <span class="text-gradient">Programs</span> & Activities
+                </h2>
+                <div class="title-underline"></div>
+                <p class="section-subtitle">
+                    A well-rounded education that goes beyond the classroom, offering diverse programs 
+                    to help every student discover and develop their unique talents.
+                </p>
+            </div>
+
+            <div class="programs-grid reveal">
+                <div class="program-card">
+                    <div class="bg-decoration"></div>
+                    <div class="card-content">
+                        <div class="icon-box">
+                            <i data-lucide="book-open"></i>
+                        </div>
+                        <h3>Academic Excellence</h3>
+                        <p>Rigorous curriculum from Pre-K through 12th grade, preparing students for top universities worldwide.</p>
+                        <div class="stat-badge"><span >98</span>% Pass Rate</div>
+                    </div>
+                </div>
+
+                <div class="program-card">
+                    <div class="bg-decoration"></div>
+                    <div class="card-content">
+                        <div class="icon-box">
+                            <i data-lucide="trophy"></i>
+                        </div>
+                        <h3>Sports & Athletics</h3>
+                        <p>Comprehensive sports programs including basketball, soccer, and athletics to build teamwork.</p>
+                        <div class="stat-badge"><span>98</span>+ Sports</div>
+                    </div>
+                </div>
+
+                <div class="program-card">
+                    <div class="bg-decoration"></div>
+                    <div class="card-content">
+                        <div class="icon-box">
+                            <i data-lucide="palette"></i>
+                        </div>
+                        <h3>Arts & Creativity</h3>
+                        <p>Nurturing artistic talents through visual arts, drama, and creative writing programs.</p>
+                        <div class="stat-badge"><span style="margin-right: 3px;">98 </span> Art Programs</div>
+                    </div>
+                </div>
+
+                <div class="program-card">
+                    <div class="bg-decoration"></div>
+                    <div class="card-content">
+                        <div class="icon-box">
+                            <i data-lucide="code"></i>
+                        </div>
+                        <h3>Technology & STEM</h3>
+                        <p>State-of-the-art computer labs and STEM curriculum that prepare students for the digital future.</p>
+                        <div class="stat-badge"><span style="margin-right: 3px;">98 </span> Tech Labs</div>
+                    </div>
+                </div>
+
+                <div class="program-card">
+                    <div class="bg-decoration"></div>
+                    <div class="card-content">
+                        <div class="icon-box">
+                            <i data-lucide="music"></i>
+                        </div>
+                        <h3>Music & Performing Arts</h3>
+                        <p>Developing musical talents through choir, band, and individual instrument lessons.</p>
+                        <div class="stat-badge"><span style="margin-right: 3px;">98 </span> Ensembles</div>
+                    </div>
+                </div>
+
+                <div class="program-card">
+                    <div class="bg-decoration"></div>
+                    <div class="card-content">
+                        <div class="icon-box">
+                            <i data-lucide="flask-conical"></i>
+                        </div>
+                        <h3>Science Programs</h3>
+                        <p>Hands-on laboratory experiences and science fairs that spark curiosity and critical thinking.</p>
+                        <div class="stat-badge"><span style="margin-right: 3px;">98 </span> Lab Stations</div>
+                    </div>
+                </div>
+
+                <div class="program-card">
+                    <div class="bg-decoration"></div>
+                    <div class="card-content">
+                        <div class="icon-box">
+                            <i data-lucide="globe-2"></i>
+                        </div>
+                        <h3>Language Programs</h3>
+                        <p>Multilingual education including English and Amharic to prepare global citizens.</p>
+                        <div class="stat-badge"><span style="margin-right: 3px;">98 </span> Languages</div>
+                    </div>
+                </div>
+
+                <div class="program-card">
+                    <div class="bg-decoration"></div>
+                    <div class="card-content">
+                        <div class="icon-box">
+                            <i data-lucide="users"></i>
+                        </div>
+                        <h3>Leadership Development</h3>
+                        <p>Student council and mentorship programs that build confident future leaders.</p>
+                        <div class="stat-badge"><span style="margin-right: 3px;">45 </span> Clubs</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="services" class="section-padding overflow-hidden">
+        <div class="container">
+            <div class="section-header reveal">
+                <span class="badge">Our Services</span>
+                <h2 class="section-title">
+                    Portals for <span class="text-gradient">Everyone</span>
+                </h2>
+                <div class="title-underline"></div>
+                <p class="section-subtitle">
+                    Each member of our community has a dedicated portal designed to enhance their experience and provide the tools they need to succeed.
+                </p>
+            </div>
+
+            <div class="services-grid reveal">
+                <div class="service-card" style="--card-gradient: linear-gradient(to right, #3b82f6, #22d3ee);">
+                    <div class="card-border-top"></div>
+                    <div class="card-inner">
+                        <div class="service-icon-box" style="--icon-bg: linear-gradient(#3b82f6, #22d3ee);">
+                            <i data-lucide="graduation-cap"></i>
+                        </div>
+                        <h3>Student Portal</h3>
+                        <p class="card-desc">Access your grades, learning paths, upcoming assignments, and track your academic journey all in one place.</p>
+                        
+                        <ul class="features-list">
+                            <li><i data-lucide="check-circle" style="color: var(--primary);"></i><span>View Grades & Reports</span></li>
+                            <li><i data-lucide="check-circle" style="color: var(--primary);"></i><span>Track Assignments</span></li>
+                            <li><i data-lucide="check-circle" style="color: var(--primary);"></i><span>Learning Resources</span></li>
+                            <li><i data-lucide="check-circle" style="color: var(--primary);"></i><span>Exam Schedule</span></li>
+                        </ul>
+
+                        <button class="portal-btn" style="--btn-bg: linear-gradient(to right, #3b82f6, #22d3ee);"  onclick="openPortal('Student')">
+                            Enter Portal <i data-lucide="arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="service-card" style="--card-gradient: linear-gradient(to right, #10b981, #2dd4bf);">
+                    <div class="card-border-top"></div>
+                    <div class="card-inner">
+                        <div class="service-icon-box" style="--icon-bg: linear-gradient(#10b981, #2dd4bf);">
+                            <i data-lucide="book-open"></i>
+                        </div>
+                        <h3>Teacher Portal</h3>
+                        <p class="card-desc">Manage your classrooms, assignments, and provide meaningful feedback to help students reach their potential.</p>
+                        
+                        <ul class="features-list">
+                            <li><i data-lucide="check-circle" style="color: var(--primary);"></i><span>Classroom Management</span></li>
+                            <li><i data-lucide="check-circle" style="color: var(--primary);"></i><span>Grade Submissions</span></li>
+                            <li><i data-lucide="check-circle" style="color: var(--primary);"></i><span>Student Analytics</span></li>
+                            <li><i data-lucide="check-circle" style="color: var(--primary);"></i><span>Curriculum Tools</span></li>
+                        </ul>
+
+                        <button class="portal-btn" style="--btn-bg: linear-gradient(to right, #10b981, #2dd4bf);"  onclick="openPortal('Teacher')">
+                            Class Management <i data-lucide="arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="service-card" style="--card-gradient: linear-gradient(to right, #f43f5e, #fb7185);">
+                    <div class="card-border-top"></div>
+                    <div class="card-inner">
+                        <div class="service-icon-box" style="--icon-bg: linear-gradient(#f43f5e, #fb7185);">
+                            <i data-lucide="shield-check"></i>
+                        </div>
+                        <h3>Admin Portal</h3>
+                        <p class="card-desc">Full control over system settings, user management, reporting, and institutional analytics at your fingertips.</p>
+                        
+                        <ul class="features-list">
+                            <li><i data-lucide="check-circle" style="color: var(--primary);"></i><span>System Settings</span></li>
+                            <li><i data-lucide="check-circle" style="color: var(--primary);"></i><span>User Management</span></li>
+                            <li><i data-lucide="check-circle" style="color: var(--primary);"></i><span>Financial Reports</span></li>
+                            <li><i data-lucide="check-circle" style="color: var(--primary);"></i><span>Data Analytics</span></li>
+                        </ul>
+
+                        <button class="portal-btn" style="--btn-bg: linear-gradient(to right, #f43f5e, #fb7185);"  onclick="openPortal('Admin')">
+                            Admin Settings <i data-lucide="arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="service-card" style="--card-gradient: linear-gradient(to right, #8b5cf6, #c084fc);">
+                    <div class="card-border-top"></div>
+                    <div class="card-inner">
+                        <div class="service-icon-box" style="--icon-bg: linear-gradient(#8b5cf6, #c084fc);">
+                            <i data-lucide="users"></i>
+                        </div>
+                        <h3>Parent Portal</h3>
+                        <p class="card-desc">Track your child's progress, communicate with teachers, and stay updated with all school news and events.</p>
+                        
+                        <ul class="features-list">
+                            <li><i data-lucide="check-circle" style="color: var(--primary);"></i><span>Child Progress</span></li>
+                            <li><i data-lucide="check-circle" style="color: var(--primary);"></i><span>Teacher Communication</span></li>
+                            <li><i data-lucide="check-circle" style="color: var(--primary);"></i><span>Event Calendar</span></li>
+                            <li><i data-lucide="check-circle" style="color: var(--primary);"></i><span>Fee Management</span></li>
+                        </ul>
+
+                        <button class="portal-btn" style="--btn-bg: linear-gradient(to right, #8b5cf6, #c084fc);"  onclick="openPortal('Parent')">
+                            Parent View <i data-lucide="arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bottom-cta reveal">
+                <p>Need help choosing the right portal?</p>
+                <a href="#contact" class="cta-link">
+                    Contact Us for Guidance <i data-lucide="arrow-right"></i>
+                </a>
+            </div>
+        </div>
+
+        <div id="loginModal" class="modal-overlay-portal">
+    <div class="login-card" onclick="event.stopPropagation()">
+        <h2 id="modalTitle">Student Portal</h2>
+        <div class="role-badge" id="roleBadge">🔑 Role: Student</div>
+        
+        <div class="input-group-portal">
+            <label><i class="fas fa-id-card"></i> Full Name / Username</label>
+            <input type="text" id="usernameInput" placeholder="e.g., john_doe" autocomplete="off">
+        </div>
+        
+        <div class="input-group-portal">
+            <label><i class="fas fa-key"></i> Passkey</label>
+            <div class="pass-wrapper">
+                <input type="password" id="passkeyInput" placeholder="········">
+                <i class="fas fa-eye-slash toggle-eye" id="togglePassIcon" onclick="togglePasswordVisibility()"></i>
+            </div>
+        </div>
+        
+        <button class="submit-btn" id="verifyBtn" onclick="verifyCredentials()"><i class="fas fa-unlock-alt"></i> Verify & Access</button>
+        
+        <div id="guestActionArea" style="display: none;">
+            <hr>
+            <div class="guest-link" id="guestBtnDynamic">📝 New Student Registration</div>
+        </div>
+        
+        <div class="back-link" onclick="closeModal()">← Cancel & Go Back</div>
+    </div>
+</div>
+    </section>
+    <section id="facilities" class="section-padding bg-secondary overflow-hidden">
+        <div class="container">
+            <div class="section-header reveal">
+                <span class="badge">Facilities</span>
+                <h2 class="section-title">
+                    World-Class <span class="text-gradient">Facilities</span>
+                </h2>
+                <div class="title-underline"></div>
+                <p class="section-subtitle">
+                    Our campuses are equipped with modern facilities designed to provide the best 
+                    possible learning environment for our students.
+                </p>
+            </div>
+
+            <div class="facilities-grid reveal">
+                <div class="facility-card">
+                    <div class="icon-box">
+                        <i data-lucide="school"></i>
+                    </div>
+                    <h3>Modern Classrooms</h3>
+                    <p>Spacious, well-lit classrooms equipped with interactive whiteboards and comfortable seating.</p>
+                </div>
+
+                <div class="facility-card">
+                    <div class="icon-box">
+                        <i data-lucide="wifi"></i>
+                    </div>
+                    <h3>High-Speed Internet</h3>
+                    <p>Campus-wide WiFi connectivity ensuring students and teachers have access to digital resources.</p>
+                </div>
+
+                <div class="facility-card">
+                    <div class="icon-box">
+                        <i data-lucide="flask-conical"></i>
+                    </div>
+                    <h3>Science Laboratories</h3>
+                    <p>Fully equipped physics, chemistry, and biology labs for hands-on experimental learning.</p>
+                </div>
+
+                <div class="facility-card">
+                    <div class="icon-box">
+                        <i data-lucide="monitor"></i>
+                    </div>
+                    <h3>Computer Labs</h3>
+                    <p>State-of-the-art computer labs with modern hardware for STEM and digital literacy.</p>
+                </div>
+
+                <div class="facility-card">
+                    <div class="icon-box">
+                        <i data-lucide="book-open"></i>
+                    </div>
+                    <h3>Library & Media Center</h3>
+                    <p>A vast collection of books, journals, and digital resources to support research.</p>
+                </div>
+
+                <div class="facility-card">
+                    <div class="icon-box">
+                        <i data-lucide="utensils"></i>
+                    </div>
+                    <h3>Cafeteria</h3>
+                    <p>Nutritious meal options prepared daily in our hygienic cafeteria, catering to diverse needs.</p>
+                </div>
+
+                <div class="facility-card">
+                    <div class="icon-box">
+                        <i data-lucide="bus"></i>
+                    </div>
+                    <h3>Transportation</h3>
+                    <p>Safe and reliable school bus services covering major routes across Addis Ababa.</p>
+                </div>
+
+                <div class="facility-card">
+                    <div class="icon-box">
+                        <i data-lucide="shield-check"></i>
+                    </div>
+                    <h3>Security & Safety</h3>
+                    <p>24/7 security personnel, CCTV, and strict safety protocols to ensure a secure environment.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="gallery" class="section-padding overflow-hidden">
+        <div class="container">
+            <div class="section-header reveal">
+                <span class="badge">Gallery</span>
+                <h2 class="section-title">Academic <span class="text-gradient">Gallery</span></h2>
+                <div class="title-underline"></div>
+                <p class="section-subtitle">
+                    A glimpse into life at EB Academy — our events, facilities, and vibrant community.
+                </p>
+            </div>
+
+            <div id="filter-bar" class="filter-container reveal">
+                </div>
+
+            <div id="gallery-grid" class="gallery-grid reveal">
+                </div>
+        </div>
+
+        <div id="lightbox" class="lightbox">
+            <button class="lightbox-close" id="close-lightbox"><i data-lucide="x"></i></button>
+            <button class="lightbox-nav prev" id="prev-btn"><i data-lucide="chevron-left"></i></button>
+            <button class="lightbox-nav next" id="next-btn"><i data-lucide="chevron-right"></i></button>
+            
+            <div class="lightbox-content">
+                <img id="lightbox-img" src="" alt="">
+                <div class="lightbox-info">
+                    <p id="lightbox-label"></p>
+                    <span id="lightbox-cat"></span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section-padding bg-secondary overflow-hidden">
+    <div class="container">
+        <div class="section-header reveal">
+            <span class="badge">Our Team</span>
+            <h2 class="section-title">Meet Our <span class="text-gradient">Expert</span> Educators</h2>
+            <div class="title-underline"></div>
+            <p class="section-subtitle">
+                Our dedicated team of experienced educators is committed to providing the highest 
+                quality education and mentorship to every student at EB Academy.
+            </p>
+        </div>
+
+        <div class="teachers-grid reveal">
+            </div>
+
+        <div class="stats-row reveal">
+            <div class="stat-card">
+                <i data-lucide="award" class="stat-icon"></i>
+                <p class="stat-value">200+</p>
+                <p class="stat-label">Certified Teachers</p>
+            </div>
+            <div class="stat-card">
+                <i data-lucide="book-open" class="stat-icon"></i>
+                <p class="stat-value">50+</p>
+                <p class="stat-label">Subject Experts</p>
+            </div>
+            <div class="stat-card">
+                <i data-lucide="heart" class="stat-icon"></i>
+                <p class="stat-value">12 Yrs</p>
+                <p class="stat-label">Avg. Experience</p>
+            </div>
+            <div class="stat-card">
+                <i data-lucide="star" class="stat-icon"></i>
+                <p class="stat-value">4.9/5</p>
+                <p class="stat-label">Teacher Rating</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="testimonials" class="section-padding bg-secondary overflow-hidden">
+    <div class="container">
+        <div class="section-header reveal">
+            <span class="badge">Testimonials</span>
+            <h2 class="section-title">What Our <span class="text-gradient">Community</span> Says</h2>
+            <div class="title-underline"></div>
+            <p class="section-subtitle">
+                Hear from students, parents, teachers, and staff about their EB Academy experience.
+            </p>
+        </div>
+
+        <div class="slider-wrapper reveal" id="slider-wrapper">
+            <div class="testimonials-grid" id="testimonials-container">
+                </div>
+        </div>
+
+        <div class="slider-controls">
+            <button class="nav-btn" id="prev-test-btn" aria-label="Previous">
+                <i data-lucide="chevron-left"></i>
+            </button>
+
+            <div class="dots-container" id="dots-container">
+                </div>
+
+            <button class="nav-btn" id="next-test-btn" aria-label="Next">
+                <i data-lucide="chevron-right"></i>
+            </button>
+        </div>
+    </div>
+</section>
+
+<section id="events" class="section-padding bg-secondary overflow-hidden">
+    <div class="container">
+        <div class="section-header reveal">
+            <span class="badge">Events</span>
+            <h2 class="section-title">Upcoming <span class="text-gradient">Events</span></h2>
+            <div class="title-underline"></div>
+            <p class="section-subtitle">
+                Stay updated with the latest events and activities happening across our campuses.
+            </p>
+        </div>
+
+        <div id="events-grid" class="events-grid reveal">
+            </div>
+    </div>
+</section>
+
+<section id="faq" class="section-padding overflow-hidden">
+        <div class="container container-narrow">
+            <div class="section-header reveal">
+                <span class="badge">FAQ</span>
+                <h2 class="section-title">Frequently Asked <span class="text-gradient">Questions</span></h2>
+                <div class="title-underline"></div>
+                <p class="section-subtitle">
+                    Find answers to common questions about EB Academy.
+                </p>
+            </div>
+
+            <div id="faq-list" class="faq-container reveal">
+                </div>
+
+            <div class="faq-footer reveal">
+                <div class="footer-card">
+                    <i data-lucide="help-circle" class="footer-icon"></i>
+                    <p style="text-align: center;">Still have questions? <a href="#contact" class="footer-link">Contact us</a></p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section-padding overflow-hidden">
+        <div class="container container-medium reveal">
+            <div class="newsletter-card">
+                <div class="blur-blob blur-top"></div>
+                <div class="blur-blob blur-bottom"></div>
+
+                <div class="newsletter-content">
+                    <div class="newsletter-icon">
+                        <i data-lucide="mail"></i>
+                    </div>
+
+                    <h3 class="newsletter-title">Stay <span class="text-gradient">Connected</span></h3>
+                    <p class="newsletter-desc">
+                        Subscribe to our newsletter for the latest news, events, academic updates, 
+                        and important announcements from <span>EB</span> Academy.
+                    </p>
+
+                    <div id="newsletter-form-container">
+                        <form id="newsletter-form" class="newsletter-form">
+                            <div class="input-wrapper">
+                                <i data-lucide="mail" class="input-icon"></i>
+                                <input 
+                                    type="email" 
+                                    id="newsletter-email" 
+                                    placeholder="Enter your email" 
+                                    required
+                                    class="newsletter-input"
+                                >
+                            </div>
+                            <button type="submit" class="newsletter-btn">
+                                Subscribe
+                                <i data-lucide="send"></i>
+                            </button>
+                        </form>
+                    </div>
+
+                    <div id="newsletter-success" class="newsletter-success hidden">
+                        <i data-lucide="check-circle"></i>
+                        <span>Thank you for subscribing!</span>
+                    </div>
+
+                    <p class="newsletter-footer">
+                        No spam, unsubscribe at any time. We respect your privacy.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer id="contact" class="footer-section bg-foreground text-white overflow-hidden" style="padding-top: 50px;">
+        <div class="cta-wrapper">
+            <div class="container py-16">
+                <div class="cta-card bg-accent-gradient reveal">
+                    <div class="cta-deco deco-1"></div>
+                    <div class="cta-deco deco-2"></div>
+
+                    <div class="cta-content">
+                        <i data-lucide="graduation-cap" class="cta-icon"></i>
+                        <h3 class="cta-title">Ready to Start Your Journey?</h3>
+                        <p class="cta-desc">
+                            Join the <span>EB</span> Academy family and give your child the education they deserve. 
+                            Enroll today and be part of our growing community of excellence.
+                        </p>
+                        <div class="cta-buttons">
+                            <a href="#home" class="btn btn-white">
+                                Enroll Now <i data-lucide="arrow-right"></i>
+                            </a>
+                            <a href="#about" class="btn btn-outline">
+                                Learn More
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="container pb-8">
+            <div class="footer-grid reveal">
+                <div class="brand-col">
+                    <div class="footer-logo">
+                        <div class="logo-box bg-accent-gradient">E</div>
+                        <span class="logo-text"><span class="text-primary">EB</span> ACADEMY</span>
+                    </div>
+                    <p class="brand-desc">
+                        Excellence in education since 1995. Nurturing minds, shaping futures, 
+                        and building a legacy of academic achievement across Addis Ababa.
+                    </p>
+                    <div class="social-links" id="social-links">
+                        </div>
+                </div>
+
+                <div class="footer-col">
+                    <h3 class="col-title"><i data-lucide="map-pin"></i> Branches</h3>
+                    <ul class="footer-list" id="branches-list">
+                        </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h3 class="col-title"><i data-lucide="phone"></i> Contact Us</h3>
+                    <ul class="contact-list">
+                        <li><i data-lucide="mail" style="color: var(--primary);"></i> <span>ebacademy@gmail.com</span></li>
+                        <li><i data-lucide="phone" style="color: var(--primary);"></i> <span>09-12-13-14-15</span></li>
+                        <li><i data-lucide="globe" style="color: var(--primary);"></i> <span>www.ebacademy.com</span></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h3 class="col-title"><i data-lucide="send"></i> Channels</h3>
+                    <ul class="footer-list" id="telegram-list"></ul>
+                    
+                    <h3 class="col-title mt-8">Quick Links</h3>
+                    <ul class="footer-list" id="quick-links"></ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p class="copyright">© 2026 Eb Academy. All Rights Reserved. Education is the passport to the future.</p>
+                <div class="made-with">
+                    Made with <i data-lucide="heart" class="heart-icon"></i> for <span id="made_name">EB</span> Academy
+                </div>
+            </div>
+        </div>
+        <!-- Map Overlay Modal -->
+<div id="mapOverlay" class="map-overlay" onclick="closeMap()">
+    <div class="map-window" onclick="event.stopPropagation()">
+        <button class="map-close-btn" onclick="closeMap()">
+            <i class="fas fa-times"></i>
+        </button>
+        <div id="map"></div>
+        <div class="map-info">
+            <h3 id="targetName">Branch Name</h3>
+            <div class="map-dist-label">Distance from you</div>
+            <div id="distance" class="map-dist-val">-- km</div>
+            <div class="map-route-note">📍 Shortest road route (Yellow) | Alternative routes (Blue)</div>
+        </div>
+    </div>
+</div>
+    </footer>
+</body>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script type="module" src="eschool_home.js"></script>
+</html>

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Overview — ShopHub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../../style.css" />
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+</head>
+<body class="module-body">
+<div class="page-head"><div><h2>Manager Overview</h2><p>Bird's-eye view of business performance</p></div></div><div class="kpi-grid"><div class="kpi"><div class="kpi-icon"><i data-lucide="dollar-sign"></i></div><div class="label">Revenue</div><div class="val">$248,910</div><div class="delta up"><i data-lucide="arrow-up-right"></i>+12.4%</div></div><div class="kpi"><div class="kpi-icon"><i data-lucide="shopping-cart"></i></div><div class="label">Orders</div><div class="val">3,420</div><div class="delta up"><i data-lucide="arrow-up-right"></i>+8.1%</div></div><div class="kpi"><div class="kpi-icon"><i data-lucide="users"></i></div><div class="label">Customers</div><div class="val">12,840</div><div class="delta up"><i data-lucide="arrow-up-right"></i>+5.6%</div></div><div class="kpi"><div class="kpi-icon"><i data-lucide="percent"></i></div><div class="label">Conversion</div><div class="val">4.8%</div><div class="delta down"><i data-lucide="arrow-down-right"></i>-0.3%</div></div></div><div class="grid-2"><div class="card"><h3>Sales Trend<span class="pill">Last 7 days</span></h3><div class="bars"><div class="bar" style="height:55%"><span>Mon</span></div><div class="bar" style="height:70%"><span>Tue</span></div><div class="bar" style="height:45%"><span>Wed</span></div><div class="bar" style="height:80%"><span>Thu</span></div><div class="bar" style="height:95%"><span>Fri</span></div><div class="bar" style="height:65%"><span>Sat</span></div><div class="bar" style="height:78%"><span>Sun</span></div></div></div><div class="card"><h3>Top Categories</h3><div class="bar-row"><div class="br"><div class="top"><span>Electronics</span><span>84%</span></div><div class="progress"><div style="width:84%"></div></div></div><div class="br"><div class="top"><span>Fashion</span><span>72%</span></div><div class="progress"><div style="width:72%"></div></div></div><div class="br"><div class="top"><span>Home</span><span>58%</span></div><div class="progress"><div style="width:58%"></div></div></div><div class="br"><div class="top"><span>Beauty</span><span>46%</span></div><div class="progress"><div style="width:46%"></div></div></div><div class="br"><div class="top"><span>Sports</span><span>33%</span></div><div class="progress"><div style="width:33%"></div></div></div></div></div></div><div class="card"><h3>Recent Orders</h3><table><thead><tr><th>Order</th><th>Customer</th><th>Amount</th><th>Status</th><th>Date</th></tr></thead><tbody><tr><td>#10921</td><td>Aisha Khan</td><td>$214</td><td><span class='badge success'>Delivered</span></td><td>May 9</td></tr><tr><td>#10920</td><td>Ravi Patel</td><td>$87</td><td><span class='badge warning'>Pending</span></td><td>May 9</td></tr><tr><td>#10919</td><td>Sara Johnson</td><td>$320</td><td><span class='badge info'>Shipped</span></td><td>May 8</td></tr><tr><td>#10918</td><td>Marc Lee</td><td>$56</td><td><span class='badge danger'>Cancelled</span></td><td>May 8</td></tr><tr><td>#10917</td><td>Lina Park</td><td>$179</td><td><span class='badge success'>Delivered</span></td><td>May 7</td></tr></tbody></table></div>
+<script>
+(function(){
+  function paint(){ if(window.lucide) window.lucide.createIcons(); }
+  var t = (function(){ try{return localStorage.getItem('shophub-theme');}catch(e){return null;} })() || 'light';
+  document.documentElement.setAttribute('data-theme', t);
+  window.addEventListener('message', function(e){
+    if(e.data && e.data.type==='theme'){ document.documentElement.setAttribute('data-theme', e.data.theme); }
+  });
+  if(document.readyState!=='loading') paint(); else window.addEventListener('DOMContentLoaded', paint);
+  window.addEventListener('load', function(){ paint(); try{ parent.postMessage({type:'frameReady'},'*'); }catch(e){} });
+})();
+</script>
+</body>
+</html>

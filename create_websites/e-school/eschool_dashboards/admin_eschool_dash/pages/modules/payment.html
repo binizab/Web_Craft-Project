@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EB Academy | Annual Ledger & Payments</title>
+    <style>
+        :root {
+            --bg: #09090b;
+            --card: #18181b;
+            --accent: #38bdf8;
+            --text: #ffffff;
+            --dim: #71717a;
+            --border: #27272a;
+            --success: #10b981;
+            --danger: #ef4444;
+        }
+
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); padding: 20px; }
+        .container { max-width: 1100px; margin: 0 auto; }
+
+        /* Month Grid */
+        .month-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 12px;
+            margin-bottom: 40px;
+        }
+
+        .month-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .month-card:hover { border-color: var(--accent); }
+        .month-card.active { background: var(--accent); color: #000; border: none; font-weight: bold; }
+        .month-card span { font-size: 0.7rem; display: block; opacity: 0.7; }
+
+        /* Ledger Table */
+        .ledger-box {
+            background: var(--card);
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th { text-align: left; color: var(--dim); padding: 15px; border-bottom: 2px solid var(--border); font-size: 0.75rem; text-transform: uppercase; }
+        td { padding: 15px; border-bottom: 1px solid #27272a; font-size: 0.9rem; }
+        
+        /* Action Button */
+        .btn-pay {
+            background: var(--success);
+            color: #000;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: 0.2s;
+        }
+
+        .btn-pay:hover { background: #14d496; transform: scale(1.05); }
+        .btn-pay.disabled { background: #27272a; color: var(--dim); cursor: not-allowed; transform: none; }
+
+        .total-row { background: rgba(212, 175, 55, 0.05); font-weight: bold; color: var(--accent); }
+
+        .header-flex { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header style="margin-bottom:30px;">
+            <h1 style="margin:0; color:var(--accent)">Staff Payment Ledger</h1>
+            <p style="color:var(--dim)">Disburse salaries and manage historical records</p>
+        </header>
+
+        <div class="month-grid">
+            <div class="month-card"><h4>Meskerem</h4><span>Sep</span></div>
+            <div class="month-card"><h4>Tikimt</h4><span>Oct</span></div>
+            <div class="month-card"><h4>Hidar</h4><span>Nov</span></div>
+            <div class="month-card active"><h4>Tahsas</h4><span>Dec</span></div>
+            <div class="month-card"><h4>Tir</h4><span>Jan</span></div>
+            <div class="month-card"><h4>Yakatit</h4><span>Feb</span></div>
+            <div class="month-card"><h4>Magabit</h4><span>Mar</span></div>
+            <div class="month-card"><h4>Miyazia</h4><span>Apr</span></div>
+            <div class="month-card"><h4>Ginbot</h4><span>May</span></div>
+            <div class="month-card"><h4>Sene</h4><span>Jun</span></div>
+            <div class="month-card"><h4>Hamle</h4><span>Jul</span></div>
+            <div class="month-card"><h4>Nehasse</h4><span>Aug</span></div>
+        </div>
+
+        <div class="ledger-box">
+            <div class="header-flex">
+                <h2 id="currentMonthTitle" style="margin:0">Payroll: Tahsas 2025</h2>
+                <button class="btn-pay" style="background:var(--accent); padding: 12px 20px;" onclick="batchPay()">Release Batch Payment</button>
+            </div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Teacher</th>
+                        <th>Base Salary</th>
+                        <th>Bonus</th>
+                        <th>Deductions</th>
+                        <th>Net Total</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="ledgerBody">
+                    <tr>
+                        <td><strong>Abebe Molla</strong><br><small style="color:var(--dim)">CBE: ****4421</small></td>
+                        <td>12,000 ETB</td>
+                        <td>450 ETB</td>
+                        <td>-200 ETB</td>
+                        <td>12,250 ETB</td>
+                        <td><button class="btn-pay" onclick="processPayment(this, 'Abebe')">Pay Now</button></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Selam Tadesse</strong><br><small style="color:var(--dim)">Telebirr: 0911***</small></td>
+                        <td>11,500 ETB</td>
+                        <td>800 ETB</td>
+                        <td>-0 ETB</td>
+                        <td>12,300 ETB</td>
+                        <td><button class="btn-pay" onclick="processPayment(this, 'Selam')">Pay Now</button></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Kebede Melaku</strong><br><small style="color:var(--dim)">CBE: ****9901</small></td>
+                        <td>10,000 ETB</td>
+                        <td>200 ETB</td>
+                        <td>-100 ETB</td>
+                        <td>10,100 ETB</td>
+                        <td><button class="btn-pay disabled">Paid ✓</button></td>
+                    </tr>
+                    <tr class="total-row">
+                        <td colspan="4" style="text-align:right">Monthly Total:</td>
+                        <td>34,650 ETB</td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Month Switcher Logic
+        document.querySelectorAll('.month-card').forEach(card => {
+            card.addEventListener('click', function() {
+                document.querySelectorAll('.month-card').forEach(c => c.classList.remove('active'));
+                this.classList.add('active');
+                const monthName = this.querySelector('h4').innerText;
+                document.getElementById('currentMonthTitle').innerText = `Payroll: ${monthName} 2025`;
+                
+                // Randomize payment status for demo when switching months
+                resetTableState();
+            });
+        });
+
+        // Individual Payment Logic
+        function processPayment(btn, name) {
+            if(btn.classList.contains('disabled')) return;
+            
+            if(confirm(`Confirm salary disbursement for ${name}? Funds will be sent to the registered bank/mobile wallet.`)) {
+                btn.innerText = "Processing...";
+                btn.style.background = "#555";
+                
+                setTimeout(() => {
+                    btn.innerText = "Paid ✓";
+                    btn.classList.add('disabled');
+                    btn.style.background = ""; // Returns to CSS disabled state
+                }, 1500);
+            }
+        }
+
+        // Batch Payment Logic
+        function batchPay() {
+            if(confirm("Process all pending salaries for this month?")) {
+                const buttons = document.querySelectorAll('.btn-pay:not(.disabled)');
+                buttons.forEach((btn, index) => {
+                    setTimeout(() => {
+                        btn.innerText = "Paid ✓";
+                        btn.classList.add('disabled');
+                    }, index * 200); // Staggered effect for realism
+                });
+            }
+        }
+
+        function resetTableState() {
+            // This just resets the buttons so you can test them again on different months
+            const buttons = document.querySelectorAll('.btn-pay');
+            buttons.forEach((btn, i) => {
+                if(i < 2) { // Make the first two "unpaid" for testing
+                    btn.innerText = "Pay Now";
+                    btn.classList.remove('disabled');
+                } else {
+                    btn.innerText = "Paid ✓";
+                    btn.classList.add('disabled');
+                }
+            });
+        }
+    </script>
+
+</body>
+</html>

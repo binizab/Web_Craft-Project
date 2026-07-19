@@ -1,0 +1,89 @@
+CTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Strict Validation Form</title>
+    <style>
+        .input-group { margin-bottom: 15px; font-family: sans-serif; }
+        .error-message { color: #d93025; font-size: 0.85em; display: block; margin-top: 4px; min-height: 1.2em; }
+        input { padding: 10px; width: 250px; border: 1px solid #ccc; border-radius: 4px; }
+        .phone-container { display: flex; align-items: center; }
+        .prefix { background: #f1f3f4; padding: 10px; border: 1px solid #ccc; border-right: none; border-radius: 4px 0 0 4px; font-weight: bold; }
+        .prefixed-input { border-radius: 0 4px 4px 0; }
+        button { padding: 10px 20px; cursor: pointer; background-color: #1a73e8; color: white; border: none; border-radius: 4px; }
+    </style>
+</head>
+<body>
+
+    <div class="input-group">
+        <label>Email:</label>
+        <input type="text" id="email" placeholder="mail@example.com">
+        <span id="email-error" class="error-message"></span>
+    </div>
+
+    <div class="input-group">
+        <label>Phone:</label>
+        <div class="phone-container">
+            <span class="prefix">+251</span>
+            <input type="text" id="phone" class="prefixed-input" maxlength="9" 
+                   oninput="this.value = this.value.replace(/[^0-9]/g, '')" 
+                   placeholder="911223344">
+        </div>
+        <span id="phone-error" class="error-message"></span>
+    </div>
+
+    <div class="input-group">
+        <label>URL:</label>
+        <input type="text" id="url" placeholder="https://site.com">
+        <span id="url-error" class="error-message"></span>
+    </div>
+
+    <div class="input-group">
+        <label>Number (Max 2 digits):</label>
+        <input type="text" id="num" maxlength="2" 
+               oninput="this.value = this.value.replace(/[^0-9]/g, '')" 
+               placeholder="0-99">
+        <span id="num-error" class="error-message"></span>
+    </div>
+
+    <button onclick="validateForm()">Verify Details</button>
+
+    <script>
+        function validateForm() {
+            // Reset errors
+            document.querySelectorAll('.error-message').forEach(el => el.innerText = "");
+            let isValid = true;
+
+            // Email check
+            const email = document.getElementById('email').value;
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                document.getElementById('email-error').innerText = "Invalid email format.";
+                isValid = false;
+            }
+
+            // Phone check (Ensures exactly 9 digits)
+            const phone = document.getElementById('phone').value;
+            if (phone.length !== 9) {
+                document.getElementById('phone-error').innerText = "Phone must be exactly 9 digits.";
+                isValid = false;
+            }
+
+            // URL check
+            const url = document.getElementById('url').value;
+            try { new URL(url); } catch (_) {
+                document.getElementById('url-error').innerText = "Please include http:// or https://";
+                isValid = false;
+            }
+
+            // Number check
+            const num = document.getElementById('num').value;
+            if (num === "") {
+                document.getElementById('num-error').innerText = "Field cannot be empty.";
+                isValid = false;
+            }
+
+            if (isValid) alert("All inputs are valid!");
+        }
+    </script>
+</body>
+</html>

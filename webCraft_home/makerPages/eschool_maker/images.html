@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Visual Asset Manager | Pro</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<style>
+:root{
+    --primary:#00a2ff;
+    --bg:#050505;
+    --card:#111;
+    --border:rgba(255,255,255,.1);
+    --text:#ececec;
+    --error:#ff4d4d;
+    --hover-bg:#011927;
+    --transition:all .3s cubic-bezier(.4,0,.2,1);
+}
+
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',sans-serif}
+body{background:var(--bg);color:var(--text);padding:40px 20px}
+
+.gallery-container{max-width:1100px;margin:auto}
+.header{text-align:center;margin-bottom:50px}
+.header h1{font-size:2.5rem;margin-bottom:10px}
+.header p{color:#888;font-size:.9rem}
+
+.image-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+    gap:25px;
+}
+
+.upload-card{
+    background:var(--card);
+    border:2px dashed rgba(59,130,246,.3);
+    border-radius:20px;
+    display:flex;
+    flex-direction:column;
+    min-height:340px;
+    transition:var(--transition);
+}
+
+.upload-card:hover{
+    border-color:var(--primary);
+    border-style:solid;
+    box-shadow:0 0 25px rgba(0,162,255,.15);
+    transform:translateY(-5px);
+}
+
+.upload-card:hover .media-area,
+.upload-card:hover .info-area{
+    background:var(--hover-bg)!important;
+}
+
+.media-area{
+    position:relative;
+    height:200px;
+    background:#1a1a1b;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    transition:var(--transition);
+}
+
+.preview-img{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:none;
+}
+
+.upload-card.has-image .preview-img{display:block}
+.upload-card.has-image .placeholder-content{display:none}
+.upload-card.has-image .card-actions{display:flex}
+
+.placeholder-content{text-align:center;color:#555}
+.placeholder-content i{font-size:2rem;margin-bottom:10px;color:#333}
+.placeholder-content span{font-size:.8rem;font-weight:600;text-transform:uppercase}
+
+.info-area{
+    padding:20px;
+    background:#1a1a1b;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    flex-grow:1;
+}
+
+.label-input{
+    width:100%;
+    background:#0a0a0a;
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:10px 12px;
+    color:#fff;
+    font-size:.85rem;
+    outline:none;
+}
+
+.label-input:focus{border-color:var(--primary)}
+.label-input.input-error{
+    border-color:var(--error);
+    background:rgba(255,77,77,.05);
+}
+
+/* UPDATED CLASS */
+.error-hint{
+    color:var(--error);
+    font-size:.72rem;
+    font-weight:600;
+    display:none;
+    align-items:center;
+    gap:6px;
+    margin-top:4px;
+}
+
+.err-img-missing .msg-img{display:flex}
+.err-label-missing .msg-label{display:flex}
+
+.upload-card.has-error{
+    border-color:var(--error)!important;
+    border-style:solid;
+}
+
+.card-actions{
+    display:none;
+    gap:8px;
+    margin-top:auto;
+    padding-top:10px;
+}
+
+.action-btn{
+    flex:1;
+    padding:10px;
+    border-radius:8px;
+    border:none;
+    background:rgba(255,255,255,.05);
+    color:#888;
+    cursor:pointer;
+    transition:.2s;
+}
+
+.action-btn:hover{
+    background:var(--primary);
+    color:#fff;
+}
+
+.btn-del:hover{
+    background:var(--error);
+    color:#fff;
+}
+
+.controls{
+    margin-top:60px;
+    text-align:center;
+}
+
+.save-btn{
+    padding:18px 60px;
+    border-radius:14px;
+    border:none;
+    background:var(--primary);
+    color:white;
+    font-weight:700;
+    cursor:pointer;
+    transition:var(--transition);
+    box-shadow:0 10px 20px rgba(0,162,255,.2);
+}
+
+.save-btn:hover{
+    transform:scale(1.02);
+    box-shadow:0 15px 30px rgba(0,162,255,.3);
+}
+</style>
+</head>
+
+<body>
+
+<div class="gallery-container">
+<header class="header">
+<h1>Visual Assets</h1>
+<p>Ensure every slot has an image and a unique name before saving.</p>
+</header>
+
+<main class="image-grid" id="assetGrid"></main>
+
+<div class="controls">
+<button class="save-btn" onclick="validateAndSave()">Save Assets</button>
+</div>
+</div>
+
+<script>
+const slots=[
+"Home Hero","Brand Logo","Gallery 1","Gallery 2",
+"Gallery 3","Gallery 4","Gallery 5","Gallery 6"
+];
+
+let galleryData=JSON.parse(localStorage.getItem('user_gallery_pro'))||{};
+const grid=document.getElementById("assetGrid");
+
+/* Generate Cards */
+slots.forEach((name,i)=>{
+const idx=i+1;
+
+grid.innerHTML+=`
+<div class="upload-card" id="card-${idx}">
+<div class="media-area" id="form-imageInput-${idx}" onclick="triggerInput(${idx})">
+<img src="" class="preview-img" id="prev-${idx}">
+<div class="placeholder-content">
+<i class="fas fa-cloud-arrow-up"></i><br>
+<span>${name}</span>
+</div>
+<input type="file" id="input-${idx}" hidden accept="image/*" onchange="handleFile(this,${idx})">
+</div>
+
+<div class="info-area">
+<input type="text"
+class="label-input"
+id="form-labelInput-${idx}"
+placeholder="Asset Label"
+oninput="updateLabel(${idx},this.value)">
+
+<p class="error-hint msg-img" id="err-image-${idx}">
+<i class="fas fa-circle-exclamation"></i> Image required
+</p>
+
+<p class="error-hint msg-label" id="err-label-${idx}">
+<i class="fas fa-circle-exclamation"></i> Name required
+</p>
+
+<div class="card-actions">
+<button class="action-btn" onclick="triggerInput(${idx})">
+<i class="fas fa-sync-alt"></i> Replace
+</button>
+<button class="action-btn btn-del" onclick="removeImage(${idx})">
+<i class="fas fa-trash"></i>
+</button>
+</div>
+</div>
+</div>
+`;
+});
+
+/* Functions */
+
+function triggerInput(index){
+document.getElementById(`input-${index}`).click();
+}
+
+function handleFile(input,index){
+if(input.files&&input.files[0]){
+const reader=new FileReader();
+reader.onload=function(e){
+const card=document.getElementById(`card-${index}`);
+const img=document.getElementById(`prev-${index}`);
+
+img.src=e.target.result;
+card.classList.add("has-image");
+card.classList.remove("err-img-missing");
+checkCardError(card);
+
+if(!galleryData[`slot-${index}`])
+galleryData[`slot-${index}`]={img:"",label:""};
+
+galleryData[`slot-${index}`].img=e.target.result;
+};
+reader.readAsDataURL(input.files[0]);
+}
+}
+
+function updateLabel(index,value){
+const card=document.getElementById(`card-${index}`);
+const input=document.getElementById(`form-labelInput-${index}`);
+
+if(!galleryData[`slot-${index}`])
+galleryData[`slot-${index}`]={img:"",label:""};
+
+galleryData[`slot-${index}`].label=value;
+
+if(value.trim()!==""){
+card.classList.remove("err-label-missing");
+input.classList.remove("input-error");
+checkCardError(card);
+}
+}
+
+function removeImage(index){
+const card=document.getElementById(`card-${index}`);
+const img=document.getElementById(`prev-${index}`);
+
+img.src="";
+card.classList.remove("has-image");
+
+if(galleryData[`slot-${index}`])
+galleryData[`slot-${index}`].img="";
+}
+
+function checkCardError(card){
+if(!card.classList.contains("err-img-missing")
+&&!card.classList.contains("err-label-missing")){
+card.classList.remove("has-error");
+}
+}
+
+function validateAndSave(){
+let valid=true;
+const cards=document.querySelectorAll(".upload-card");
+
+cards.forEach(card=>{
+const index=card.id.split("-")[1];
+const label=document.getElementById(`form-labelInput-${index}`);
+const hasImage=card.classList.contains("has-image");
+const hasLabel=label.value.trim()!=="";
+
+card.classList.remove("err-img-missing","err-label-missing","has-error");
+label.classList.remove("input-error");
+
+if(!hasImage){
+card.classList.add("err-img-missing");
+valid=false;
+}
+
+if(!hasLabel){
+card.classList.add("err-label-missing");
+label.classList.add("input-error");
+valid=false;
+}
+
+if(!hasImage||!hasLabel){
+card.classList.add("has-error");
+}
+});
+
+if(valid){
+localStorage.setItem("user_gallery_pro",JSON.stringify(galleryData));
+alert("Assets saved successfully ✅");
+}
+}
+</script>
+
+</body>
+</html>
