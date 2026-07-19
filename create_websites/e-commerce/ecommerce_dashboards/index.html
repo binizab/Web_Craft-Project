@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>ShopHub — E-commerce Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- LOGIN VIEW -->
+<div id="loginView" class="login-wrap">
+  <div class="login-card">
+    <div class="login-brand">
+      <div class="logo-badge"><i data-lucide="shopping-bag"></i></div>
+      <h1>ShopHub</h1>
+      <p>E-commerce Operations Suite</p>
+    </div>
+    <form id="loginForm" class="login-form">
+      <label>Select Role</label>
+      <div class="role-grid">
+        <label class="role-opt"><input type="radio" name="role" value="manager" required><span><i data-lucide="briefcase"></i>Manager</span></label>
+        <label class="role-opt"><input type="radio" name="role" value="finance"><span><i data-lucide="wallet"></i>Finance</span></label>
+        <label class="role-opt"><input type="radio" name="role" value="store"><span><i data-lucide="store"></i>Store</span></label>
+        <label class="role-opt"><input type="radio" name="role" value="hr"><span><i data-lucide="users"></i>HR</span></label>
+        <label class="role-opt"><input type="radio" name="role" value="delivery"><span><i data-lucide="truck"></i>Delivery</span></label>
+      </div>
+      <label for="email">Email</label>
+      <input id="email" type="email" placeholder="you@shophub.com" required>
+      <label for="passkey">Passkey</label>
+      <input id="passkey" type="password" placeholder="Enter passkey" required>
+      <div class="login-error" id="loginError"></div>
+      <button type="submit" class="btn-primary"><i data-lucide="log-in"></i>Sign In</button>
+      <p class="hint">Demo passkey: <code>shophub2026</code></p>
+    </form>
+    <button class="theme-fab login-theme" id="loginTheme" aria-label="Toggle theme"><i data-lucide="moon"></i></button>
+  </div>
+</div>
+
+<!-- APP VIEW -->
+<div id="appView" class="app hidden">
+  <aside class="sidebar" id="sidebar">
+    <div class="side-head">
+      <div class="logo-badge sm"><i data-lucide="shopping-bag"></i></div>
+      <span class="brand-text">ShopHub</span>
+      <button class="collapse-btn" id="collapseBtn" aria-label="Collapse"><i data-lucide="chevrons-left"></i></button>
+    </div>
+    <nav class="side-nav" id="sideNav"></nav>
+    <div class="side-foot">
+      <button class="logout-btn" id="logoutBtn"><i data-lucide="log-out"></i><span>Logout</span></button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <button class="icon-btn mobile-only" id="mobileMenu"><i data-lucide="menu"></i></button>
+      <div class="search">
+        <i data-lucide="search"></i>
+        <input placeholder="Search orders, products, people…">
+      </div>
+      <div class="top-actions">
+        <button class="icon-btn" id="themeBtn" aria-label="Theme"><i data-lucide="moon"></i></button>
+        <button class="icon-btn"><i data-lucide="bell"></i></button>
+        <div class="user-chip">
+          <div class="avatar" id="userAvatar">M</div>
+          <div class="user-meta">
+            <strong id="userEmail">user@shophub.com</strong>
+            <small id="userRole">Manager</small>
+          </div>
+        </div>
+      </div>
+    </header>
+    <section id="content" class="content"></section>
+  </main>
+</div>
+
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

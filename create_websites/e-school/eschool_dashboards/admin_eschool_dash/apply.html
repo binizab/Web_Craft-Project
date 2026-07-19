@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>EB Academy | Apply</title>
+    <style>
+        :root { --bg: #09090b; --card: #18181b; --accent: #38bdf8; --text: #ffffff; --border: #27272a; --success: #10b981; --danger: #ef4444; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .form-card { background: var(--card); padding: 30px; border-radius: 16px; border: 1px solid var(--border); width: 100%; max-width: 500px; margin-bottom: 20px; }
+        input, select, textarea { width: 100%; padding: 12px; margin: 10px 0; background: #000; border: 1px solid var(--border); color: white; border-radius: 8px; box-sizing: border-box; }
+        button { width: 100%; padding: 15px; background: var(--accent); border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .status-box { margin-top: 20px; padding: 15px; border-radius: 8px; text-align: center; display: none; border: 1px solid var(--border); }
+    </style>
+</head>
+<body>
+    <div class="form-card">
+        <h2 style="color:var(--accent)">Submit Application</h2>
+        <form id="admissionForm">
+            <input type="text" id="name" placeholder="Full Name" required>
+            <input type="email" id="email" placeholder="Email (Used to check status)" required>
+            <select id="type"><option value="student">Student</option><option value="teacher">Teacher</option></select>
+            <input type="text" id="subject" placeholder="Grade/Subject">
+            <label style="font-size: 0.8rem; color: var(--accent);">Upload Document (ID/Transcript):</label>
+            <input type="file" id="fileInput" accept="image/*">
+            <button type="submit">Submit Application</button>
+        </form>
+
+        <div id="statusResult" class="status-box"></div>
+    </div>
+
+    <div class="form-card">
+        <h3>Check My Status</h3>
+        <input type="email" id="checkEmail" placeholder="Enter your email">
+        <button onclick="checkStatus()" style="background: transparent; border: 1px solid var(--accent); color: var(--accent);">Check Status</button>
+    </div>
+
+    <script>
+        const form = document.getElementById('admissionForm');
+
+        // This listener runs automatically whenever localStorage changes in another tab
+window.addEventListener('storage', (e) => {
+    if (e.key === 'last_update') {
+        const update = JSON.parse(e.newValue);
+        
+        // Optional: Only show alert if the user currently has their email in the 'Check Status' box
+        // Or remove the 'if' below to show it to whoever has the page open
+        const currentCheckEmail = document.getElementById('checkEmail').value.trim().toLowerCase();
+
+        if (update.email.toLowerCase() === currentCheckEmail) {
+            if (update.status === 'Accepted') {
+                alert(`✨ LIVE UPDATE: CONGRATULATIONS ${update.name}!\n\nYour application has been ACCEPTED!`);
+            } else {
+                alert(`🚨 LIVE UPDATE: Hello ${update.name},\n\nYour application status has changed to: REJECTED.\nReason: ${update.reason}`);
+            }
+        }
+    }
+});
+
+// 1. Helper to compress images so they fit in LocalStorage
+const processImage = (file) => {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = (event) => {
+            const img = new Image();
+            img.src = event.target.result;
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                const MAX_WIDTH = 800; 
+                let width = img.width;
+                let height = img.height;
+
+                if (width > MAX_WIDTH) {
+                    height *= MAX_WIDTH / width;
+                    width = MAX_WIDTH;
+                }
+
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+                // Quality 0.7 (70%) reduces file size from MBs to KBs
+                resolve(canvas.toDataURL('image/jpeg', 0.7));
+            };
+        };
+        reader.onerror = error => reject(error);
+    });
+};
+
+// 2. Handle Submission
+form.onsubmit = async function(e) {
+    e.preventDefault();
+    const fileInput = document.getElementById('fileInput');
+    let finalImage = "https://placehold.co/400x400?text=No+Document"; 
+
+    try {
+        if (fileInput.files[0]) {
+            finalImage = await processImage(fileInput.files[0]);
+        }
+
+        const newApp = {
+            id: Date.now(),
+            name: document.getElementById('name').value,
+            email: document.getElementById('email').value,
+            type: document.getElementById('type').value,
+            subject: document.getElementById('subject').value,
+            fileUrl: finalImage,
+            status: 'Pending',
+            reason: ''
+        };
+
+        const apps = JSON.parse(localStorage.getItem('eb_applications')) || [];
+        apps.push(newApp);
+        localStorage.setItem('eb_applications', JSON.stringify(apps));
+        
+        alert("Application Sent Successfully!");
+        form.reset();
+    } catch (err) {
+        alert("Error: Storage is likely full. Clear the Dashboard and try again.");
+    }
+};
+
+// 3. Handle Status Check
+function checkStatus() {
+    const emailInput = document.getElementById('checkEmail').value.trim();
+    
+    if (!emailInput) {
+        alert("Please enter your email first.");
+        return;
+    }
+
+    // 1. Get the latest data from LocalStorage
+    const apps = JSON.parse(localStorage.getItem('eb_applications')) || [];
+    
+    // 2. Find the application (case-insensitive search)
+    const myApp = apps.find(a => a.email.toLowerCase() === emailInput.toLowerCase());
+
+    // 3. Trigger Alert based on status
+    if (myApp) {
+        if (myApp.status === 'Accepted') {
+            alert(`🎉 CONGRATULATIONS, ${myApp.name.toUpperCase()}!\n\nYour application as a ${myApp.type} has been ACCEPTED.\n\nPlease check your email for enrollment instructions.`);
+        } 
+        else if (myApp.status === 'Rejected') {
+            alert(`APPLICATION UPDATE: REJECTED\n\nDear ${myApp.name},\nWe regret to inform you that your application was not successful.\n\nREASON: ${myApp.reason || "No specific reason provided."}`);
+        } 
+        else {
+            alert(`Hi ${myApp.name},\n\nYour application is still PENDING.\nOur admissions team is currently reviewing your documents. Please check back later.`);
+        }
+    } else {
+        alert("❌ No application found for this email address. Please ensure you used the correct email or submit a new application.");
+    }
+}
+    </script>
+</body>
+</html>

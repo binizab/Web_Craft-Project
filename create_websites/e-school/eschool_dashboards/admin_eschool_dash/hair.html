@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Grooming & Uniform Portal</title>
+    
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+
+    <style>
+        :root {
+            --bg: #020617;
+            --card: #1e293b;
+            --blue: #3b82f6;
+            --green: #22c55e;
+            --red: #ef4444;
+            --text: #f8fafc;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .main-container {
+            width: 100%;
+            max-width: 900px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .section-card {
+            background: var(--card);
+            padding: 25px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        /* AI Scanner Styling */
+        .video-wrapper {
+            position: relative;
+            width: 100%;
+            height: 350px;
+            background: #000;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 2px solid var(--blue);
+        }
+
+        canvas {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+        }
+
+        video { display: none; }
+
+        /* Status UI */
+        .status-box {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 10px;
+            background: #0f172a;
+            text-align: center;
+        }
+
+        .status-text { font-size: 1.4rem; font-weight: 800; margin-bottom: 5px; }
+        .scanning { color: var(--blue); }
+        .good { color: var(--green); }
+        .rude { color: var(--red); }
+
+        .progress-bg { height: 10px; background: #334155; border-radius: 5px; margin-top: 10px; overflow: hidden; }
+        #progress-fill { width: 0%; height: 100%; background: var(--blue); transition: 0.2s; }
+
+        /* Instructions */
+        .hint { color: #94a3b8; font-size: 0.85rem; margin-top: 10px; }
+
+        h2 { color: var(--blue); margin-top: 0; }
+    </style>
+</head>
+<body>
+
+<div class="main-container">
+
+    <div class="section-card">
+        <h2>AI Grooming Inspector</h2>
+        <div class="video-wrapper">
+            <video id="input_video"></video>
+            <canvas id="output_canvas"></canvas>
+        </div>
+
+        <div class="status-box">
+            <div id="status-display" class="status-text scanning">INITIALIZING AI...</div>
+            <div id="detail-text">Please allow camera access.</div>
+            <div class="progress-bg"><div id="progress-fill"></div></div>
+        </div>
+        <p class="hint">Note: High "Growth Level" triggers a **RUDE** status.</p>
+    </div>
+
+</div>
+
+<script>
+    const videoElement = document.getElementById('input_video');
+    const canvasElement = document.getElementById('output_canvas');
+    const canvasCtx = canvasElement.getContext('2d');
+    const statusDisplay = document.getElementById('status-display');
+    const detailText = document.getElementById('detail-text');
+    const progressFill = document.getElementById('progress-fill');
+
+    function onResults(results) {
+        // Set canvas dimensions to match video once
+        if (canvasElement.width !== videoElement.videoWidth) {
+            canvasElement.width = videoElement.videoWidth;
+            canvasElement.height = videoElement.videoHeight;
+        }
+
+        canvasCtx.save();
+        canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+        canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
+
+        if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+            for (const landmarks of results.multiHandLandmarks) {
+                // Draw AI skeletal overlay
+                drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS, {color: '#3b82f6', lineWidth: 4});
+                drawLandmarks(canvasCtx, landmarks, {color: '#ffffff', lineWidth: 1, radius: 2});
+
+                // Calculation: Distance between Fingertip (8) and Joint (7)
+                const tip = landmarks[8];
+                const joint = landmarks[7];
+                const dist = Math.sqrt(Math.pow(tip.x - joint.x, 2) + Math.pow(tip.y - joint.y, 2));
+
+                const growthScore = Math.min(dist * 600, 100); 
+                progressFill.style.width = growthScore + "%";
+
+                if (growthScore > 48) {
+                    statusDisplay.innerText = "STATUS: RUDE";
+                    statusDisplay.className = "status-text rude";
+                    detailText.innerText = "Excessive growth detected. Please trim nails.";
+                } else {
+                    statusDisplay.innerText = "STATUS: GOOD";
+                    statusDisplay.className = "status-text good";
+                    detailText.innerText = "Grooming is within acceptable limits.";
+                }
+            }
+        } else {
+            statusDisplay.innerText = "SCANNING...";
+            statusDisplay.className = "status-text scanning";
+            detailText.innerText = "Show your hand/fingers to the camera.";
+            progressFill.style.width = "0%";
+        }
+        canvasCtx.restore();
+    }
+
+    // AI Initialization with Error Catching
+    async function startAI() {
+        try {
+            const hands = new Hands({
+                locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
+            });
+
+            hands.setOptions({
+                maxNumHands: 1,
+                modelComplexity: 1,
+                minDetectionConfidence: 0.5,
+                minTrackingConfidence: 0.5
+            });
+
+            hands.onResults(onResults);
+
+            const camera = new Camera(videoElement, {
+                onFrame: async () => {
+                    await hands.send({image: videoElement});
+                },
+                width: 640,
+                height: 480
+            });
+
+            await camera.start();
+            statusDisplay.innerText = "READY";
+            detailText.innerText = "AI System Online.";
+            
+        } catch (err) {
+            console.error(err);
+            statusDisplay.innerText = "AI ERROR";
+            statusDisplay.className = "status-text rude";
+            detailText.innerText = "Network blocked. Try disabling QUIC in chrome://flags.";
+        }
+    }
+
+    // Start
+    window.onload = startAI;
+</script>
+
+</body>
+</html>

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduTrack | Student Lobby</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://unpkg.com/dexie/dist/dexie.js"></script>
+    <style>
+        :root {
+            --bg: #0d1117; --surface: #161b22; --border: #30363d;
+            --text: #c9d1d9; --accent: #58a6ff; --success: #238636;
+            --warning: #d29922; --danger: #f85149; --font-main: 'Poppins', sans-serif;
+        }
+        body { font-family: var(--font-main); background: var(--bg); color: var(--text); margin: 0; padding: 40px 20px; }
+        .container { max-width: 1100px; margin: auto; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 25px; margin-top: 30px; }
+        .card { 
+            background: var(--surface); border: 1px solid var(--border); border-radius: 20px; 
+            overflow: hidden; transition: 0.3s; cursor: pointer; display: flex; flex-direction: column;
+        }
+        .card:hover { border-color: var(--accent); transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .card.locked { cursor: not-allowed; opacity: 0.6; filter: grayscale(0.5); }
+        .card-body { padding: 25px; flex-grow: 1; }
+        .badge { font-size: 0.65rem; font-weight: 800; padding: 5px 12px; border-radius: 50px; text-transform: uppercase; display: inline-flex; align-items: center; gap: 5px; margin-bottom: 15px; }
+        .badge-live { background: rgba(35, 134, 54, 0.15); color: var(--success); }
+        .badge-wait { background: rgba(210, 153, 34, 0.15); color: var(--warning); }
+        .footer { padding: 15px 25px; background: rgba(0,0,0,0.3); border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .timer-val { font-family: monospace; font-size: 1.1rem; font-weight: 700; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+        <h1>Available <span style="color:var(--accent)">Exams</span></h1>
+        <button onclick="location.href='Exampublisher.html'" style="background:var(--accent); color:white; border:none; padding:10px 20px; border-radius:10px; cursor:pointer; font-weight:600;">+ Create Exam</button>
+    </div>
+    <div class="grid" id="examGrid"></div>
+</div>
+<script src="https://unpkg.com/dexie/dist/dexie.js"></script>
+<script>
+    const db = new Dexie("EduTrackDB");
+    db.version(1).stores({ exams: '++id, title, startTime, status' });
+
+    async function updateLobby() {
+        const grid = document.getElementById('examGrid');
+        const exams = await db.exams.toArray();
+        const now = new Date().getTime();
+
+        if(exams.length === 0) {
+            grid.innerHTML = '<p style="text-align:center; grid-column:1/-1; padding:100px; opacity:0.5;">No exams published yet.</p>';
+            return;
+        }
+
+        grid.innerHTML = exams.map(exam => {
+            const timeUntilStart = exam.startTime - now;
+            const isLive = timeUntilStart <= 0;
+            const endTime = exam.startTime + (exam.duration * 60 * 1000);
+            const timeRemaining = endTime - now;
+
+            if (timeRemaining <= 0) return ''; 
+
+            const format = (ms) => {
+                const s = Math.floor(ms / 1000);
+                const m = Math.floor(s / 60);
+                const h = Math.floor(m / 60);
+                return `${h}:${(m%60).toString().padStart(2,'0')}:${(s%60).toString().padStart(2,'0')}`;
+            };
+
+            return `
+                <div class="card ${!isLive ? 'locked' : ''}" onclick="${isLive ? `enterExam(${exam.id})` : `alert('This exam has not started yet!')`}">
+                    <div class="card-body">
+                        <div class="badge ${isLive ? 'badge-live' : 'badge-wait'}">
+                            <i data-lucide="${isLive ? 'play' : 'clock'}" size="12"></i>
+                            ${isLive ? 'Live Now' : 'Upcoming'}
+                        </div>
+                        <h3 style="margin:0; color:#fff;">${exam.title}</h3>
+                        <p style="color:#8b949e; font-size:0.8rem; margin-top:10px;">${exam.questionCount} Questions | ${exam.duration} Mins</p>
+                    </div>
+                    <div class="footer">
+                        <div>
+                            <div style="font-size:0.6rem; color:#8b949e; text-transform:uppercase;">${isLive ? 'Time Left' : 'Starts After'}</div>
+                            <div class="timer-val" style="color:${isLive ? 'var(--success)' : 'var(--warning)'}">
+                                ${isLive ? format(timeRemaining) : format(timeUntilStart)}
+                            </div>
+                        </div>
+                        <i data-lucide="${isLive ? 'arrow-right-circle' : 'lock'}"></i>
+                    </div>
+                </div>
+            `;
+        }).join('');
+        lucide.createIcons();
+    }
+
+    function enterExam(id) {
+    // This now correctly opens the StudentExam.html file
+    window.location.href = `test.html?id=${id}`;
+}
+
+    setInterval(updateLobby, 1000);
+    updateLobby();
+</script>
+</body>
+</html>

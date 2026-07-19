@@ -799,6 +799,7 @@ const serviceModalTitle = document.getElementById('serviceModalTitle');
 const serviceModalContent = document.getElementById('serviceModalContent');
 
 // Service data for each card
+// Service data for each card
 const serviceData = {
     'ecommerce': {
         title: '🛒 E-commerce Websites',
@@ -823,9 +824,8 @@ const serviceData = {
                 Starting from 1,000 ETB - Contact for custom quote
             </div>
             
-            <button class="cta-modal-btn" onclick="document.getElementById('serviceModal').classList.remove('active'); document.getElementById('contact').scrollIntoView({behavior: 'smooth'});">
-                <i class="fas fa-paper-plane"></i> Get a Quote
-            </button>
+<a href="../makerPages/ecommerce_maker/ecommerce_maker.html" target="_blank" class="cta-modal-btn" style="text-decoration: none; display: inline-block; text-align: center;" onclick="document.getElementById('serviceModal').classList.remove('active'); document.body.style.overflow = '';">                <i class="fas fa-external-link-alt"></i> Open Maker
+            </a>
         `
     },
     'school': {
@@ -852,9 +852,9 @@ const serviceData = {
                 Starting from 10,000 ETB - Contact for custom quote
             </div>
             
-            <button class="cta-modal-btn" onclick="document.getElementById('serviceModal').classList.remove('active'); document.getElementById('contact').scrollIntoView({behavior: 'smooth'});">
-                <i class="fas fa-paper-plane"></i> Get a Quote
-            </button>
+            <a href="../makerPages/eschool_maker/eschool_maker.html" target="_blank" class="cta-modal-btn" style="text-decoration: none; display: inline-block; text-align: center;" onclick="document.getElementById('serviceModal').classList.remove('active'); document.body.style.overflow = '';">
+                <i class="fas fa-external-link-alt"></i> Open Maker
+            </a>
         `
     },
     'portfolio': {
@@ -881,9 +881,9 @@ const serviceData = {
                 Starting from 500 ETB - Contact for custom quote
             </div>
             
-            <button class="cta-modal-btn" onclick="document.getElementById('serviceModal').classList.remove('active'); document.getElementById('contact').scrollIntoView({behavior: 'smooth'});">
-                <i class="fas fa-paper-plane"></i> Get a Quote
-            </button>
+            <a href="../makerPages/portfolio_maker/portfolio_maker.html" target="_blank" class="cta-modal-btn" style="text-decoration: none; display: inline-block; text-align: center;" onclick="document.getElementById('serviceModal').classList.remove('active'); document.body.style.overflow = '';">
+                <i class="fas fa-external-link-alt"></i> Open Maker
+            </a>
         `
     },
     'search': {
@@ -908,9 +908,8 @@ const serviceData = {
                 Starting from 2,000 ETB - Contact for custom quote
             </div>
             
-            <button class="cta-modal-btn" onclick="document.getElementById('serviceModal').classList.remove('active'); document.getElementById('contact').scrollIntoView({behavior: 'smooth'});">
-                <i class="fas fa-paper-plane"></i> Get a Quote
-            </button>
+<a href="../../search_websites/search_ecommerce/search_ecommerce.html" target="_blank" class="cta-modal-btn" style="text-decoration: none; display: inline-block; text-align: center;" onclick="document.getElementById('serviceModal').classList.remove('active'); document.body.style.overflow = '';">                <i class="fas fa-external-link-alt"></i> Open Engine
+            </a>
         `
     },
     'connect': {
@@ -936,9 +935,8 @@ const serviceData = {
                 Starting from 5,000 ETB - Contact for custom quote
             </div>
             
-            <button class="cta-modal-btn" onclick="document.getElementById('serviceModal').classList.remove('active'); document.getElementById('contact').scrollIntoView({behavior: 'smooth'});">
-                <i class="fas fa-paper-plane"></i> Get a Quote
-            </button>
+<a href="../../search_websites/search_portfolio/search_portfolio.html" target="_blank" class="cta-modal-btn" style="text-decoration: none; display: inline-block; text-align: center;" onclick="document.getElementById('serviceModal').classList.remove('active'); document.body.style.overflow = '';">                <i class="fas fa-external-link-alt"></i> Open Engine
+            </a>
         `
     },
     'buy': {
@@ -965,9 +963,8 @@ const serviceData = {
                 Starting from 3,000 ETB - Contact for custom quote
             </div>
             
-            <button class="cta-modal-btn" onclick="document.getElementById('serviceModal').classList.remove('active'); document.getElementById('contact').scrollIntoView({behavior: 'smooth'});">
-                <i class="fas fa-paper-plane"></i> Get a Quote
-            </button>
+<a href="../../search_websites/search_eschools/search_eschools.html" target="_blank" class="cta-modal-btn" style="text-decoration: none; display: inline-block; text-align: center;" onclick="document.getElementById('serviceModal').classList.remove('active'); document.body.style.overflow = '';">                <i class="fas fa-external-link-alt"></i> Open Engine
+            </a>
         `
     }
 };

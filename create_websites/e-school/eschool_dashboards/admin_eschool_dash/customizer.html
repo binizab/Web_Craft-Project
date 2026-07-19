@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EB Academy | Smart Registrar</title>
+    <style>
+        :root {
+            --bg: #09090b;
+            --card: #18181b;
+            --accent: #38bdf8;
+            --text: #ffffff;
+            --border: #27272a;
+            --desk: #22c55e;
+        }
+
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+
+        /* Configuration Bar */
+        .config-bar {
+            background: var(--card); border: 1px solid var(--border);
+            padding: 20px; border-radius: 15px; display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px; margin-bottom: 30px; align-items: end;
+        }
+
+        input, select { background: #000; border: 1px solid var(--border); color: white; padding: 10px; border-radius: 8px; width: 100%; box-sizing: border-box; }
+        
+        .btn-ai { background: var(--accent); color: black; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+
+        /* Classroom Grid */
+        .classroom-layout {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;
+        }
+
+        .section-card { background: var(--card); border: 1px solid var(--border); border-radius: 15px; padding: 20px; }
+        .section-title { color: var(--accent); border-bottom: 1px solid #333; padding-bottom: 10px; margin-bottom: 15px; display: flex; justify-content: space-between; }
+
+        /* Desk Map UI */
+        .desk-grid {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 15px;
+        }
+
+        .desk {
+            background: #111; border: 1px solid #333; aspect-ratio: 1; border-radius: 4px;
+            display: flex; align-items: center; justify-content: center; font-size: 0.65rem;
+            color: #777; text-align: center; padding: 2px;
+        }
+
+        .desk.occupied { border-color: var(--desk); color: var(--text); background: rgba(34, 197, 94, 0.1); }
+        
+        .teacher-desk {
+            grid-column: span 4; background: #333; color: white; padding: 5px; 
+            text-align: center; font-size: 0.7rem; border-radius: 4px; margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header style="margin-bottom: 30px;">
+            <h1 style="color:var(--accent); margin:0;">AI Registrar & Seating Planner</h1>
+            <p style="color:var(--dim)">Automated student classification and desk assignment</p>
+        </header>
+
+        <div class="config-bar">
+            <div>
+                <label style="font-size:0.8rem; color:var(--dim)">Grade Level</label>
+                <select id="gradeSelect">
+                    <option value="9">Grade 9</option>
+                    <option value="10">Grade 10</option>
+                    <option value="11">Grade 11</option>
+                    <option value="12">Grade 12</option>
+                </select>
+            </div>
+            <div>
+                <label style="font-size:0.8rem; color:var(--dim)">Max Students Per Section</label>
+                <input type="number" id="maxStudents" value="20">
+            </div>
+            <button class="btn-ai" onclick="runAIClassifier()">⚡ Run AI Classification</button>
+        </div>
+
+        <div class="classroom-layout" id="classRooms">
+            <div style="text-align:center; grid-column: 1/-1; color:var(--dim); padding: 50px;">
+                Enter settings and click "Run AI" to distribute students alphabetically.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Mock Database of Students (Normally comes from your Registration Page)
+        const studentPool = [
+            "Abebe Bekele", "Almaz Tesfaye", "Biniam Yosef", "Chala Gebre", "Dawit Haile", 
+            "Elias Melaku", "Fantu Kebede", "Girma Wolde", "Hanna Belay", "Ismael Mohammed",
+            "Jemal Ahmed", "Kalkidan Tadesse", "Lidya Solomon", "Mulugeta Assefa", "Nardos Girma",
+            "Omar Hassan", "Pulos Tekle", "Quasir Ali", "Rahel Desta", "Samuel Kassa",
+            "Tewodros Kassahun", "Umar Sani", "Violet Getachew", "Wondwosen Adugna", "Yonas Biru", "Zelalem Tsegaye"
+        ];
+
+        function runAIClassifier() {
+            const maxPerClass = parseInt(document.getElementById('maxStudents').value);
+            const container = document.getElementById('classRooms');
+            container.innerHTML = ''; // Clear current view
+
+            // 1. AI Sorting: Alphabetical order
+            const sortedStudents = [...studentPool].sort();
+
+            // 2. Classification: Split into Sections (A, B, C...)
+            let sections = [];
+            for (let i = 0; i < sortedStudents.length; i += maxPerClass) {
+                sections.push(sortedStudents.slice(i, i + maxPerClass));
+            }
+
+            // 3. Render Classroom & Desk Placement
+            sections.forEach((students, index) => {
+                const sectionLetter = String.fromCharCode(65 + index); // A, B, C
+                const card = document.createElement('div');
+                card.className = 'section-card';
+                
+                let deskHtml = '';
+                students.forEach(name => {
+                    const lastName = name.split(' ')[1] || '';
+                    const initials = name[0] + (lastName[0] || '');
+                    deskHtml += `<div class="desk occupied" title="${name}">${initials}</div>`;
+                });
+
+                // Fill remaining empty desks to maintain grid look
+                for(let j = students.length; j < 24; j++) {
+                    deskHtml += `<div class="desk">Empty</div>`;
+                }
+
+                card.innerHTML = `
+                    <div class="section-title">
+                        <strong>Section ${sectionLetter}</strong>
+                        <span>Count: ${students.length}</span>
+                    </div>
+                    <div class="teacher-desk">TEACHER'S PLATFORM</div>
+                    <div class="desk-grid">
+                        ${deskHtml}
+                    </div>
+                    <div style="margin-top:15px; font-size:0.75rem; color:#777;">
+                        <strong>Roster:</strong> ${students.join(', ')}
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+    </script>
+</body>
+</html>

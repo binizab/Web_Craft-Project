@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Calendar Pro · Year Quick Select Overlay</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --primary-light: #eef2ff;
+            --primary-soft: #e0e7ff;
+            --border: #e2e8f0;
+            --text: #1e293b;
+            --text-muted: #64748b;
+            --bg: #ffffff;
+            --bg-overlay: rgba(0, 0, 0, 0.4);
+            --radius-card: 20px;
+            --radius-md: 14px;
+            --radius-sm: 10px;
+            --shadow-lg: 0 25px 40px -12px rgba(0, 0, 0, 0.25);
+            --transition: all 0.2s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+            background: linear-gradient(145deg, #f1f5f9 0%, #eef2ff 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .card {
+            background: var(--bg);
+            padding: 28px 24px 32px;
+            border-radius: var(--radius-card);
+            box-shadow: var(--shadow-lg);
+            border: 1px solid rgba(255,255,255,0.5);
+            width: 100%;
+            max-width: 380px;
+        }
+
+        label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+        }
+
+        label i {
+            width: 16px;
+            height: 16px;
+            stroke-width: 1.8;
+        }
+
+        .calendar-wrapper {
+            position: relative;
+        }
+
+        .calendar-input {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 18px;
+            border: 2px solid var(--border);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            background: white;
+            transition: var(--transition);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+        }
+
+        .calendar-input:hover {
+            border-color: var(--primary);
+            background: #fefeff;
+            box-shadow: 0 4px 10px rgba(99,102,241,0.08);
+        }
+
+        .calendar-input i {
+            color: var(--primary);
+            width: 20px;
+            height: 20px;
+        }
+
+        #selectedDateText {
+            font-weight: 500;
+            color: var(--text);
+            font-size: 0.95rem;
+        }
+
+        .calendar-dropdown {
+            position: absolute;
+            top: calc(100% + 12px);
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            box-shadow: var(--shadow-lg);
+            z-index: 200;
+            padding: 20px 18px;
+            display: none;
+            backdrop-filter: blur(0px);
+        }
+
+        .calendar-dropdown.show {
+            display: block;
+            animation: fadeSlideUp 0.2s ease;
+        }
+
+        @keyframes fadeSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(6px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .year-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-overlay);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            visibility: hidden;
+            opacity: 0;
+            transition: visibility 0.2s, opacity 0.2s ease;
+        }
+
+        .year-overlay.active {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .year-panel {
+            background: white;
+            border-radius: 32px;
+            width: 300px;
+            max-width: 85vw;
+            padding: 20px 16px 24px;
+            box-shadow: 0 30px 50px rgba(0,0,0,0.3);
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.3);
+            transform: scale(0.96);
+            transition: transform 0.2s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+        }
+
+        .year-overlay.active .year-panel {
+            transform: scale(1);
+        }
+
+        .year-panel h3 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .year-panel h3 i {
+            color: var(--primary);
+            width: 24px;
+            height: 24px;
+        }
+
+        .year-scroll-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px 10px;
+            max-height: 320px;
+            overflow-y: auto;
+            padding: 6px 8px;
+            margin-bottom: 20px;
+        }
+
+        .year-btn {
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 40px;
+            padding: 10px 0;
+            font-weight: 600;
+            font-size: 1rem;
+            color: var(--text);
+            cursor: pointer;
+            transition: all 0.18s;
+            font-family: monospace;
+            letter-spacing: 0.5px;
+        }
+
+        .year-btn:hover {
+            background: var(--primary-light);
+            border-color: var(--primary);
+            color: var(--primary-dark);
+            transform: scale(1.02);
+        }
+
+        .year-btn.active-year {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            box-shadow: 0 4px 8px rgba(99,102,241,0.3);
+        }
+
+        .close-year-btn {
+            background: none;
+            border: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            cursor: pointer;
+            margin-top: 8px;
+            padding: 8px 16px;
+            border-radius: 40px;
+            transition: background 0.15s;
+        }
+
+        .close-year-btn:hover {
+            background: #f1f5f9;
+            color: var(--text);
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            background: #fefefe;
+        }
+
+        .year-month-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .year-badge {
+            background: var(--primary-light);
+            padding: 6px 12px;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--primary-dark);
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            letter-spacing: 0.3px;
+        }
+
+        .year-badge:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .year-badge i {
+            width: 14px;
+            height: 14px;
+        }
+
+        .calendar-header h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            background: transparent;
+            color: var(--text);
+        }
+
+        .nav-btn {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 40px;
+            padding: 6px 10px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.18s;
+        }
+
+        .nav-btn:hover {
+            background: var(--primary-light);
+            border-color: var(--primary);
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            text-align: center;
+            margin-top: 8px;
+        }
+
+        .weekday {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            padding-bottom: 10px;
+            letter-spacing: 0.3px;
+        }
+
+        .day {
+            padding: 8px 0;
+            font-size: 0.85rem;
+            font-weight: 500;
+            border-radius: 40px;
+            cursor: pointer;
+            transition: 0.15s;
+        }
+
+        .day:hover:not(.empty) {
+            background: var(--primary-light);
+            color: var(--primary);
+            transform: scale(1.02);
+        }
+
+        .day.selected {
+            background: var(--primary) !important;
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 2px 6px rgba(99,102,241,0.4);
+        }
+
+        .day.today {
+            border: 1.5px solid var(--primary);
+            background: transparent;
+            font-weight: 700;
+            color: var(--primary-dark);
+        }
+
+        .day.empty {
+            cursor: default;
+            opacity: 0.5;
+        }
+
+        .year-scroll-grid::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .year-scroll-grid::-webkit-scrollbar-track {
+            background: #eef2ff;
+            border-radius: 10px;
+        }
+
+        .year-scroll-grid::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <label>
+        <i data-lucide="calendar-days"></i> 
+        <span>Pick a date</span>
+    </label>
+    <div class="calendar-wrapper">
+        <div class="calendar-input" id="calInput">
+            <i data-lucide="calendar"></i>
+            <span id="selectedDateText">Select a date</span>
+        </div>
+
+        <div class="calendar-dropdown" id="calDropdown">
+            <div class="calendar-header">
+                <button class="nav-btn" id="prevMonth"><i data-lucide="chevron-left"></i></button>
+                <div class="year-month-area">
+                    <h4 id="monthDisplay">Month</h4>
+                    <div class="year-badge" id="yearBadgeTrigger">
+                        <span id="currentYearLabel">2025</span>
+                        <i data-lucide="chevron-down" style="width: 14px; height: 14px;"></i>
+                    </div>
+                </div>
+                <button class="nav-btn" id="nextMonth"><i data-lucide="chevron-right"></i></button>
+            </div>
+            <div class="calendar-grid" id="calendarGrid"></div>
+        </div>
+    </div>
+</div>
+
+<div id="yearOverlay" class="year-overlay">
+    <div class="year-panel">
+        <h3>
+            <i data-lucide="calendar-range"></i> 
+            Select Year
+        </h3>
+        <div class="year-scroll-grid" id="yearGridContainer"></div>
+        <button class="close-year-btn" id="closeYearOverlayBtn">Cancel</button>
+    </div>
+</div>
+
+<script>
+    lucide.createIcons();
+
+    // DOM elements
+    const calInput = document.getElementById('calInput');
+    const calDropdown = document.getElementById('calDropdown');
+    const grid = document.getElementById('calendarGrid');
+    const monthDisplay = document.getElementById('monthDisplay');
+    const dateText = document.getElementById('selectedDateText');
+    const yearBadgeTrigger = document.getElementById('yearBadgeTrigger');
+    const currentYearSpan = document.getElementById('currentYearLabel');
+    const yearOverlay = document.getElementById('yearOverlay');
+    const yearGridContainer = document.getElementById('yearGridContainer');
+    const closeYearBtn = document.getElementById('closeYearOverlayBtn');
+    const prevMonthBtn = document.getElementById('prevMonth');
+    const nextMonthBtn = document.getElementById('nextMonth');
+
+    let currentNavDate = new Date();
+    let selectedDate = null;
+
+    function updateYearBadge() {
+        const year = currentNavDate.getFullYear();
+        currentYearSpan.innerText = year;
+    }
+
+    const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    const weekdays = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
+
+    function renderCalendar() {
+        grid.innerHTML = '';
+        const year = currentNavDate.getFullYear();
+        const month = currentNavDate.getMonth();
+        
+        monthDisplay.innerText = `${months[month]} ${year}`;
+        updateYearBadge();
+        
+        weekdays.forEach(day => {
+            const el = document.createElement('div');
+            el.className = 'weekday';
+            el.innerText = day;
+            grid.appendChild(el);
+        });
+        
+        const firstDayOfMonth = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        
+        for (let i = 0; i < firstDayOfMonth; i++) {
+            const emptyDiv = document.createElement('div');
+            emptyDiv.className = 'day empty';
+            emptyDiv.innerText = '';
+            grid.appendChild(emptyDiv);
+        }
+        
+        for (let i = 1; i <= daysInMonth; i++) {
+            const dayDiv = document.createElement('div');
+            dayDiv.className = 'day';
+            dayDiv.innerText = i;
+            
+            const currentDateObj = new Date(year, month, i);
+            const today = new Date();
+            const isToday = (today.getFullYear() === year && today.getMonth() === month && today.getDate() === i);
+            if (isToday) dayDiv.classList.add('today');
+            
+            if (selectedDate && selectedDate.getFullYear() === year && selectedDate.getMonth() === month && selectedDate.getDate() === i) {
+                dayDiv.classList.add('selected');
+            }
+            
+            dayDiv.onclick = (e) => {
+                e.stopPropagation();
+                selectedDate = new Date(year, month, i);
+                const formatted = selectedDate.toLocaleDateString('en-US', { 
+                    month: 'long', 
+                    day: 'numeric', 
+                    year: 'numeric' 
+                });
+                dateText.innerText = formatted;
+                calDropdown.classList.remove('show');
+                renderCalendar();
+            };
+            
+            grid.appendChild(dayDiv);
+        }
+        
+        lucide.createIcons();
+    }
+    
+    function buildYearGrid() {
+        yearGridContainer.innerHTML = '';
+        const currentYear = new Date().getFullYear();
+        const startYear = 1920;
+        const endYear = currentYear + 25;
+        
+        for (let y = startYear; y <= endYear; y++) {
+            const yearBtn = document.createElement('button');
+            yearBtn.className = 'year-btn';
+            yearBtn.innerText = y;
+            
+            const displayYear = currentNavDate.getFullYear();
+            if (y === displayYear) {
+                yearBtn.classList.add('active-year');
+            }
+            
+            yearBtn.onclick = (e) => {
+                e.stopPropagation();
+                const newYear = y;
+                const currentMonth = currentNavDate.getMonth();
+                const oldDay = currentNavDate.getDate();
+                const daysInNewMonth = new Date(newYear, currentMonth + 1, 0).getDate();
+                const safeDay = Math.min(oldDay, daysInNewMonth);
+                currentNavDate = new Date(newYear, currentMonth, safeDay);
+                
+                renderCalendar();
+                yearOverlay.classList.remove('active');
+                lucide.createIcons();
+            };
+            
+            yearGridContainer.appendChild(yearBtn);
+        }
+        
+        const activeYearElem = yearGridContainer.querySelector('.year-btn.active-year');
+        if (activeYearElem) {
+            activeYearElem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        lucide.createIcons();
+    }
+    
+    function openYearOverlay() {
+        buildYearGrid();
+        yearOverlay.classList.add('active');
+        lucide.createIcons();
+    }
+    
+    function closeYearOverlay() {
+        yearOverlay.classList.remove('active');
+    }
+    
+    function closeCalendarDropdown() {
+        calDropdown.classList.remove('show');
+    }
+    
+    function toggleCalendarDropdown() {
+        if (calDropdown.classList.contains('show')) {
+            calDropdown.classList.remove('show');
+        } else {
+            calDropdown.classList.add('show');
+            lucide.createIcons();
+        }
+    }
+    
+    // Event listeners
+    calInput.onclick = (e) => {
+        e.stopPropagation();
+        toggleCalendarDropdown();
+    };
+    
+    prevMonthBtn.onclick = (e) => {
+        e.stopPropagation();
+        currentNavDate = new Date(currentNavDate.getFullYear(), currentNavDate.getMonth() - 1, 1);
+        renderCalendar();
+    };
+    
+    nextMonthBtn.onclick = (e) => {
+        e.stopPropagation();
+        currentNavDate = new Date(currentNavDate.getFullYear(), currentNavDate.getMonth() + 1, 1);
+        renderCalendar();
+    };
+    
+    yearBadgeTrigger.onclick = (e) => {
+        e.stopPropagation();
+        closeCalendarDropdown();
+        openYearOverlay();
+    };
+    
+    closeYearBtn.onclick = () => {
+        closeYearOverlay();
+    };
+    
+    yearOverlay.onclick = (e) => {
+        if (e.target === yearOverlay) {
+            closeYearOverlay();
+        }
+    };
+    
+    document.addEventListener('click', (e) => {
+        if (!calDropdown.contains(e.target) && e.target !== calInput && !calInput.contains(e.target)) {
+            calDropdown.classList.remove('show');
+        }
+    });
+    
+    calDropdown.onclick = (e) => e.stopPropagation();
+    
+    // Initialize
+    currentNavDate = new Date();
+    selectedDate = null;
+    dateText.innerText = "Select a date";
+    renderCalendar();
+    
+    // Refresh icons periodically for dynamic content
+    const refreshIcons = () => lucide.createIcons();
+    setInterval(refreshIcons, 500);
+</script>
+</body>
+</html>

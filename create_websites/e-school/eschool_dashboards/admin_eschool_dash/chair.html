@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EB Academy | Smart Seating Planner</title>
+    <style>
+        :root {
+            --bg: #09090b;
+            --room: #18181b;
+            --desk: #38bdf8;
+            --accent: rgb(55, 73, 212);
+            --text: #ffffff;
+            --border: #27272a;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .controls {
+            padding: 20px;
+            display: flex;
+            gap: 15px;
+            background: #111;
+            width: 100%;
+            justify-content: center;
+            border-bottom: 1px solid var(--border);
+            z-index: 10;
+        }
+
+        .info-panel {
+            background: #111;
+            padding: 10px 40px;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: #888;
+            border-bottom: 1px solid var(--border);
+        }
+
+        button {
+            padding: 10px 20px;
+            background: var(--accent);
+            color: black;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover { opacity: 0.8; transform: translateY(-2px); }
+        .clear-btn { background: #ef4444; color: white; }
+
+        canvas {
+            background-color: var(--room);
+            margin-top: 20px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            cursor: crosshair;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .instruction { position: absolute; bottom: 20px; color: #555; font-size: 0.8rem; }
+    </style>
+</head>
+<body>
+
+    <div class="controls">
+        <button onclick="runAIAlphabetical()">⚡ AI Alphabetical Sort</button>
+        <button onclick="addManualDesk()">➕ Add Custom Desk</button>
+        <button class="clear-btn" onclick="clearRoom()">🗑️ Reset Room</button>
+    </div>
+
+    <div class="info-panel">
+        <div id="statClass">Class: 10th Grade (Natural Science)</div>
+        <div id="statSection">Section: A</div>
+        <div id="statCount">Student Count: 20</div>
+    </div>
+
+    <canvas id="classCanvas"></canvas>
+
+    <div class="instruction">
+        [AI Mode: Auto-places students A-Z] | [Manual: Drag desks to rearrange | Double-click to remove]
+    </div>
+
+<script>
+    const canvas = document.getElementById('classCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // Canvas Settings
+    canvas.width = window.innerWidth * 0.9;
+    canvas.height = window.innerHeight * 0.65;
+
+    // Student Database
+    const students = [
+        "Abebe B.", "Almaz T.", "Biniam Y.", "Chala G.", "Dawit H.", 
+        "Elias M.", "Fantu K.", "Girma W.", "Hanna B.", "Ismael M.",
+        "Jemal A.", "Kalkidan T.", "Lidya S.", "Mulugeta A.", "Nardos G.",
+        "Omar H.", "Pulos T.", "Rahel D.", "Samuel K.", "Tewodros K."
+    ];
+
+    let desks = [];
+    let isDragging = false;
+    let selectedDesk = null;
+    let offset = { x: 0, y: 0 };
+    const deskW = 100;
+    const deskH = 60;
+
+    // --- AI LOGIC: Alphabetical Classification & Row Placement ---
+    function runAIAlphabetical() {
+        desks = [];
+        const sorted = [...students].sort();
+        const padding = 40;
+        const gapX = 120;
+        const gapY = 100;
+        const desksPerRow = Math.floor(canvas.width / gapX);
+
+        sorted.forEach((name, i) => {
+            const row = Math.floor(i / desksPerRow);
+            const col = i % desksPerRow;
+            
+            desks.push({
+                x: padding + (col * gapX),
+                y: 100 + (row * gapY),
+                w: deskW,
+                h: deskH,
+                student: name,
+                color: '#d4af37'
+            });
+        });
+        draw();
+    }
+
+    function addManualDesk() {
+        desks.push({
+            x: 50, y: 50, w: deskW, h: deskH,
+            student: "New Student",
+            color: '#00d4ff'
+        });
+        draw();
+    }
+
+    function clearRoom() {
+        desks = [];
+        draw();
+    }
+
+    function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        // Draw Teacher Platform (Orientation)
+        ctx.fillStyle = "#333";
+        ctx.fillRect(canvas.width/2 - 100, 20, 200, 40);
+        ctx.fillStyle = "white";
+        ctx.font = "bold 12px Inter";
+        ctx.textAlign = "center";
+        ctx.fillText("TEACHER'S FRONT", canvas.width/2, 45);
+
+        // Draw Desks
+        desks.forEach(desk => {
+            // Draw Main Desk
+            ctx.fillStyle = desk.color;
+            ctx.beginPath();
+            ctx.roundRect(desk.x, desk.y, desk.w, desk.h, 8);
+            ctx.fill();
+
+            // Draw Student Name Label
+            ctx.fillStyle = "black";
+            ctx.font = "bold 11px Inter";
+            ctx.fillText(desk.student, desk.x + (desk.w/2), desk.y + 35);
+
+            // Draw Desk ID (Alphabet Pos)
+            ctx.fillStyle = "rgba(0,0,0,0.3)";
+            ctx.font = "9px Inter";
+            ctx.fillText("SEAT " + (desks.indexOf(desk) + 1), desk.x + (desk.w/2), desk.y + 15);
+        });
+    }
+
+    // --- Drag and Drop Engine ---
+    canvas.onmousedown = (e) => {
+        const mouseX = e.offsetX;
+        const mouseY = e.offsetY;
+
+        for (let i = desks.length - 1; i >= 0; i--) {
+            const d = desks[i];
+            if (mouseX > d.x && mouseX < d.x + d.w && mouseY > d.y && mouseY < d.y + d.h) {
+                selectedDesk = d;
+                isDragging = true;
+                offset.x = mouseX - d.x;
+                offset.y = mouseY - d.y;
+                return;
+            }
+        }
+    };
+
+    canvas.onmousemove = (e) => {
+        if (isDragging && selectedDesk) {
+            selectedDesk.x = e.offsetX - offset.x;
+            selectedDesk.y = e.offsetY - offset.y;
+            draw();
+        }
+    };
+
+    canvas.onmouseup = () => {
+        isDragging = false;
+        selectedDesk = null;
+    };
+
+    canvas.ondblclick = (e) => {
+        const mouseX = e.offsetX;
+        const mouseY = e.offsetY;
+        desks = desks.filter(d => !(mouseX > d.x && mouseX < d.x + d.w && mouseY > d.y && mouseY < d.y + d.h));
+        draw();
+    };
+
+    // Initial Layout
+    runAIAlphabetical();
+</script>
+
+</body>
+</html>
