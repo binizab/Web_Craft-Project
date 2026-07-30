@@ -691,7 +691,7 @@ async function launchProject(id) {
     const p = await db.projects.get(id);
     console.log("Launching Project:", p);
     await db.shared.put({ key: 'current_active', data: p });
-    window.open("../home/home.html", "_blank");
+    window.open("https://binizab.github.io/Web_Craft-Project/../home/home.html", "_blank");
 }
 
 async function filterProjects() {
