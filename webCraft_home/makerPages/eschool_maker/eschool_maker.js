@@ -695,7 +695,7 @@ async function launchProject(id) {
     await db.shared.put({ key: 'current_active', data: p });
 
     // 2. Open live preview in a new tab
-    const previewUrl = '../../../../create_websites/e-school/eschool_home/eschool_home.html';
+    const previewUrl = '../../../Web_Craft-Project/create_websites/e-school/eschool_home/eschool_home.html';
     window.open(previewUrl, '_blank');
 
     // 3. Trigger WebCraft-Setup.exe download from GitHub Releases
