@@ -688,10 +688,20 @@ async function deleteProject(id) {
 }
 
 async function launchProject(id) {
-    const p = await db.projects.get(id);
-    console.log("Launching Project:", p);
-    await db.shared.put({ key: 'current_active', data: p });
-    window.open("https://binizab.github.io/Web_Craft-Projectcreate_websites/e-commerce/ecommerce_home/ecommerce_home.html", "_blank");
+    try {
+        const p = await db.projects.get(id);
+        console.log("Launching Project:", p);
+
+        // 1. Save project data to Dexie shared store
+        await db.shared.put({ key: 'current_active', data: p });
+
+        // 2. Open live preview in a new tab (added missing slash and fixed window.open)
+        const previewUrl = 'https://binizab.github.io/Web_Craft-Project/create_websites/e-commerce/ecommerce_home/ecommerce_home.html';
+        window.open(previewUrl, '_blank');
+
+    } catch (error) {
+        console.error("Error launching project:", error);
+    }
 }
 
 async function filterProjects() {
