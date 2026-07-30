@@ -688,23 +688,29 @@ async function deleteProject(id) {
 }
 
 async function launchProject(id) {
-    const p = await db.projects.get(id);
-    console.log("Launching Project:", p);
+    try {
+        const p = await db.projects.get(id);
+        console.log("Launching Project:", p);
 
-    // 1. Save project data to Dexie shared store
-    await db.shared.put({ key: 'current_active', data: p });
+        // 1. Save project data to Dexie shared store
+        await db.shared.put({ key: 'current_active', data: p });
 
-    // 2. Open live preview in a new tab
-const previewUrl = 'https://binizab.github.io/Web_Craft-Project/Web_Craft-Project/create_websites/e-school/eschool_home/eschool_home.html';    window.open(previewUrl, '_blank');
+        // 2. Open live preview in a new tab (Fixed single repo path)
+        const previewUrl = 'https://binizab.github.io/Web_Craft-Project/create_websites/e-school/eschool_home/eschool_home.html';
+        window.open(previewUrl, '_blank');
 
-    // 3. Trigger WebCraft-Setup.exe download from GitHub Releases
-    const downloadLink = document.createElement('a');
-    downloadLink.href = 'https://github.com/binizab/Web_Craft-Project/releases/download/v1.0.0/WebCraft-Setup.exe';
-    downloadLink.download = 'WebCraft-Setup.exe';
+        // 3. Trigger WebCraft-Setup.exe download from GitHub Releases
+        const downloadLink = document.createElement('a');
+        downloadLink.href = 'https://github.com/binizab/Web_Craft-Project/releases/download/v1.0.0/WebCraft-Setup.exe';
+        downloadLink.download = 'WebCraft-Setup.exe';
+        
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        downloadLink.remove();
 
-    document.body.appendChild(downloadLink);
-    downloadLink.click();
-    document.body.removeChild(downloadLink);
+    } catch (error) {
+        console.error("Error launching project:", error);
+    }
 }
 
 // ==================== EDIT MODE - RESTORE DATA ====================
