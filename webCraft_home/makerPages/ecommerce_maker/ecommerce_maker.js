@@ -696,7 +696,7 @@ async function launchProject(id) {
         await db.shared.put({ key: 'current_active', data: p });
 
         // 2. Open live preview in a new tab (added missing slash and fixed window.open)
-        const previewUrl = 'https://binizab.github.io/Web_Craft-Project/Web_Craft-Project/create_websites/e-commerce/ecommerce_home/ecommerce_home.html';
+        const previewUrl = 'https://binizab.github.io/Web_Craft-Project/create_websites/e-commerce/ecommerce_home/ecommerce_home.html';
         window.open(previewUrl, '_blank');
 
     } catch (error) {
