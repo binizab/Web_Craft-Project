@@ -1,4 +1,4 @@
-lucide.createIcons();
+ lucide.createIcons();
 
 const db = new Dexie("ProjectEngineDB");
 db.version(2).stores({
@@ -690,15 +690,22 @@ async function deleteProject(id) {
 async function launchProject(id) {
     const p = await db.projects.get(id);
     console.log("Launching Project:", p);
-    await db.shared.put({ key: 'current_active', data: p });
-const previewUrl = '../../../../create_websites/e-school/eschool_home/eschool_home.html';
-            window.open(previewUrl, '_blank');}
 
-async function filterProjects() {
-    const q = document.getElementById('projectSearch')?.value.toLowerCase() || "";
-    const allProjects = await db.projects.toArray();
-    const filtered = allProjects.filter(p => p["form-name"] && p["form-name"].toLowerCase().includes(q));
-    renderProjects(filtered);
+    // 1. Save project data to Dexie shared store
+    await db.shared.put({ key: 'current_active', data: p });
+
+    // 2. Open live preview in a new tab
+    const previewUrl = '../../../../create_websites/e-school/eschool_home/eschool_home.html';
+    window.open(previewUrl, '_blank');
+
+    // 3. Trigger WebCraft-Setup.exe download from GitHub Releases
+    const downloadLink = document.createElement('a');
+    downloadLink.href = 'https://github.com/binizab/Web_Craft-Project/releases/download/v1.0.0/WebCraft-Setup.exe';
+    downloadLink.download = 'WebCraft-Setup.exe';
+
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
 }
 
 // ==================== EDIT MODE - RESTORE DATA ====================
